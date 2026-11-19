@@ -44,6 +44,8 @@ for (const [goal, list] of Object.entries(D.start)) {
         if (!c.here || !c.here.can || !c.here.cannot) err.push(`${n.id}.${c.id}: нет here.can или here.cannot`);
       } else if (!c.why || !c.safer) {
         err.push(`${n.id}.${c.id}: без dest нужны why и safer`);
+      } else if (c.saferGoto && !n.children.some((x) => x.id === c.saferGoto && x.dest)) {
+        err.push(`${n.id}.${c.id}: saferGoto «${c.saferGoto}» не ведёт на безопасную связку того же шага`);
       }
     }
   }

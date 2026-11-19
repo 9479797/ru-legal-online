@@ -222,10 +222,10 @@ function fineRows(keys) {
 
 function list(items) { return '<ul>' + items.map((x) => '<li>' + esc(x) + '</li>').join('') + '</ul>'; }
 
-function finalPanel(link, p) {
+function finalPanel(link, p, from) {
   const who = D.formWho[S.form];
-  const can = (link ? '<h4>В Instagram</h4>' + list(link.here.can) + '<h4>' + esc(p.name) + '</h4>' : '') + list(p.can);
-  const cannot = (link ? '<h4>В Instagram</h4>' + list(link.here.cannot) + '<h4>' + esc(p.name) + '</h4>' : '') + list(p.cannot);
+  const can = (link ? '<h4>' + esc(from) + '</h4>' + list(link.here.can) + '<h4>' + esc(p.name) + '</h4>' : '') + list(p.can);
+  const cannot = (link ? '<h4>' + esc(from) + '</h4>' + list(link.here.cannot) + '<h4>' + esc(p.name) + '</h4>' : '') + list(p.cannot);
   const fines = (link ? link.fines : []).concat(p.fines || []);
   const checks = (p.check || []).filter((c) => !c.forms || c.forms.includes(S.form));
   return '<div class="row" style="align-items:stretch">' +
@@ -235,10 +235,12 @@ function finalPanel(link, p) {
     (checks.length ? '<div class="check"><span class="disp" style="font-size:15px;font-weight:600;margin-right:6px">Перед первым постом</span>' + checks.map((c, i) => '<span class="chip">' + (i + 1) + ' · ' + esc(c.text) + '</span>').join('') + '</div>' : '');
 }
 
-function redPanel(link) {
+function redPanel(link, siblings) {
+  const go = link.saferGoto || 'author';
+  const target = (siblings || []).find((x) => x.id === go);
   return '<div class="row" style="align-items:stretch">' +
     '<div class="big" style="background:var(--r)"><h3>Почему нельзя</h3>' + list(link.why) + '</div>' +
-    '<div class="big" style="background:var(--g)"><h3>Как сделать безопаснее</h3><p style="margin:0;font-size:14px;font-weight:500">' + esc(link.safer) + '</p><button type="button" class="wbtn" style="align-self:flex-start;color:#0B6E58" data-goto="author">Открыть связку «Через имя автора»</button></div>' +
+    '<div class="big" style="background:var(--g)"><h3>Как сделать безопаснее</h3><p style="margin:0;font-size:14px;font-weight:500">' + esc(link.safer) + '</p><button type="button" class="wbtn" style="align-self:flex-start;color:#0B6E58" data-goto="' + esc(go) + '">Открыть связку «' + esc(target ? target.name : 'Через имя автора') + '»</button></div>' +
     '<div class="big" style="background:var(--brand)"><h3>Ответственность ' + esc(D.formWho[S.form]) + '</h3>' + fineRows(link.fines) + '</div></div>';
 }
 
@@ -262,10 +264,10 @@ function render() {
     if (a && a.children) {
       html += step(2, a.nextTitle, '', '<div class="row">' + a.children.map((n) => card(n, 1, S.path[1])).join('') + '</div>');
       if (b && b.dest) {
-        html += step(3, 'Куда ведёт «' + b.name + '»', 'где продаёте книгу', '<div class="row">' + b.dest.map((k) => card(place(k), 2, S.path[2])).join('') + '</div>');
-        if (d) html += step(4, d.name + ' в этой связке', '', finalPanel(b, d));
+        html += step(3, 'Куда ведёт «' + b.name + '»', 'где продаёте', '<div class="row">' + b.dest.map((k) => card(place(k), 2, S.path[2])).join('') + '</div>');
+        if (d) html += step(4, d.name + ' в этой связке', '', finalPanel(b, d, a.name));
       } else if (b) {
-        html += step(3, 'Почему так нельзя', '', redPanel(b));
+        html += step(3, 'Почему так нельзя', '', redPanel(b, a.children));
       }
     } else if (a) {
       html += step(2, a.name + ': если продаёте здесь', '', finalPanel(null, a));
