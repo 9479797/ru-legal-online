@@ -13,6 +13,7 @@ ru-legal-online/
 ├── CLAUDE.md              короткая версия правил для Claude Code
 ├── CHANGELOG.md           журнал изменений норм с датами и источниками
 ├── docs/
+│   ├── fas-ponyatie-reklamy.md  конспект руководства ФАС «Понятие рекламы»
 │   ├── istochniki.md      официальные источники и ключевые нормы
 │   └── ustanovka.md       как подключить навыки и как они связаны
 ├── scripts/
