@@ -5,11 +5,14 @@
 - есть фронтматтер с name и description;
 - name совпадает с именем папки;
 - description не длиннее 1024 символов;
-- нет запрещённых оборотов из AGENTS.md.
+- нет запрещённых оборотов из AGENTS.md;
+- данные схемы site/data.js ссылаются только на существующие штрафы и площадки (нужен Node.js).
 Печатает число пунктов [ПРОВЕРЯТЬ] по навыкам.
 Код выхода 1, если есть ошибки.
 """
 import pathlib
+import shutil
+import subprocess
 import re
 import sys
 
@@ -40,6 +43,19 @@ def frontmatter(text):
     return data
 
 
+def proverka_skhemy():
+    """Запускает проверку данных схемы site/data.js, если установлен Node.js."""
+    if not (ROOT / "site" / "data.js").exists():
+        return []
+    node = shutil.which("node")
+    if not node:
+        print("Схема: Node.js не найден, проверка данных схемы пропущена.")
+        return []
+    r = subprocess.run([node, str(ROOT / "scripts" / "proverka_skhemy.js")], capture_output=True, text=True)
+    print(r.stdout.strip())
+    return [] if r.returncode == 0 else ["данные схемы site/data.js: см. вывод выше"]
+
+
 def main():
     oshibki = []
     print(f"{'навык':32} [ПРОВЕРЯТЬ]")
@@ -62,6 +78,8 @@ def main():
             if z in nizhn:
                 oshibki.append(f"{papka}: запрещённый оборот «{z}»")
         print(f"{papka:32} {text.count('[ПРОВЕРЯТЬ')}")
+    print()
+    oshibki += proverka_skhemy()
     if oshibki:
         print("\nОшибки:")
         for o in oshibki:
