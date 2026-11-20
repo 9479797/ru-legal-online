@@ -261,12 +261,12 @@ function render() {
   if (!goal.ready) {
     html = step(1, 'Где вы начинаете', '', '<div class="note"><p style="margin:0 0 12px">Схема для цели «' + esc(goal.name) + '» пока наполняется. Сейчас готовы ветки «Продать книгу», «Продать онлайн-курс» и «Продать сопровождение родов».</p><button type="button" class="cta" data-goal="book">Открыть ветку «Продать книгу»</button> <button type="button" class="cta" data-goal="doula">Открыть «Сопровождение родов»</button></div>');
   } else {
-    html += step(1, 'Где вы начинаете', 'цвет полосы — риск рекламы на площадке', '<div class="row">' + level1().map((n) => card(n, 0, S.path[0])).join('') + '</div>');
+    html += step(1, goal.startTitle || 'Где вы начинаете', goal.startHint || 'цвет полосы — риск рекламы на площадке', '<div class="row">' + level1().map((n) => card(n, 0, S.path[0])).join('') + '</div>');
     const [a, b, d] = c;
     if (a && a.children) {
       html += step(2, a.nextTitle, '', '<div class="row">' + a.children.map((n) => card(n, 1, S.path[1])).join('') + '</div>');
       if (b && b.dest) {
-        html += step(3, 'Куда ведёт «' + b.name + '»', 'где продаёте', '<div class="row">' + b.dest.map((k) => card(place(k), 2, S.path[2])).join('') + '</div>');
+        html += step(3, 'Куда ведёт «' + b.name + '»', goal.destHint || 'где продаёте', '<div class="row">' + b.dest.map((k) => card(place(k), 2, S.path[2])).join('') + '</div>');
         if (d) html += step(4, d.name + ' в этой связке', '', finalPanel(b, d, a.name));
       } else if (b) {
         html += step(3, 'Почему так нельзя', '', redPanel(b, a.children));
