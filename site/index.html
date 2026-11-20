@@ -38,7 +38,9 @@ button:focus-visible,select:focus-visible,a:focus-visible{outline:3px solid #8E9
 main{position:relative;z-index:1;max-width:1240px;margin:0 auto;padding:18px max(3vw,16px) 0;display:flex;flex-direction:column;gap:28px}
 .hero{display:flex;flex-wrap:wrap;gap:18px 28px;align-items:center;padding:22px;border-radius:24px;background:var(--brand);color:#fff;box-shadow:0 16px 40px rgba(91,103,221,.28)}
 .hero h1{margin:6px 0 8px;font-size:clamp(30px,4vw,40px);font-weight:700;line-height:1}
-.hero p{margin:0;max-width:460px;color:rgba(255,255,255,.94)}
+.hero p{margin:0 0 8px;max-width:560px;color:rgba(255,255,255,.94)}
+.hero .theme-note{padding:10px 14px;border-radius:14px;background:rgba(255,255,255,.16);font-size:14px}
+.hero .start-note{margin:0;font-weight:700}
 .tag{display:inline-flex;align-items:center;min-height:26px;padding:0 12px;border-radius:999px;border:1px solid rgba(255,255,255,.7);font-size:11.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase}
 .fields{flex:0 1 340px;display:flex;flex-direction:column;gap:10px}
 .fields label{display:block;margin-bottom:5px;font-size:12.5px;font-weight:700;color:rgba(255,255,255,.94)}
@@ -98,7 +100,11 @@ dialog::backdrop{background:rgba(20,21,34,.45)}
 .mini{display:flex;flex-direction:column;gap:6px;padding:12px;border-radius:16px;background:#fff;color:#1F2033;font-size:13.5px}
 .ml{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:5px}
 .lab{align-self:flex-start;padding:2px 9px;border-radius:999px;color:#fff;font-family:Oswald,sans-serif;font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase}
-@media(max-width:600px){.opt{flex:1 1 100%;max-width:none}.tools{margin-left:0;width:100%;justify-content:space-between}.two{grid-template-columns:minmax(0,1fr)}.foot{padding:18px}}
+@media(max-width:600px){.opt{flex:1 1 100%;max-width:none}.tools{margin-left:0;width:100%;justify-content:space-between}.two{grid-template-columns:minmax(0,1fr)}.foot{padding:18px}
+.top{position:static}.bar{gap:8px;padding:8px 14px}.word{font-size:15px}.crumbs{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;width:100%}.crumb{flex:0 0 auto}.seg button{font-size:0;gap:0;padding:0 10px}.seg button svg{width:16px;height:16px}.cta{min-height:36px}.hero{padding:18px}.hero h1{font-size:26px}}
+.savebar{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
+#print{display:none}
+@media print{body{background:#fff;color:#000;font:12pt/1.45 Manrope,Arial,sans-serif}body>*:not(#print){display:none!important}#print{display:block}#print h1{font-size:18pt;margin:0 0 6pt}#print h2{font-size:13pt;margin:12pt 0 4pt;text-transform:uppercase}#print ul{margin:0;padding-left:18pt}#print .pl{margin-top:14pt;font-size:10pt;color:#444}}
 @media(prefers-reduced-motion:reduce){.opt{transition:none}.opt:hover{transform:none}}
 </style>
 </head>
@@ -124,9 +130,11 @@ dialog::backdrop{background:rgba(20,21,34,.45)}
 <main>
 <section class="hero" aria-labelledby="h0">
 <div style="flex:1 1 360px">
-<span class="tag">Шаг 00</span>
-<h1 id="h0" class="disp">Ваш проект</h1>
-<p>Ответьте на два вопроса — схема покажет безопасные пути для вашего статуса и цели.</p>
+<span class="tag">Что это за сайт</span>
+<h1 id="h0" class="disp">Продажи и реклама онлайн-проекта по закону РФ</h1>
+<p>Для экспертов, которые продают в интернете курсы, гайды, консультации и сопровождение. Схема показывает, где можно рекламироваться и продавать, какие пути рискованные, что делать нельзя и какие штрафы грозят.</p>
+<p class="theme-note"><b>Тема примеров:</b> медицина и здоровье — питание, спорт, сон, психология, красота, беременность и дети. Здесь правила строже: нельзя обещать лечебный эффект, использовать образ врача, нужно особое согласие на данные о здоровье. Общие правила рекламы и продаж подходят для любой темы.</p>
+<p class="start-note">Начните с двух вопросов: как вы оформлены и что хотите продать.</p>
 </div>
 <div class="fields">
 <div><label for="form">Как вы оформлены</label><div class="sw"><select id="form"></select><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4F5BD5" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></div></div>
@@ -135,6 +143,7 @@ dialog::backdrop{background:rgba(20,21,34,.45)}
 </section>
 <div id="steps" style="display:flex;flex-direction:column;gap:28px"></div>
 </main>
+<div id="print" aria-hidden="true"></div>
 
 <footer>
 <div class="foot">
@@ -272,16 +281,53 @@ function render() {
       html += step(2, a.nextTitle, '', '<div class="row">' + a.children.map((n) => card(n, 1, S.path[1])).join('') + '</div>');
       if (b && b.dest) {
         html += step(3, 'Куда ведёт «' + b.name + '»', goal.destHint || 'где продаёте', '<div class="row">' + b.dest.map((k) => card(place(k), 2, S.path[2])).join('') + '</div>');
-        if (d) html += step(4, d.name + ' в этой связке', '', finalPanel(b, d, a.name));
+        if (d) html += step(4, d.name + ' в этой связке', '', finalPanel(b, d, a.name) + saveBar());
       } else if (b) {
-        html += step(3, 'Почему так нельзя', '', redPanel(b, a.children));
+        html += step(3, 'Почему так нельзя', '', redPanel(b, a.children) + saveBar());
       }
     } else if (a) {
-      html += step(2, a.name + ': если продаёте здесь', '', finalPanel(null, a));
+      html += step(2, a.name + ': если продаёте здесь', '', finalPanel(null, a) + saveBar());
     }
   }
   $('#steps').innerHTML = html;
   $('#legal').textContent = 'Это разбор, а не юридическое заключение. Нормы сверены ' + D.checked + '. Пометка «сверить» — сумма или норма ещё проверяется. Спорные случаи проверьте у юриста по рекламному праву.';
+}
+
+/* Итог для печати, PDF или текстового файла */
+function saveBar() {
+  return '<div class="savebar"><button type="button" class="cta" data-save="print">Сохранить итог: печать или PDF</button><button type="button" class="wbtn" data-save="txt">Скачать итог текстом</button></div>';
+}
+
+function summaryParts() {
+  const goal = D.goals.find((g) => g.id === S.goal);
+  const [a, b, d] = chain();
+  const F = (keys) => [...new Set(keys)].map((k) => D.fines[k]).filter(Boolean).map((f) => f.title + ': ' + fv(f) + ' (' + f.law + ')' + (f.verify ? ' — сверить' : ''));
+  const out = { title: goal.name + ' · ' + curForm().name, path: [a, b, d].filter(Boolean).map((n) => n.name).join(' → '), blocks: [] };
+  if (curForm().note) out.blocks.push(['Ваш статус', [curForm().note]]);
+  if (b && b.why) {
+    out.blocks.push(['Почему нельзя', b.why], ['Как сделать безопаснее', [b.safer]], ['Ответственность', F(b.fines || [])]);
+  } else {
+    const link = d ? b : null, p = d || a;
+    out.blocks.push(['Можно', (link ? link.here.can : []).concat(p.can || [])], ['Нельзя', (link ? link.here.cannot : []).concat(p.cannot || [])],
+      ['Ответственность', F((link ? link.fines : []).concat(p.fines || []))],
+      ['Перед первым постом', (p.check || []).filter((c) => !c.forms || c.forms.some((x) => curForm().tags.includes(x))).map((c) => c.text)]);
+  }
+  out.blocks = out.blocks.filter((x) => x[1].length);
+  out.legal = 'Это разбор, а не юридическое заключение. Нормы сверены ' + D.checked + '. Спорные случаи проверьте у юриста.';
+  return out;
+}
+
+function saveResult(kind) {
+  const r = summaryParts();
+  if (kind === 'txt') {
+    const txt = ['Итог: ' + r.title, 'Путь: ' + r.path, ''].concat(r.blocks.flatMap(([t, items]) => [t.toUpperCase()].concat(items.map((x) => '— ' + x), ''))).concat([r.legal, location.href.split('#')[0]]).join('\n');
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([txt], { type: 'text/plain;charset=utf-8' }));
+    a.download = 'itog-skhemy.txt'; document.body.appendChild(a); a.click(); a.remove();
+    return;
+  }
+  $('#print').innerHTML = '<h1>Итог: ' + esc(r.title) + '</h1><p><b>Путь:</b> ' + esc(r.path) + '</p>' + r.blocks.map(([t, items]) => '<h2>' + esc(t) + '</h2><ul>' + items.map((x) => '<li>' + esc(x) + '</li>').join('') + '</ul>').join('') + '<p class="pl">' + esc(r.legal) + '</p>';
+  window.print();
 }
 
 function findAt(level, id) {
@@ -313,6 +359,8 @@ function scrollTo(num) {
 }
 
 document.addEventListener('click', (e) => {
+  const s = e.target.closest('[data-save]');
+  if (s) { saveResult(s.dataset.save); return; }
   const t = e.target.closest('[data-pick],[data-more],[data-fines],[data-crumb],[data-goto],[data-goal],[data-explain],[data-theme-set]');
   if (!t) return;
   if (t.dataset.pick !== undefined) {
