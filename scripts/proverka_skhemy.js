@@ -11,10 +11,12 @@ vm.runInNewContext(fs.readFileSync(file, 'utf8'), ctx, { filename: file });
 const D = ctx.window.SCHEMA;
 const err = [];
 const forms = D.forms.map((f) => f.id);
+const tags = new Set(D.forms.flatMap((f) => f.tags || [f.id]));
+D.forms.forEach((f) => { if (!['self', 'ip', 'ooo'].includes(f.col)) err.push(`форма ${f.id}: колонка col «${f.col}» не self, ip или ooo`); if (!(f.id in D.formWho)) err.push(`форма ${f.id}: нет подписи в formWho`); });
 const risks = ['g', 'y', 'r'];
 
 for (const [k, f] of Object.entries(D.fines)) {
-  for (const fm of forms) if (!f[fm]) err.push(`штраф ${k}: нет суммы для формы ${fm}`);
+  for (const fo of D.forms) if (!f[fo.id] && !f[fo.col]) err.push(`штраф ${k}: нет суммы для формы ${fo.id}`);
   if (!f.title || !f.law) err.push(`штраф ${k}: нет title или law`);
 }
 const fineRefs = (where, list) => (list || []).forEach((k) => { if (!D.fines[k]) err.push(`${where}: нет штрафа «${k}»`); });
@@ -24,7 +26,7 @@ for (const [k, p] of Object.entries(D.places)) {
   for (const f of ['name', 'short', 'details']) if (!p[f]) err.push(`площадка ${k}: нет ${f}`);
   if (!p.can || !p.cannot) err.push(`площадка ${k}: нет can или cannot`);
   fineRefs(`площадка ${k}`, p.fines);
-  (p.check || []).forEach((c) => (c.forms || []).forEach((fm) => { if (!forms.includes(fm)) err.push(`площадка ${k}: форма «${fm}» в check`); }));
+  (p.check || []).forEach((c) => (c.forms || []).forEach((fm) => { if (!tags.has(fm)) err.push(`площадка ${k}: форма «${fm}» в check`); }));
 }
 
 let uzly = 0;

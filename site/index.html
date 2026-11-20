@@ -126,10 +126,10 @@ dialog::backdrop{background:rgba(20,21,34,.45)}
 <div style="flex:1 1 360px">
 <span class="tag">Шаг 00</span>
 <h1 id="h0" class="disp">Ваш проект</h1>
-<p>Ответьте на два вопроса — схема покажет безопасные пути для вашей формы работы и цели.</p>
+<p>Ответьте на два вопроса — схема покажет безопасные пути для вашего статуса и цели.</p>
 </div>
 <div class="fields">
-<div><label for="form">Форма работы</label><div class="sw"><select id="form"></select><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4F5BD5" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></div></div>
+<div><label for="form">Как вы оформлены</label><div class="sw"><select id="form"></select><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4F5BD5" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></div></div>
 <div><label for="goal">Цель</label><div class="sw"><select id="goal"></select><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4F5BD5" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></div></div>
 </div>
 </section>
@@ -140,7 +140,7 @@ dialog::backdrop{background:rgba(20,21,34,.45)}
 <div class="foot">
 <div style="flex:1 1 340px;display:flex;flex-direction:column;gap:10px">
 <span class="tag" style="align-self:flex-start">Как пользоваться</span>
-<p>Выберите форму работы и цель. Затем площадку, с которой начинаете. Ниже по шагам откроются варианты связок, их риск и то, что можно и нельзя делать. Кнопка «Ответственность» показывает штрафы для вашей формы работы.</p>
+<p>Выберите, как вы оформлены, и цель. Затем площадку, с которой начинаете. Ниже по шагам откроются варианты связок, их риск и то, что можно и нельзя делать. Кнопка «Ответственность» показывает штрафы для вашего статуса.</p>
 <div style="display:flex;flex-wrap:wrap;gap:8px" role="list" aria-label="Обозначения риска">
 <span role="listitem" class="wbtn" style="color:#0B6E58;cursor:default"><span class="dot" style="background:var(--g)" aria-hidden="true"></span>Без риска</span>
 <span role="listitem" class="wbtn" style="color:#7A5300;cursor:default"><span class="dot" style="background:var(--y)" aria-hidden="true"></span>Низкий риск</span>
@@ -213,12 +213,17 @@ function step(num, title, hint, body) {
   return '<section class="step" id="step-' + num + '" aria-labelledby="st-' + num + '"><div class="sh"><span class="num" aria-hidden="true">0' + num + '</span><h2 id="st-' + num + '">' + esc(title) + '</h2>' + (hint ? '<span class="hint">' + esc(hint) + '</span>' : '') + '</div>' + body + '</section>';
 }
 
+/* Сумма штрафа для выбранной формы: своя строка у штрафа или колонка col этой формы */
+function curForm() { return D.forms.find((f) => f.id === S.form) || D.forms[0]; }
+function fv(f) { return f[S.form] != null ? f[S.form] : f[curForm().col]; }
+function formNote() { const n = curForm().note; return n ? '<div class="fine"><span><b>Ваш статус:</b> ' + esc(n) + '</span></div>' : ''; }
+
 function fineRows(keys) {
   const seen = [...new Set(keys)];
   return seen.map((k) => {
     const f = D.fines[k];
     if (!f) return '';
-    return '<div class="fine"><span><b>' + esc(f.title) + ':</b> ' + esc(f[S.form]) + (f.verify ? '<span class="vf">сверить</span>' : '') + '</span><small>' + esc(f.law) + '</small></div>';
+    return '<div class="fine"><span><b>' + esc(f.title) + ':</b> ' + esc(fv(f)) + (f.verify ? '<span class="vf">сверить</span>' : '') + '</span><small>' + esc(f.law) + '</small></div>';
   }).join('');
 }
 
@@ -229,11 +234,11 @@ function finalPanel(link, p, from) {
   const can = (link ? '<h4>' + esc(from) + '</h4>' + list(link.here.can) + '<h4>' + esc(p.name) + '</h4>' : '') + list(p.can);
   const cannot = (link ? '<h4>' + esc(from) + '</h4>' + list(link.here.cannot) + '<h4>' + esc(p.name) + '</h4>' : '') + list(p.cannot);
   const fines = (link ? link.fines : []).concat(p.fines || []);
-  const checks = (p.check || []).filter((c) => !c.forms || c.forms.includes(S.form));
+  const checks = (p.check || []).filter((c) => !c.forms || c.forms.some((x) => curForm().tags.includes(x)));
   return '<div class="row" style="align-items:stretch">' +
     '<div class="big" style="background:var(--g)"><h3>Можно</h3>' + can + '</div>' +
     '<div class="big" style="background:var(--r)"><h3>Нельзя</h3>' + cannot + '</div>' +
-    '<div class="big" style="background:var(--brand)"><h3>Ответственность ' + esc(who) + '</h3>' + fineRows(fines) + '</div></div>' +
+    '<div class="big" style="background:var(--brand)"><h3>Ответственность ' + esc(who) + '</h3>' + formNote() + fineRows(fines) + '</div></div>' +
     (checks.length ? '<div class="check"><span class="disp" style="font-size:15px;font-weight:600;margin-right:6px">Перед первым постом</span>' + checks.map((c, i) => '<span class="chip">' + (i + 1) + ' · ' + esc(c.text) + '</span>').join('') + '</div>' : '');
 }
 
@@ -243,7 +248,7 @@ function redPanel(link, siblings) {
   return '<div class="row" style="align-items:stretch">' +
     '<div class="big" style="background:var(--r)"><h3>Почему нельзя</h3>' + list(link.why) + '</div>' +
     '<div class="big" style="background:var(--g)"><h3>Как сделать безопаснее</h3><p style="margin:0;font-size:14px;font-weight:500">' + esc(link.safer) + '</p><button type="button" class="wbtn" style="align-self:flex-start;color:#0B6E58" data-goto="' + esc(go) + '">Открыть связку «' + esc(target ? target.name : 'Через имя автора') + '»</button></div>' +
-    '<div class="big" style="background:var(--brand)"><h3>Ответственность ' + esc(D.formWho[S.form]) + '</h3>' + fineRows(link.fines) + '</div></div>';
+    '<div class="big" style="background:var(--brand)"><h3>Ответственность ' + esc(D.formWho[S.form]) + '</h3>' + formNote() + fineRows(link.fines) + '</div></div>';
 }
 
 function render() {
@@ -322,7 +327,7 @@ document.addEventListener('click', (e) => {
     const n = findAt(+t.dataset.fines, t.dataset.id);
     if (n) openDlg(head('Что грозит', n.name + ' · ' + D.formWho[S.form], n.risk) + (n.fines || []).map((k) => {
       const f = D.fines[k];
-      return f ? '<div class="kv"><b>' + esc(f.title) + '</b><span>' + esc(f[S.form]) + (f.verify ? ' <span class="vf" style="background:var(--soft)">сверить</span>' : '') + '</span><span class="lw">' + esc(f.law) + (f.note ? ' · ' + esc(f.note) : '') + '</span></div>' : '';
+      return f ? '<div class="kv"><b>' + esc(f.title) + '</b><span>' + esc(fv(f)) + (f.verify ? ' <span class="vf" style="background:var(--soft)">сверить</span>' : '') + '</span><span class="lw">' + esc(f.law) + (f.note ? ' · ' + esc(f.note) : '') + '</span></div>' : '';
     }).join(''));
   } else if (t.dataset.crumb !== undefined) {
     S.path = S.path.slice(0, +t.dataset.crumb);
