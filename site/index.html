@@ -112,7 +112,8 @@ dialog::backdrop{background:rgba(20,21,34,.45)}
 .lab{align-self:flex-start;padding:2px 9px;border-radius:999px;color:#fff;font-family:Oswald,sans-serif;font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase}
 @media(max-width:600px){.opt{flex:1 1 100%;max-width:none}.tools{margin-left:0;width:100%;justify-content:space-between}.two{grid-template-columns:minmax(0,1fr)}.foot{padding:18px}
 .top{position:static}.bar{gap:8px;padding:8px 14px}.word{font-size:15px}.crumbs{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;width:100%}.crumb{flex:0 0 auto}.seg button{font-size:0;gap:0;padding:0 10px}.seg button svg{width:16px;height:16px}.cta{min-height:36px}.hero{padding:18px}.hero h1{font-size:26px}}
-.savebar{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
+.savebar{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:14px}
+.savemsg{font-size:13px;color:var(--muted)}
 #print{display:none}
 @media print{body{background:#fff;color:#000;font:12pt/1.45 Manrope,Arial,sans-serif}body>*:not(#print){display:none!important}#print{display:block}#print h1{font-size:18pt;margin:0 0 6pt}#print h2{font-size:13pt;margin:12pt 0 4pt;text-transform:uppercase}#print ul{margin:0;padding-left:18pt}#print .pl{margin-top:14pt;font-size:10pt;color:#444}}
 @media(prefers-reduced-motion:reduce){.opt{transition:none}.opt:hover{transform:none}}
@@ -307,7 +308,7 @@ function render() {
 
 /* Итог для печати, PDF или текстового файла */
 function saveBar() {
-  return '<div class="savebar"><button type="button" class="cta" data-save="print">Сохранить итог: печать или PDF</button><button type="button" class="wbtn" data-save="txt">Скачать итог текстом</button></div>';
+  return '<div class="savebar"><button type="button" class="cta" data-save="print">Сохранить итог: печать или PDF</button><button type="button" class="wbtn" data-save="file">Скачать итог файлом</button><span class="savemsg" role="status"></span></div>';
 }
 
 function summaryParts() {
@@ -329,16 +330,33 @@ function summaryParts() {
   return out;
 }
 
-function saveResult(kind) {
+/* Скачивание файла: в опубликованной странице — через возможность downloads, локально — обычной ссылкой */
+let dlPromise = null;
+function downloadsApi() {
+  if (!window.claude || typeof window.claude.use !== 'function') return Promise.resolve(null);
+  if (!dlPromise) dlPromise = window.claude.use('downloads').catch(() => null);
+  return dlPromise;
+}
+
+async function saveResult(kind) {
   const r = summaryParts();
-  if (kind === 'txt') {
-    const txt = ['Итог: ' + r.title, 'Путь: ' + r.path, ''].concat(r.blocks.flatMap(([t, items]) => [t.toUpperCase()].concat(items.map((x) => '— ' + x), ''))).concat([r.legal, location.href.split('#')[0]]).join('\n');
+  const body = '<h1>Итог: ' + esc(r.title) + '</h1><p><b>Путь:</b> ' + esc(r.path) + '</p>' + r.blocks.map(([t, items]) => '<h2>' + esc(t) + '</h2><ul>' + items.map((x) => '<li>' + esc(x) + '</li>').join('') + '</ul>').join('') + '<p class="pl">' + esc(r.legal) + '</p>';
+  if (kind === 'file') {
+    const html = '<!DOCTYPE html><html lang="ru"><head><meta charset="utf-8"><title>Итог: ' + esc(r.title) + '</title><style>body{max-width:760px;margin:32px auto;padding:0 16px;font:15px/1.5 Arial,sans-serif;color:#111}h1{font-size:22px}h2{font-size:15px;margin:18px 0 6px;text-transform:uppercase}ul{padding-left:20px}.pl{margin-top:20px;font-size:13px;color:#555}</style></head><body>' + body + '<p class="pl">Чтобы сохранить в PDF, откройте файл в браузере и выберите «Печать» → «Сохранить как PDF».</p></body></html>';
+    const msg = document.querySelector('.savemsg');
+    const show = (t) => { if (msg) msg.textContent = t; };
+    const dl = await downloadsApi();
+    if (dl) {
+      try { await dl.save({ filename: 'itog-skhemy.html', data: html }); show('Файл сохранён.'); }
+      catch (e) { show(e && e.code === 'declined' ? 'Сохранение отменено.' : 'Здесь скачать файл не получилось. Воспользуйтесь кнопкой печати.'); }
+      return;
+    }
     const a = document.createElement('a');
-    a.href = URL.createObjectURL(new Blob([txt], { type: 'text/plain;charset=utf-8' }));
-    a.download = 'itog-skhemy.txt'; document.body.appendChild(a); a.click(); a.remove();
+    a.href = URL.createObjectURL(new Blob([html], { type: 'text/html;charset=utf-8' }));
+    a.download = 'itog-skhemy.html'; document.body.appendChild(a); a.click(); a.remove();
     return;
   }
-  $('#print').innerHTML = '<h1>Итог: ' + esc(r.title) + '</h1><p><b>Путь:</b> ' + esc(r.path) + '</p>' + r.blocks.map(([t, items]) => '<h2>' + esc(t) + '</h2><ul>' + items.map((x) => '<li>' + esc(x) + '</li>').join('') + '</ul>').join('') + '<p class="pl">' + esc(r.legal) + '</p>';
+  $('#print').innerHTML = body;
   window.print();
 }
 
