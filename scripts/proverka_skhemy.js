@@ -52,6 +52,44 @@ for (const [goal, list] of Object.entries(D.start)) {
     }
   }
 }
+// Цели, повторы идентификаторов, заголовки шагов
+for (const g of D.goals) {
+  if (!D.start[g.id] || !D.start[g.id].length) err.push(`цель ${g.id}: нет стартовых блоков`);
+  const ids = (D.start[g.id] || []).map((n) => n.id);
+  ids.filter((x, i) => ids.indexOf(x) !== i).forEach((x) => err.push(`цель ${g.id}: повтор стартового блока «${x}»`));
+  for (const n of D.start[g.id] || []) {
+    if (n.children && !n.nextTitle) err.push(`${g.id}.${n.id}: нет nextTitle`);
+    const cids = (n.children || []).map((c) => c.id);
+    cids.filter((x, i) => cids.indexOf(x) !== i).forEach((x) => err.push(`${g.id}.${n.id}: повтор связки «${x}»`));
+  }
+}
+// Площадки стартового шага
+for (const [k, p] of Object.entries(D.platforms || {})) {
+  if (!risks.includes(p.risk)) err.push(`platforms.${k}: risk «${p.risk}»`);
+  fineRefs(`platforms.${k}`, p.fines);
+}
+// Пояснения и календарь
+for (const x of D.explain) if (!x.id || !x.title || !x.basis) err.push(`пояснение ${x.id || '?'}: нет id, title или basis`);
+for (const c of D.calendar || []) {
+  if (!c.group || !c.when || !c.what || !c.law) err.push(`календарь «${c.when || '?'}»: пустое поле`);
+  (c.forms || []).forEach((fm) => { if (fm !== 'all' && !tags.has(fm)) err.push(`календарь «${c.when}»: форма «${fm}»`); });
+}
+// Пустые строки, undefined и «то же» во всех текстах
+const walk = (v, where) => {
+  if (typeof v === 'string') { if (!v.trim() || v.includes('undefined')) err.push(`${where}: пустой текст или undefined`); if (/^то же/.test(v)) err.push(`${where}: «то же» без расшифровки`); }
+  else if (Array.isArray(v)) v.forEach((x, i) => walk(x, where + '[' + i + ']'));
+  else if (v && typeof v === 'object') for (const [k, x] of Object.entries(v)) walk(x, where + '.' + k);
+};
+walk(D, 'SCHEMA');
+// Страница «Маркировка по шагам»
+const mfile = path.join(__dirname, '..', 'site', 'markirovka.js');
+const mctx = { window: {} };
+vm.runInNewContext(fs.readFileSync(mfile, 'utf8'), mctx, { filename: mfile });
+const M = mctx.window.MARK;
+for (const p of M.platforms) if (!(D.platforms || {})[p.id]) err.push(`маркировка: площадки «${p.id}» нет в platforms`);
+for (const fo of D.forms) if (!M.ordData[fo.id] && !M.ordData[fo.col]) err.push(`маркировка: нет данных для ОРД формы ${fo.id}`);
+walk(M, 'MARK');
+
 const verify = Object.entries(D.fines).filter(([, f]) => f.verify).map(([k]) => k);
 console.log(`Схема: ${uzly} узлов, ${Object.keys(D.places).length} площадок, ${Object.keys(D.fines).length} штрафов, на сверке: ${verify.join(', ') || 'нет'}`);
 if (err.length) { console.log('Ошибки:\n- ' + err.join('\n- ')); process.exit(1); }
