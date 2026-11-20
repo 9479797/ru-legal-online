@@ -259,7 +259,7 @@ function render() {
 
   let html = '';
   if (!goal.ready) {
-    html = step(1, 'Где вы начинаете', '', '<div class="note"><p style="margin:0 0 12px">Схема для цели «' + esc(goal.name) + '» пока наполняется. Сейчас готовы ветки «Продать книгу», «Продать онлайн-курс» и «Продать сопровождение родов».</p><button type="button" class="cta" data-goal="book">Открыть ветку «Продать книгу»</button> <button type="button" class="cta" data-goal="doula">Открыть «Сопровождение родов»</button></div>');
+    html = step(1, 'Где вы начинаете', '', '<div class="note"><p style="margin:0 0 12px">Схема для цели «' + esc(goal.name) + '» пока наполняется. Готовые ветки: ' + D.goals.filter((g) => g.ready).map((g) => '«' + esc(g.name) + '»').join(', ') + '.</p><button type="button" class="cta" data-goal="book">Открыть ветку «Продать книгу»</button></div>');
   } else {
     html += step(1, goal.startTitle || 'Где вы начинаете', goal.startHint || 'цвет полосы — риск рекламы на площадке', '<div class="row">' + level1().map((n) => card(n, 0, S.path[0])).join('') + '</div>');
     const [a, b, d] = c;
