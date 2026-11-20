@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Маркировка рекламы по шагам</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Oswald:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+/* VOICE: спокойный наставник для эксперта-новичка, без юридического жаргона
+   IDEA: маршрутная карта — шаг за шагом от площадки к безопасной продаже
+   PICTURE: раскрывающиеся ряды карточек с цветной полосой риска
+   COLOUR and TYPE: сиренево-розовый фирменный градиент, изумруд, солнце, малина; Oswald + Manrope
+   LAYOUT: узкая строка пути сверху, шаги столбцом, градиентный подвал с пояснениями */
+:root{color-scheme:light dark;--bg:light-dark(#F6F6FB,#11121C);--ink:light-dark(#1F2033,#F1F2FA);--muted:light-dark(#5D6078,#AEB1C8);--card:light-dark(#FFFFFF,#1C1D2D);--line:light-dark(rgba(91,103,221,.28),rgba(174,181,255,.30));--pillink:light-dark(#4F5BD5,#B3B9FF);--stroke:light-dark(rgba(91,103,221,.08),rgba(174,181,255,.06));--bar:light-dark(rgba(246,246,251,.94),rgba(17,18,28,.94));--sh:light-dark(rgba(76,86,180,.10),rgba(0,0,0,.45));--soft:light-dark(#EEF0FC,#26283C);
+--brand:linear-gradient(120deg,#5B67DD 0%,#8A63DE 55%,#C3539F 100%);--g:linear-gradient(120deg,#0C8A6B 0%,#0B7F86 100%);--y:linear-gradient(120deg,#FFD452 0%,#FFB443 100%);--r:linear-gradient(120deg,#D7344C 0%,#C0266A 100%);--bright:linear-gradient(90deg,#8E9CFF 0%,#B49CF5 35%,#F0A2E5 70%,#FF3D8B 100%)}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 Manrope,system-ui,sans-serif;overflow-x:clip}
+button,select{font:inherit}
+button:focus-visible,select:focus-visible,a:focus-visible{outline:3px solid #8E9CFF;outline-offset:2px}
+.geo{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:0}
+.geo g{stroke:var(--stroke)}
+.top{position:sticky;top:0;z-index:5;background:var(--bar);backdrop-filter:blur(8px)}
+.top::before{content:"";display:block;height:3px;background:var(--bright)}
+.bar{display:flex;flex-wrap:wrap;align-items:center;gap:10px 18px;padding:10px max(3vw,16px)}
+.disp{font-family:Oswald,Manrope,sans-serif;text-transform:uppercase;letter-spacing:.01em}
+.word{font-size:18px;font-weight:700}
+.crumbs{display:flex;flex-wrap:wrap;gap:6px}
+.crumb{display:inline-flex;align-items:center;min-height:32px;padding:0 12px;border-radius:999px;border:1px solid var(--line);background:transparent;font-size:12.5px;font-weight:600;color:var(--pillink);cursor:pointer}
+.crumb[aria-current]{border-color:transparent;background:var(--brand);color:#fff;cursor:default}
+.tools{margin-left:auto;display:flex;align-items:center;gap:10px}
+.seg{display:inline-flex;gap:2px;padding:3px;border-radius:999px;background:var(--card);box-shadow:0 6px 18px var(--sh)}
+.seg button{display:inline-flex;align-items:center;gap:6px;min-height:36px;min-width:44px;padding:0 11px;border:0;border-radius:999px;background:transparent;font-size:12px;font-weight:700;color:var(--muted);cursor:pointer}
+.seg button[aria-pressed=true]{background:var(--brand);color:#fff}
+.cta{min-height:38px;padding:0 16px;white-space:nowrap;border:0;border-radius:999px;background:#D81F6E;color:#fff;font-size:13px;font-weight:700;cursor:pointer}
+main{position:relative;z-index:1;max-width:1240px;margin:0 auto;padding:18px max(3vw,16px) 0;display:flex;flex-direction:column;gap:28px}
+.hero{display:flex;flex-wrap:wrap;gap:18px 28px;align-items:center;padding:22px;border-radius:24px;background:var(--brand);color:#fff;box-shadow:0 16px 40px rgba(91,103,221,.28)}
+.hero h1{margin:6px 0 8px;font-size:clamp(30px,4vw,40px);font-weight:700;line-height:1}
+.hero p{margin:0;max-width:460px;color:rgba(255,255,255,.94)}
+.tag{display:inline-flex;align-items:center;min-height:26px;padding:0 12px;border-radius:999px;border:1px solid rgba(255,255,255,.7);font-size:11.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase}
+.fields{flex:0 1 340px;display:flex;flex-direction:column;gap:10px}
+.fields label{display:block;margin-bottom:5px;font-size:12.5px;font-weight:700;color:rgba(255,255,255,.94)}
+.sw{position:relative}
+.sw select{appearance:none;width:100%;min-height:46px;padding:0 44px 0 16px;border:0;border-radius:999px;background:#fff;color:#1F2033;font-size:16px;font-weight:700;box-shadow:0 6px 16px rgba(31,32,51,.18);cursor:pointer}
+.sw svg{position:absolute;right:16px;top:14px;pointer-events:none}
+.step{display:flex;flex-direction:column;gap:12px;scroll-margin-top:90px}
+.sh{display:flex;align-items:flex-end;gap:12px;flex-wrap:wrap}
+.num{font-family:Oswald,sans-serif;font-size:36px;font-weight:700;line-height:.9;background:linear-gradient(120deg,#6E7CF0,#D45CB8);-webkit-background-clip:text;background-clip:text;color:transparent}
+.sh h2{margin:0;font-family:Oswald,Manrope,sans-serif;font-size:23px;font-weight:600;text-transform:uppercase;line-height:1.05;text-wrap:balance}
+.hint{font-size:13px;color:var(--muted)}
+.row{display:flex;flex-wrap:wrap;gap:12px}
+.opt{display:flex;flex-direction:column;flex:1 1 190px;max-width:236px;border-radius:18px;background:var(--card);box-shadow:0 10px 30px var(--sh);overflow:hidden;transition:transform .15s ease,box-shadow .15s ease}
+.opt:hover{transform:translateY(-2px)}
+.opt.sel{box-shadow:0 0 0 2px #6C78E8,0 16px 36px rgba(108,120,232,.30)}
+.hd{display:flex;align-items:center;gap:6px;padding:7px 12px;font-family:Oswald,sans-serif;font-size:12px;font-weight:600;letter-spacing:.07em;text-transform:uppercase}
+.g .hd{background:var(--g);color:#fff}.y .hd{background:var(--y);color:#2B1F00}.r .hd{background:var(--r);color:#fff}
+.pick{margin-left:auto;padding:1px 7px;border-radius:999px;background:rgba(255,255,255,.92);color:#3B45B8;font-family:Manrope,sans-serif;font-size:10.5px;font-weight:800;letter-spacing:0;text-transform:none}
+.bd{all:unset;cursor:pointer;display:flex;flex-direction:column;gap:5px;padding:11px 12px 10px;min-height:44px}
+.bd:focus-visible{outline:3px solid #8E9CFF;outline-offset:-3px}
+.t{font-size:15px;font-weight:800;line-height:1.25}
+.d{font-size:13px;line-height:1.45;color:var(--muted)}
+.ft{display:flex;gap:6px;flex-wrap:wrap;padding:0 12px 12px;margin-top:auto}
+.lnk{display:inline-flex;align-items:center;gap:4px;min-height:32px;padding:0 8px;white-space:nowrap;border-radius:999px;border:1px solid var(--line);background:transparent;font-size:11.5px;font-weight:700;color:var(--pillink);cursor:pointer}
+.big{display:flex;flex-direction:column;gap:10px;flex:1 1 300px;padding:16px 18px;border-radius:20px;color:#fff;box-shadow:0 10px 30px var(--sh)}
+.big h3{margin:0;font-family:Oswald,sans-serif;font-size:20px;font-weight:600;text-transform:uppercase}
+.big h4{margin:4px 0 0;font-size:12px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;opacity:.92}
+.big ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:5px;font-size:14px;font-weight:500}
+.big.yel{color:#2B1F00}
+.fine{display:flex;flex-direction:column;gap:2px;font-size:14px}
+.fine b{font-weight:800}
+.fine small{font-size:12.5px;opacity:.9}
+.vf{display:inline-block;margin-left:6px;padding:0 7px;border-radius:999px;background:rgba(255,255,255,.92);color:#8A2A55;font-size:11px;font-weight:800;vertical-align:1px}
+.check{display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px;padding:12px 16px;border-radius:18px;background:var(--card);box-shadow:0 10px 30px var(--sh)}
+.chip{display:inline-flex;align-items:center;min-height:32px;padding:0 12px;border-radius:999px;border:1px solid var(--line);font-size:13px;font-weight:600;color:var(--pillink)}
+.white{background:#fff;color:#1F2033}
+.wbtn{display:inline-flex;align-items:center;gap:7px;min-height:40px;padding:0 16px;border:0;border-radius:999px;background:#fff;color:#4F5BD5;font-size:13.5px;font-weight:700;cursor:pointer}
+.note{padding:18px;border-radius:20px;background:var(--card);box-shadow:0 10px 30px var(--sh)}
+footer{position:relative;z-index:1;max-width:1240px;margin:10px auto 28px;padding:0 max(3vw,16px)}
+.foot{display:flex;flex-wrap:wrap;gap:22px;padding:24px;border-radius:26px;background:var(--brand);color:#fff;box-shadow:0 16px 40px rgba(91,103,221,.25)}
+.foot h2{margin:0 0 10px;font-size:28px;font-weight:700;line-height:1}
+.foot p{margin:0;color:rgba(255,255,255,.94)}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%}
+.legal{flex:1 1 100%;padding-top:12px;border-top:1px solid rgba(255,255,255,.28);font-size:13px;color:rgba(255,255,255,.92)}
+dialog{width:min(620px,calc(100vw - 32px));max-height:calc(100vh - 48px);padding:0;border:0;border-radius:24px;background:var(--card);color:var(--ink);box-shadow:0 24px 60px rgba(31,32,51,.25)}
+dialog::backdrop{background:rgba(20,21,34,.45)}
+.dlg{display:flex;flex-direction:column;gap:12px;padding:22px}
+.dlg.brand{background:var(--brand);color:#fff}
+.dh{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.dh h3{margin:0;font-size:26px;font-weight:700;line-height:1.05}
+.x{flex:none;display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border:0;border-radius:999px;background:var(--soft);color:var(--pillink);cursor:pointer}
+.brand .x{background:#fff;color:#4F5BD5}
+.dlg p{margin:0}
+.kv{display:grid;grid-template-columns:minmax(0,1fr);gap:4px;padding:12px 14px;border-radius:16px;background:var(--soft)}
+.kv .lw{font-size:12.5px;color:var(--muted)}
+.two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.mini{display:flex;flex-direction:column;gap:6px;padding:12px;border-radius:16px;background:#fff;color:#1F2033;font-size:13.5px}
+.lab{align-self:flex-start;padding:2px 9px;border-radius:999px;color:#fff;font-family:Oswald,sans-serif;font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase}
+@media(max-width:600px){.opt{flex:1 1 100%;max-width:none}.tools{margin-left:0;width:100%;justify-content:space-between}.two{grid-template-columns:minmax(0,1fr)}.foot{padding:18px}}
+@media(prefers-reduced-motion:reduce){.opt{transition:none}.opt:hover{transform:none}}
+.navl{display:inline-flex;align-items:center;gap:6px;min-height:32px;padding:0 12px;border-radius:999px;border:1px solid var(--line);font-size:12.5px;font-weight:700;color:var(--pillink);text-decoration:none}
+.status{display:flex;flex-direction:column;gap:6px;padding:16px 18px;border-radius:20px;color:#fff;box-shadow:0 10px 30px var(--sh)}
+.status.y{color:#2B1F00}
+.status h3{margin:0;font-family:Oswald,sans-serif;font-size:20px;font-weight:600;text-transform:uppercase}
+.status p{margin:0;font-size:14.5px;font-weight:500}
+.plan{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12px}
+.ps{display:flex;gap:14px;padding:16px 18px;border-radius:18px;background:var(--card);box-shadow:0 10px 30px var(--sh)}
+.pn{flex:none;display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:50%;background:var(--brand);color:#fff;font-family:Oswald,sans-serif;font-size:17px;font-weight:600}
+.pb{display:flex;flex-direction:column;gap:6px}
+.pb h3{margin:0;font-size:16.5px;font-weight:800;line-height:1.3}
+.pb p{margin:0;font-size:14.5px}
+.pnote{padding:9px 12px;border-radius:12px;background:var(--soft);font-size:13.5px}
+.pnote b{color:var(--pillink)}
+.cmp{width:100%;border-collapse:separate;border-spacing:0;border-radius:18px;overflow:hidden;background:var(--card);box-shadow:0 10px 30px var(--sh);font-size:14px}
+.cmp th,.cmp td{padding:11px 14px;text-align:left;vertical-align:top;border-bottom:1px solid var(--stroke)}
+.cmp thead th{background:var(--brand);color:#fff;font-family:Oswald,sans-serif;font-size:14px;font-weight:600;letter-spacing:.04em;text-transform:uppercase}
+.cmp tbody th{font-weight:800;width:26%}
+.cmp tr:last-child td,.cmp tr:last-child th{border-bottom:0}
+.fines3{display:flex;flex-direction:column;gap:8px}
+@media(max-width:600px){.cmp th,.cmp td{padding:9px 10px;font-size:13px}.ps{padding:14px}}
+</style>
+</head>
+<body>
+<svg class="geo" aria-hidden="true" viewBox="0 0 1440 1400" preserveAspectRatio="xMidYMin slice"><g fill="none" stroke-width="1.2"><polyline points="0,300 420,40 760,520 1200,180 1440,420"/><polyline points="0,840 360,560 820,900 1180,620 1440,880"/><polyline points="0,1300 480,1040 900,1360 1300,1080 1440,1220"/><line x1="420" y1="40" x2="360" y2="560"/><line x1="760" y1="520" x2="820" y2="900"/><line x1="1200" y1="180" x2="1180" y2="620"/><line x1="360" y1="560" x2="480" y2="1040"/><line x1="1180" y1="620" x2="1300" y2="1080"/></g></svg>
+
+<header class="top">
+<div class="bar">
+<span class="disp word">Маркировка по шагам</span>
+<a class="navl" href="index.html"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>Схема продвижения</a>
+<div class="tools">
+<div class="seg" role="group" aria-label="Тема оформления">
+<button type="button" data-theme-set="auto" aria-pressed="true">Авто</button>
+<button type="button" data-theme-set="light" aria-pressed="false">День</button>
+<button type="button" data-theme-set="dark" aria-pressed="false">Ночь</button>
+</div>
+</div>
+</div>
+</header>
+
+<main>
+<section class="hero" aria-labelledby="h0">
+<div style="flex:1 1 360px">
+<span class="tag">План действий</span>
+<h1 id="h0" class="disp">Маркировка рекламы</h1>
+<p>Выберите, кто вы, где размещаете и как. Ниже — ваши шаги по порядку, от проверки площадки до отчёта в ОРД.</p>
+</div>
+<div class="fields">
+<div><label for="form">Кто вы</label><div class="sw"><select id="form"></select><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4F5BD5" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></div></div>
+<div><label for="pl">Где размещаете</label><div class="sw"><select id="pl"></select><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4F5BD5" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></div></div>
+<div><label for="mt">Как размещаете</label><div class="sw"><select id="mt"></select><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4F5BD5" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></div></div>
+</div>
+</section>
+<div id="out" style="display:flex;flex-direction:column;gap:28px"></div>
+</main>
+
+<footer>
+<div class="foot">
+<div style="flex:1 1 340px;display:flex;flex-direction:column;gap:10px">
+<span class="tag" style="align-self:flex-start">Три элемента в посте</span>
+<p>«Реклама», рекламодатель и erid. erid получают в ОРД до публикации, отчёт о показах передают в течение 30 дней после месяца публикации.</p>
+</div>
+<p class="legal" id="legal"></p>
+</div>
+</footer>
+
+<script src="data.js"></script>
+<script src="markirovka.js"></script>
+<script>
+{
+const D = window.SCHEMA, M = window.MARK;
+const $ = (s) => document.querySelector(s);
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const RL = { g: 'Без риска', y: 'Низкий риск', r: 'Высокий риск' };
+const store = {
+  get(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+};
+let S = Object.assign({ form: 'ip', pl: 'vk', mt: 'own' }, store.get('mark-state', {}));
+if (!D.forms.some((f) => f.id === S.form)) S.form = 'ip';
+if (!M.platforms.some((p) => p.id === S.pl)) S.pl = 'vk';
+if (!M.methods.some((m) => m.id === S.mt)) S.mt = 'own';
+
+function sec(num, title, body) {
+  return '<section class="step" aria-labelledby="s' + num + '"><div class="sh"><span class="num" aria-hidden="true">0' + num + '</span><h2 id="s' + num + '">' + esc(title) + '</h2></div>' + body + '</section>';
+}
+
+function render() {
+  store.set('mark-state', S);
+  const p = M.platforms.find((x) => x.id === S.pl);
+  const m = M.methods.find((x) => x.id === S.mt);
+  const who = D.formWho[S.form];
+  let html = '';
+  const bg = 'var(--' + p.risk + ')';
+  html += '<div class="status ' + p.risk + '" style="background:' + bg + '"><h3>' + esc(p.name) + ' · ' + RL[p.risk] + '</h3><p>' + esc(p.status) + '</p></div>';
+
+  if (p.stop) {
+    html += sec(1, 'Что делать вместо', '<div class="note"><p style="margin:0">Размещайте рекламу в VK, на Rutube или в Дзене. В Instagram можно вести экспертный блог без рекламы и вести людей к себе через имя автора — этот путь разобран в схеме продвижения.</p></div>');
+    $('#out').innerHTML = html; return;
+  }
+  if (S.mt === 'cabinet' && !p.cabinet) {
+    html += sec(1, 'Этот способ здесь недоступен', '<div class="note"><p style="margin:0">У ' + esc(p.name) + ' нет рекламного кабинета для России. Выберите «Свой пост в своём канале» или «Покупаю пост у блогера», либо запустите рекламу в VK Рекламе или Яндекс Директе.</p></div>');
+    $('#out').innerHTML = html; return;
+  }
+
+  const steps = M.steps.filter((s) => s.methods.includes(S.mt));
+  const items = steps.map((s, i) => {
+    let t = s.text[S.mt] || s.text.all;
+    let notes = '';
+    if (s.id === 'ord') notes += '<div class="pnote"><b>Данные ' + esc(who) + ':</b> ' + esc(M.ordData[S.form]) + '</div><div class="pnote"><b>' + esc(p.name) + ':</b> ' + esc(S.mt === 'own' ? p.own : p.buy) + '</div>';
+    if (s.id === 'contract' && S.mt === 'buy') notes += '<div class="pnote"><b>' + esc(p.name) + ':</b> ' + esc(p.buy) + '</div>';
+    if (s.id === 'contract' && S.mt === 'cabinet') notes += '<div class="pnote"><b>' + esc(p.name) + ':</b> ' + esc(p.cabinet) + '</div>';
+    if (s.platform === 'publish') notes += '<div class="pnote"><b>' + esc(p.name) + ':</b> ' + esc(p.publish) + '</div>';
+    return '<li class="ps"><span class="pn" aria-hidden="true">' + (i + 1) + '</span><div class="pb"><h3>' + esc(s.title) + '</h3><p>' + esc(t) + '</p>' + notes + '</div></li>';
+  }).join('');
+  html += sec(1, 'Ваши шаги: ' + m.name.toLowerCase(), '<ol class="plan">' + items + '</ol>');
+
+  const keys = S.mt === 'buy' ? ['marking', 'erir', 'registry', 'content'] : S.mt === 'own' ? ['marking', 'erir', 'content'] : ['content'];
+  html += sec(2, 'Ответственность ' + who, '<div class="big" style="background:var(--brand);flex:none"><div class="fines3">' + keys.map((k) => {
+    const f = D.fines[k];
+    return '<div class="fine"><span><b>' + esc(f.title) + ':</b> ' + esc(f[S.form]) + (f.verify ? '<span class="vf">сверить</span>' : '') + '</span><small>' + esc(f.law) + (f.note ? ' · ' + esc(f.note) : '') + '</small></div>';
+  }).join('') + '</div></div>');
+
+  const c = M.compare;
+  html += sec(3, c.title, '<div style="overflow-x:auto"><table class="cmp"><thead><tr><th scope="col"></th><th scope="col">Telegram</th><th scope="col">VK</th></tr></thead><tbody>' +
+    c.rows.map((r) => '<tr><th scope="row">' + esc(r.label) + '</th><td>' + esc(r.tg) + '</td><td>' + esc(r.vk) + '</td></tr>').join('') +
+    '</tbody></table></div><p style="margin:0;font-size:14.5px">' + esc(c.outro) + '</p>');
+  $('#out').innerHTML = html;
+}
+
+function setTheme(m) {
+  if (m === 'auto') document.documentElement.removeAttribute('data-theme');
+  else document.documentElement.setAttribute('data-theme', m);
+  document.querySelectorAll('[data-theme-set]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.themeSet === m)));
+  store.set('skhema-theme', m);
+}
+document.addEventListener('click', (e) => { const t = e.target.closest('[data-theme-set]'); if (t) setTheme(t.dataset.themeSet); });
+
+$('#form').innerHTML = D.forms.map((f) => '<option value="' + f.id + '">' + esc(f.name) + '</option>').join('');
+$('#pl').innerHTML = M.platforms.map((p) => '<option value="' + p.id + '">' + esc(p.name) + '</option>').join('');
+$('#mt').innerHTML = M.methods.map((m) => '<option value="' + m.id + '">' + esc(m.name) + '</option>').join('');
+$('#form').value = S.form; $('#pl').value = S.pl; $('#mt').value = S.mt;
+['form', 'pl', 'mt'].forEach((k) => $('#' + k).addEventListener('change', (e) => { S[k] = e.target.value; render(); }));
+$('#legal').textContent = 'Это разбор, а не юридическое заключение. Нормы сверены ' + M.checked + '. Спорные случаи проверьте у юриста по рекламному праву.';
+setTheme(store.get('skhema-theme', 'auto'));
+render();
+}
+</script>
+</body>
+</html>
