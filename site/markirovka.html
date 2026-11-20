@@ -112,6 +112,7 @@ dialog::backdrop{background:rgba(20,21,34,.45)}
 .pb p{margin:0;font-size:14.5px}
 .pnote{padding:9px 12px;border-radius:12px;background:var(--soft);font-size:13.5px}
 .pnote b{color:var(--pillink)}
+.pnote.ex{white-space:pre-line;background:transparent;border:1px dashed var(--line)}
 .cmp{width:100%;border-collapse:separate;border-spacing:0;border-radius:18px;overflow:hidden;background:var(--card);box-shadow:0 10px 30px var(--sh);font-size:14px}
 .cmp th,.cmp td{padding:11px 14px;text-align:left;vertical-align:top;border-bottom:1px solid var(--stroke)}
 .cmp thead th{background:var(--brand);color:#fff;font-family:Oswald,sans-serif;font-size:14px;font-weight:600;letter-spacing:.04em;text-transform:uppercase}
@@ -211,6 +212,8 @@ function render() {
     if (s.id === 'contract' && S.mt === 'buy') notes += '<div class="pnote"><b>' + esc(p.name) + ':</b> ' + esc(p.buy) + '</div>';
     if (s.id === 'contract' && S.mt === 'cabinet') notes += '<div class="pnote"><b>' + esc(p.name) + ':</b> ' + esc(p.cabinet) + '</div>';
     if (s.platform === 'publish') notes += '<div class="pnote"><b>' + esc(p.name) + ':</b> ' + esc(p.publish) + '</div>';
+    const ex = s.example && (s.example[S.mt] || s.example.all);
+    if (ex) notes += '<div class="pnote ex"><b>Пример:</b> ' + esc(ex) + '</div>';
     return '<li class="ps"><span class="pn" aria-hidden="true">' + (i + 1) + '</span><div class="pb"><h3>' + esc(s.title) + '</h3><p>' + esc(t) + '</p>' + notes + '</div></li>';
   }).join('');
   html += sec(1, 'Ваши шаги: ' + m.name.toLowerCase(), '<ol class="plan">' + items + '</ol>');
