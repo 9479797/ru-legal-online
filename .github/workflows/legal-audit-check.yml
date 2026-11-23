@@ -38,8 +38,10 @@ jobs:
         run: python3 scripts/proverka_kontrolnyh_summ.py
       - name: Run checksum regression tests
         run: python3 -m unittest discover -s scripts -p "test_*.py" -v
-      - name: Display normative text hashes
-        run: python3 scripts/sravnit_tekst.py --hash docs/fas-teksty/*.txt docs/normy-teksty/pp-1224-2025.txt
+      - name: Display normalized FAS text hashes
+        run: python3 scripts/sravnit_tekst.py --hash docs/fas-teksty/*.txt
+      - name: Display original archived normative file checksum
+        run: sha256sum docs/normy-teksty/pp-1224-2025.txt
 
   browser-smoke-test:
     name: Browser and UI smoke tests
