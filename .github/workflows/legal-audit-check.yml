@@ -1,0 +1,59 @@
+name: Legal audit technical checks
+
+on:
+  push:
+    branches:
+      - pravka/audit-online-2026-11
+  pull_request:
+    paths:
+      - "skills/**"
+      - "scripts/**"
+      - "site/**"
+      - "docs/**"
+      - ".github/workflows/legal-audit-check.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  repository-validation:
+    name: Python and Node.js validation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "22"
+      - name: Test all skills and full schema
+        run: python3 scripts/proverka.py
+      - name: Test JS schema explicitly
+        run: node scripts/proverka_skhemy.js
+      - name: Compile Python test scripts
+        run: python3 -m py_compile scripts/proverka.py scripts/proverka_brauzer.py scripts/sravnit_tekst.py scripts/proverka_kontrolnyh_summ.py scripts/test_proverka_kontrolnyh_summ.py
+      - name: Verify registered normative text checksums
+        run: python3 scripts/proverka_kontrolnyh_summ.py
+      - name: Run checksum regression tests
+        run: python3 -m unittest discover -s scripts -p "test_*.py" -v
+      - name: Display normalized FAS text hashes
+        run: python3 scripts/sravnit_tekst.py --hash docs/fas-teksty/*.txt
+      - name: Display original archived normative file checksum
+        run: sha256sum docs/normy-teksty/pp-1224-2025.txt
+
+  browser-smoke-test:
+    name: Browser and UI smoke tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+      - name: Install Playwright
+        run: |
+          python3 -m pip install playwright
+          python3 -m playwright install --with-deps chromium
+      - name: Open all primary UI paths
+        run: python3 scripts/proverka_brauzer.py
