@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-"""Check normalized SHA-256 checksums listed in docs/reestr-dokumentov.md.
+"""Check SHA-256 checksums listed in docs/reestr-dokumentov.md.
+
+The registry has two explicit historical checksum formats:
+- docs/fas-teksty: SHA-256 of text normalized by sravnit_tekst.py.
+- docs/normy-teksty: SHA-256 of the original archived UTF-8 file.
 
 Unlike sravnit_tekst.py --hash, this test FAILS if a referenced source
 has disappeared, differs from its registered checksum, or has no checksum.
@@ -7,6 +11,7 @@ A matching hash is only an integrity check, NOT a legal-currency check.
 """
 from __future__ import annotations
 
+import hashlib
 import pathlib
 import re
 import sys
@@ -56,14 +61,20 @@ def verify(root: pathlib.Path, registry: pathlib.Path) -> tuple[int, list[str]]:
             errors.append(f"{registry.name}:{lineno}: отсутствует {relpath}")
             continue
         try:
-            actual = summa(chitat(source))
+            if relpath.startswith("docs/normy-teksty/"):
+                # The norms archive recorded raw-file SHA-256; see docs/sverka-norm-2026-11-20.md.
+                actual = hashlib.sha256(source.read_bytes()).hexdigest()
+            else:
+                # FAS register checksums refer to normalized legal text.
+                actual = summa(chitat(source))
         except (OSError, UnicodeError, ValueError) as exc:
             errors.append(f"{relpath}: ошибка чтения/нормализации: {exc}")
             continue
         if actual != expected:
             errors.append(f"{relpath}: НЕСОВПАДЕНИЕ на строке {lineno}: реестр={expected}, фактически={actual}")
         else:
-            print(f"OK {relpath}: {actual}")
+            mode = "sha256 файла" if relpath.startswith("docs/normy-teksty/") else "sha256 нормализованного текста"
+            print(f"OK {relpath} ({mode}): {actual}")
     return len(records), errors
 
 
