@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Regression tests for checksum comparison against the registered baseline."""
+import hashlib
 import pathlib
 import tempfile
 import unittest
@@ -61,6 +62,32 @@ class RegistryChecksumTests(unittest.TestCase):
         )
         _, errors = verify(self.root, self.registry)
         self.assertTrue(any("повтор файла" in e for e in errors), errors)
+
+    def test_raw_archived_norms_checksum_passes(self):
+        archive = self.root / "docs/normy-teksty/example.txt"
+        archive.parent.mkdir(parents=True)
+        archive.write_text("Первый абзац.\nВторой абзац.\n", encoding="utf-8")
+        raw_hash = hashlib.sha256(archive.read_bytes()).hexdigest()
+        self.registry.write_text(
+            f"| Постановление | документы | текст есть: docs/normy-teksty/example.txt, sha256 файла {raw_hash} |\n",
+            encoding="utf-8",
+        )
+        count, errors = verify(self.root, self.registry)
+        self.assertEqual(count, 1)
+        self.assertEqual(errors, [])
+
+    def test_raw_archived_norms_modified_fails(self):
+        archive = self.root / "docs/normy-teksty/example.txt"
+        archive.parent.mkdir(parents=True)
+        archive.write_text("Первый абзац.\n", encoding="utf-8")
+        old_hash = hashlib.sha256(archive.read_bytes()).hexdigest()
+        self.registry.write_text(
+            f"| Постановление | документы | текст есть: docs/normy-teksty/example.txt, sha256 файла {old_hash} |\n",
+            encoding="utf-8",
+        )
+        archive.write_text("Второй абзац.\n", encoding="utf-8")
+        _, errors = verify(self.root, self.registry)
+        self.assertTrue(any("НЕСОВПАДЕНИЕ" in e for e in errors), errors)
 
 
 if __name__ == "__main__":
