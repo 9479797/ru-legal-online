@@ -21,11 +21,11 @@ jobs:
     name: Python and Node.js validation
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.13"
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version: "22"
       - name: Test all skills and full schema
@@ -33,16 +33,20 @@ jobs:
       - name: Test JS schema explicitly
         run: node scripts/proverka_skhemy.js
       - name: Compile Python test scripts
-        run: python3 -m py_compile scripts/proverka.py scripts/proverka_brauzer.py scripts/sravnit_tekst.py
-      - name: Check normative text hashes
-        run: python3 scripts/sravnit_tekst.py --hash docs/fas-teksty/*.txt
+        run: python3 -m py_compile scripts/proverka.py scripts/proverka_brauzer.py scripts/sravnit_tekst.py scripts/proverka_kontrolnyh_summ.py scripts/test_proverka_kontrolnyh_summ.py
+      - name: Verify registered normative text checksums
+        run: python3 scripts/proverka_kontrolnyh_summ.py
+      - name: Run checksum regression tests
+        run: python3 -m unittest discover -s scripts -p "test_*.py" -v
+      - name: Display normative text hashes
+        run: python3 scripts/sravnit_tekst.py --hash docs/fas-teksty/*.txt docs/normy-teksty/pp-1224-2025.txt
 
   browser-smoke-test:
     name: Browser and UI smoke tests
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.13"
       - name: Install Playwright
