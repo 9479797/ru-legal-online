@@ -1,0 +1,345 @@
+--- a/index.html
++++ b/index.html
+@@ -3,7 +3,7 @@
+ <head>
+ <meta charset="utf-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1">
+-<title>Схема продвижения — локальная версия для просмотра</title>
++<title>Схема продвижения — доработка интерфейса</title>
+ <style>
+ /* VOICE: спокойный наставник для эксперта-новичка, без юридического жаргона
+    IDEA: маршрутная карта — шаг за шагом от площадки к безопасной продаже
+@@ -151,6 +151,7 @@
+ @media(max-width:560px){.journey-path{display:grid;grid-template-columns:1fr}.hero h1{line-height:1.1}.sh h2{line-height:1.2}.cta{white-space:normal}.book-settings{align-items:flex-start}}
+ 
+ </style>
++<link rel="stylesheet" href="frontend.css">
+ </head>
+ <body>
+ <svg class="geo" aria-hidden="true" viewBox="0 0 1440 1400" preserveAspectRatio="xMidYMin slice"><g fill="none" stroke-width="1.2"><polyline points="0,300 420,40 760,520 1200,180 1440,420"/><polyline points="0,840 360,560 820,900 1180,620 1440,880"/><polyline points="0,1300 480,1040 900,1360 1300,1080 1440,1220"/><line x1="420" y1="40" x2="360" y2="560"/><line x1="760" y1="520" x2="820" y2="900"/><line x1="1200" y1="180" x2="1180" y2="620"/><line x1="360" y1="560" x2="480" y2="1040"/><line x1="1180" y1="620" x2="1300" y2="1080"/></g></svg>
+@@ -169,11 +170,12 @@
+ <button type="button" data-theme-set="light" aria-pressed="false"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>День</button>
+ <button type="button" data-theme-set="dark" aria-pressed="false"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>Ночь</button>
+ </div>
+-<button type="button" class="cta" id="reset">Начать заново</button>
+-</div>
+-</div>
+-<nav class="pathbar" aria-label="Ваш путь"><span class="lbl">Ваш путь</span><ol class="crumbs" id="crumbs"></ol></nav>
++<button type="button" class="winbtn" data-help="navigation" aria-label="Как выбрать и изменить путь" aria-haspopup="dialog">Как пользоваться <span aria-hidden="true">?</span></button>
++</div>
++</div>
+ </header>
++<nav class="pathbar" aria-label="Выбранная связка"><div class="path-heading"><span class="lbl">Ваша связка</span><span id="path-context"></span></div><ol class="crumbs" id="crumbs"></ol><button type="button" class="path-change" data-step-nav="1">Сменить площадку</button></nav>
++<div class="sr-only" id="route-status" role="status" aria-live="polite"></div>
+ 
+ <main>
+ <section class="hero" aria-labelledby="h0">
+@@ -185,19 +187,20 @@
+ <p class="start-note">Выберите цель и статус, затем нужную часть пути: продвижение или продажу.</p>
+ </div>
+ <div class="fields">
+-<div><label for="scope">Что проверяем</label><div class="sw"><select id="scope" aria-describedby="scope-help"><option value="promotion">Продвижение</option><option value="sale">Продажу</option></select></div></div>
++<div><div class="label-help"><label for="scope">Что проверяем</label><button type="button" class="help-button" data-help="scope" aria-label="Чем отличаются продвижение и продажа" aria-haspopup="dialog">?</button></div><div class="sw"><select id="scope"><option value="promotion">Продвижение</option><option value="sale">Продажу</option></select></div></div>
+ <div><label for="form">Как вы оформлены</label><div class="sw"><select id="form"></select><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4F5BD5" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></div></div>
+ <div><label for="goal">Цель</label><div class="sw"><select id="goal"></select><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4F5BD5" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></div></div>
+ </div>
+ </section>
+-<section class="note" id="scope-help" aria-label="Как выбрать раздел"><p><b>Продвижение</b> — как человек узнаёт о предложении и приходит к нему: публикации, реклама, рекомендации и переходы между площадками.</p><p><b>Продажа</b> — что человек видит в месте продажи: страница товара, карточка или предложение в боте. Здесь проверяем рекламный характер, содержание и необходимые сведения.</p><p>Выдача материалов, доставка и оказание услуг относятся к сопровождению онлайн-бизнеса.</p></section>
+-<section class="note review-banner"><b>Рабочая версия · 24.11.2026 · v8</b><p>Обновлены общие пояснения и первая цель. Другие девять целей сохранены и ждут последовательной проверки. Статус готовности маршрута не подтверждается одним цветом карточки.</p><p><a href="TASKS.md">Задачи и нерешённые вопросы</a> · <a href="LEGAL_REVIEW_2026-11-24.md">Результаты дополнительной сверки</a></p></section>
+ <section class="note book-settings" id="book-settings" aria-label="Формат текстового материала"><div><label for="format"><b>Что получает покупатель</b></label><select id="format"><option value="file">Цифровой файл</option><option value="print">Печатную книгу</option></select></div><label class="sample-choice"><input type="checkbox" id="sample">Предлагать бесплатный фрагмент перед покупкой</label><p>Фрагмент — необязательный этап знакомства с содержанием. Покупка и рекламная подписка рассматриваются отдельно.</p></section>
+-<div id="steps" style="display:flex;flex-direction:column;gap:28px"></div>
++<div id="steps"></div>
+ </main>
+ <div id="print" aria-hidden="true"></div>
+ 
++<template id="scope-help"><p><b>Продвижение</b> — как человек узнаёт о предложении и приходит к нему: публикации, реклама, рекомендации и переходы между площадками.</p><p><b>Продажа</b> — что человек видит в месте продажи: страница товара, карточка или предложение в боте. Здесь проверяем рекламный характер, содержание и необходимые сведения.</p><p>Выдача материалов, доставка и оказание услуг относятся к сопровождению онлайн-бизнеса.</p></template>
++
+ <footer>
++<details class="version-note"><summary>Рабочая версия · 24.11.2026 · v8 + фронтенд</summary><p>Обновлены общие пояснения и первая цель. Другие девять целей сохранены и ждут последовательной проверки. Статус готовности маршрута не подтверждается одним цветом карточки.</p><p><a href="TASKS.md">Задачи и нерешённые вопросы</a> · <a href="LEGAL_REVIEW_2026-11-24.md">Результаты дополнительной сверки</a></p></details>
+ <div class="foot">
+ <div style="flex:1 1 340px;display:flex;flex-direction:column;gap:10px">
+ <span class="tag" style="align-self:flex-start">Как пользоваться</span>
+@@ -285,14 +288,17 @@
+ function card(n, level, selected) {
+   const sel = selected === n.id;
+   return '<div class="opt ' + n.risk + (sel ? ' sel' : '') + '">' +
+-    '<div class="hd">' + ico(n.risk) + RL[n.risk] + (sel ? '<span class="pick">Выбрано</span>' : '') + '</div>' +
++    (sel ? '<div class="selection-label">✓ Шаг ' + (level + 1) + ' · Ваш выбор</div>' : '') +
++    '<div class="hd">' + ico(n.risk) + RL[n.risk] + '</div>' +
+     '<button class="bd" type="button" data-pick="' + level + '" data-id="' + esc(n.id) + '" aria-pressed="' + sel + '"><span class="t">' + esc(n.name) + '</span><span class="d">' + esc(n.short) + '</span></button>' +
+     '<div class="ft">' + (n.guide ? '<button class="lnk guide-button" type="button" data-guide="' + level + '" data-id="' + esc(n.id) + '" aria-haspopup="dialog" aria-controls="dlg">Пояснение и 2 примера</button>' : '') + '<button class="lnk" type="button" data-more="' + level + '" data-id="' + esc(n.id) + '">Подробнее</button>' +
+     '<button class="lnk" type="button" data-fines="' + level + '" data-id="' + esc(n.id) + '">' + scale + 'Ответственность</button></div></div>';
+ }
+ 
+ function step(num, title, hint, body) {
+-  return '<section class="step" id="step-' + num + '" aria-labelledby="st-' + num + '"><div class="sh"><span class="num" aria-hidden="true">0' + num + '</span><h2 id="st-' + num + '">' + esc(title) + '</h2>' + (hint ? '<span class="hint">' + esc(hint) + '</span>' : '') + '</div>' + body + '</section>';
++  const selected = S.scope === 'promotion' ? chain()[num - 1] : null;
++  const choice = selected ? '<div class="stage-selection"><span class="stage-check" aria-hidden="true">✓</span><b>Шаг ' + num + ' · ' + esc(selected.name) + '</b></div>' : '';
++  return '<section class="step' + (selected ? ' has-selection' : '') + '" id="step-' + num + '" aria-labelledby="st-' + num + '"><div class="sh"><span class="num" aria-hidden="true">0' + num + '</span><h2 id="st-' + num + '" tabindex="-1">' + esc(title) + '</h2>' + (hint ? '<span class="hint">' + esc(hint) + '</span>' : '') + '</div>' + choice + (num === 1 ? '<p class="restart-hint">Чтобы построить другую связку, выберите любую площадку здесь. Следующие шаги обновятся.</p>' : '') + body + '</section>';
+ }
+ 
+ /* Сумма штрафа для выбранной формы: своя строка у штрафа или колонка col этой формы */
+@@ -350,12 +356,43 @@
+ }
+ 
+ function redPanel(link, siblings) {
+-  const go = link.saferGoto || 'author';
+-  const target = (siblings || []).find((x) => x.id === go);
++  const target = (siblings || []).find(x => x.id === (link.saferGoto || 'author'));
++  const change = target ? '<p class="sub">Кнопка заменит ваш выбор на шаге 2. Затем вы сможете посмотреть условия этого способа.</p><button type="button" class="wbtn" data-goto="' + esc(target.id) + '">Выбрать «' + esc(target.name) + '»</button>' : '<button type="button" class="wbtn" data-step-nav="2">Вернуться к выбору способа</button>';
+   return '<div class="row" style="align-items:stretch">' +
+-    '<div class="big" style="background:var(--r)"><h3>' + (link.review ? 'Что нужно проверить' : 'Почему нельзя') + '</h3>' + list(link.why) + '</div>' +
+-    '<div class="big" style="background:var(--g)"><h3>Как сделать безопаснее</h3><p style="margin:0;font-size:14px;font-weight:500">' + esc(link.safer) + '</p><button type="button" class="wbtn" style="align-self:flex-start;color:#0B6E58" data-goto="' + esc(go) + '">Открыть связку «' + esc(target ? target.name : 'Через имя автора') + '»</button></div>' +
++    '<div class="big" style="background:var(--r)"><h3>' + (link.review ? 'Что нужно проверить' : 'Почему нельзя') + '</h3>' + list(link.why) + '<div class="risk-entry"><button type="button" class="wbtn" data-risk-options aria-haspopup="dialog">Хочу рискнуть</button><p class="sub">Показать рискованные варианты и их последствия.</p></div></div>' +
++    '<div class="big" style="background:var(--g)"><h3>Как сделать безопаснее</h3><p>' + esc(link.safer) + '</p>' + change + '</div>' +
+     '<div class="big" style="background:var(--brand)"><h3>Ответственность ' + esc(D.formWho[S.form]) + '</h3><p class="sub">Штрафы по КоАП для статуса «' + esc(curForm().name) + '». Сменить статус можно в поле «Как вы оформлены».</p>' + formNote() + fineRows(link.fines) + '</div></div>';
++}
++
++function openRiskOptions() {
++  const [platform] = chain();
++  if (!platform) return;
++  const groups = level1().filter(p => p.children?.some(n => n.risk === 'r' || n.review));
++  groups.sort((a, b) => Number(b.id === platform.id) - Number(a.id === platform.id));
++  const content = groups.map(p => '<section class="risk-group"><h4>' + esc(p.name) + (p.id === platform.id ? ' · текущая площадка' : '') + '</h4><div class="risk-options">' + p.children.filter(n => n.risk === 'r' || n.review).map(n => '<button type="button" class="risk-option" data-risk-platform="' + esc(p.id) + '" data-risk-pick="' + esc(n.id) + '"><span class="risk-tag">' + esc(RL[n.risk]) + '</span><b>' + esc(n.name) + '</b><span>' + esc(n.short) + '</span><strong>Посмотреть разбор' + (S.path[0] === p.id && S.path[1] === n.id ? ' · выбран сейчас' : '') + '</strong></button>').join('') + '</div></section>').join('');
++  openDlg(head('Рискованные варианты', D.goals.find(g => g.id === S.goal).name) + '<p class="risk-notice">Выберите вариант на текущей или другой площадке. Откроется его разбор; запрет или необходимость проверки сохраняются.</p>' + (content || '<p>Для этой цели отдельные рискованные варианты в текущей схеме не описаны.</p>'), false, true);
++}
++
++function drawRoute() {
++  const host = $('#steps');
++  host.querySelector('.route-lines')?.remove();
++  const anchors = [...host.querySelectorAll('.stage-selection')];
++  if (anchors.length < 2) return;
++  const box = host.getBoundingClientRect();
++  const points = anchors.map(el => { const r = el.getBoundingClientRect(); return {x:r.left-box.left-8,y:r.top-box.top+r.height/2}; });
++  const rail = 8;
++  let paths = '';
++  for (let i=1;i<points.length;i++) {
++    const a=points[i-1], b=points[i];
++    paths += '<path d="M '+a.x+' '+a.y+' H '+rail+' V '+b.y+' H '+b.x+'"/>';
++  }
++  host.insertAdjacentHTML('afterbegin','<svg class="route-lines" aria-hidden="true" width="'+box.width+'" height="'+box.height+'">'+paths+points.map(p=>'<circle cx="'+p.x+'" cy="'+p.y+'" r="4"/>').join('')+'</svg>');
++}
++
++function syncRouteLayout() {
++  const bar = $('.pathbar');
++  document.documentElement.style.setProperty('--route-height', bar.offsetHeight + 'px');
++  drawRoute();
+ }
+ 
+ function render() {
+@@ -373,15 +410,16 @@
+   S.path = c.map((n) => n.id);
+   store.set('skhema-state', S);
+ 
+-  let crumbs = ['<button type="button" class="crumb" data-crumb="0"' + (c.length ? '' : ' aria-current="step"') + ' title="Вернуться к выбору площадки">' + esc(form.name) + ' · ' + esc(goal.short || goal.name) + '</button>']
+-    .concat(c.map((n, i) => '<button type="button" class="crumb" data-crumb="' + (i + 1) + '"' + (i === c.length - 1 ? ' aria-current="step"' : '') + ' title="Вернуться к шагу ' + (i + 1) + '"><span class="n">0' + (i + 1) + '</span>' + esc(n.name) + '</button>'));
++  $('#path-context').textContent = form.name + ' · ' + (goal.short || goal.name);
++  const labels = ['Площадка', 'Способ', 'Результат'];
++  let crumbs = c.map((n, i) => '<li><button type="button" class="crumb" data-step-nav="' + (i + 1) + '"' + (i === c.length - 1 ? ' aria-current="step"' : '') + '><span class="crumb-index">' + (i + 1) + '</span><span><small>' + labels[i] + '</small><b>' + esc(n.name) + '</b></span></button></li>');
++  if (!c.length) crumbs = ['<li><button type="button" class="crumb empty" data-step-nav="1">Выберите площадку на шаге 1</button></li>'];
+   if (S.goal === 'book' && S.scope !== 'promotion') {
+-    const section = 'Продажа';
+     const orderName = S.salePlace === 'tgbot' ? 'Telegram-бот' : (D.bookPlaces[S.salePlace]?.name || S.salePlace);
+-    const productLabel = S.format === 'print' ? 'печатная книга' : S.salePlace === 'donut' ? 'доступ по подписке' : 'цифровой файл';
+-    crumbs = [crumbs[0], '<span class="crumb" aria-current="step">' + esc(section + ' · ' + productLabel + ' · ' + orderName) + '</span>'];
+-  }
+-  $('#crumbs').innerHTML = crumbs.map((x) => '<li>' + x + '</li>').join('');
++    crumbs = ['<li><span class="crumb" aria-current="step"><span><small>Продажа · ' + (S.format === 'print' ? 'печатная книга' : S.salePlace === 'donut' ? 'подписка' : 'цифровой файл') + '</small><b>' + esc(orderName) + '</b></span></span></li>'];
++  }
++  $('#crumbs').innerHTML = crumbs.join('');
++  $('.path-change').hidden = S.scope !== 'promotion' || !c.length;
+ 
+   let html = '';
+   if (S.goal === 'book' && S.scope !== 'promotion') {
+@@ -410,6 +448,7 @@
+     }
+   }
+   $('#steps').innerHTML = html;
++  requestAnimationFrame(syncRouteLayout);
+   $('#legal').textContent = 'Это разбор, а не юридическое заключение. Общие уточнения и первая цель: 24.11.2026. Другие цели и исходные суммы: ' + D.checked + ', их проверка продолжается. Неопределённые условия не являются подтверждённым разрешением или запретом.';
+ }
+ 
+@@ -539,6 +578,24 @@
+ }
+ 
+ document.addEventListener('click', (e) => {
++  const help = e.target.closest('[data-help]');
++  if (help) {
++    openDlg(head(help.dataset.help === 'scope' ? 'Что проверяем' : 'Как изменить связку') + (help.dataset.help === 'scope' ? $('#scope-help').innerHTML : '<p>Выберите цель и статус, затем площадку на шаге 1 и способ на шаге 2. Каждый следующий этап откроется ниже.</p><p><b>Чтобы начать другую связку, выберите любую площадку на шаге 1.</b> Способ и результат обновятся. Цель, статус и формат материала сохранятся.</p><p>Кнопки в полосе «Ваша связка» возвращают к соответствующему шагу, сохраняя выбор. Цветная полоса карточки показывает риск; фиолетовая рамка и галочка — ваш выбор.</p>'));
++    return;
++  }
++  const nav = e.target.closest('[data-step-nav]');
++  if (nav) { scrollTo(+nav.dataset.stepNav); document.getElementById('st-' + nav.dataset.stepNav)?.focus({preventScroll:true}); return; }
++  if (e.target.closest('[data-risk-options]')) { openRiskOptions(); return; }
++  const riskPick = e.target.closest('[data-risk-pick]');
++  if (riskPick) {
++    const platform = level1().find(p => p.id === riskPick.dataset.riskPlatform);
++    const n = platform?.children?.find(n => n.id === riskPick.dataset.riskPick);
++    if (!n) return;
++    dlg.close(); S.path = [platform.id, n.id]; render();
++    $('#route-status').textContent = 'Выбран рискованный вариант: ' + n.name;
++    requestAnimationFrame(() => { scrollTo(3); $('#st-3')?.focus({preventScroll:true}); });
++    return;
++  }
+   const bs = e.target.closest('[data-book-scope]');
+   if (bs) { const wasPromotion = S.scope === 'promotion'; S.scope = bs.dataset.bookScope; if (wasPromotion && S.scope !== 'promotion' && ['site','vkshop','market','donut','tgbot'].includes(S.path[2])) S.salePlace = S.path[2]; render(); return; }
+   const sp = e.target.closest('[data-sale-place]');
+@@ -554,7 +611,8 @@
+     if (S.goal === 'book' && lv === 1 && findAt(lv, t.dataset.id)?.sample) S.sample = true;
+     S.path = S.path.slice(0, lv).concat(t.dataset.id);
+     render();
+-    requestAnimationFrame(() => scrollTo(lv + 2));
++    $('#route-status').textContent = 'Шаг ' + (lv + 1) + ': ' + (findAt(lv, t.dataset.id)?.name || '') + '. Следующий этап открыт ниже.';
++    requestAnimationFrame(() => { scrollTo(lv + 2); const target = document.getElementById('st-' + (lv + 2)) || document.getElementById('st-' + (lv + 1)); target?.focus({preventScroll:true}); });
+   } else if (t.dataset.guide !== undefined) {
+     const n = findAt(+t.dataset.guide, t.dataset.id);
+     if (n) openGuide(n);
+@@ -572,9 +630,11 @@
+     S.path = S.path.slice(0, +t.dataset.crumb);
+     render();
+   } else if (t.dataset.goto) {
++    if (!chain()[0]?.children?.some(n => n.id === t.dataset.goto)) return;
+     S.path = [S.path[0], t.dataset.goto];
+     render();
+-    requestAnimationFrame(() => scrollTo(3));
++    $('#route-status').textContent = 'Способ на шаге 2 изменён: ' + chain()[1].name;
++    requestAnimationFrame(() => { scrollTo(2); $('#steps [data-pick="1"][aria-pressed="true"]')?.focus({preventScroll:true}); });
+   } else if (t.dataset.goal) {
+     S.goal = t.dataset.goal; S.path = []; $('#goal').value = S.goal; render();
+   } else if (t.dataset.explain) {
+@@ -597,7 +657,8 @@
+   store.set('skhema-theme', m);
+ }
+ 
+-$('#reset').addEventListener('click', () => { S.path = []; S.scope = 'promotion'; S.format = 'file'; S.sample = false; S.salePlace = 'site'; S.publisher = ''; render(); window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' }); });
++if (typeof ResizeObserver !== 'undefined') { const routeObserver = new ResizeObserver(() => requestAnimationFrame(syncRouteLayout)); routeObserver.observe($('.pathbar')); routeObserver.observe($('#steps')); }
++window.addEventListener('resize', () => requestAnimationFrame(syncRouteLayout));
+ document.addEventListener('change', e => { if (e.target.id === 'publisher') { S.publisher = (D.bookPublishers || []).some(p => p.id === e.target.value) ? e.target.value : ''; render(); $('#publisher')?.focus(); } });
+ $('#form').innerHTML = D.forms.map((f) => '<option value="' + f.id + '">' + esc(f.name) + '</option>').join('');
+ $('#goal').innerHTML = D.goals.map((g) => '<option value="' + g.id + '">' + esc(g.name) + '</option>').join('');
+--- /dev/null
++++ b/frontend.css
+@@ -0,0 +1,72 @@
++/* Selection uses violet; legal risk retains its own stripe and label. */
++:root{--selection:light-dark(#4C43BF,#BDB7FF);--selection-bg:light-dark(#F0EEFF,#292640);--route-height:120px}
++body{font-size:16px}
++.geo{opacity:.35}
++.top{position:relative;z-index:6}
++.pathbar{position:sticky;top:0;z-index:5;display:flex;flex-wrap:wrap;align-items:center;gap:10px 18px;padding:14px max(3vw,16px);background:var(--bar);backdrop-filter:blur(16px);border-block:1px solid var(--selection);box-shadow:0 8px 24px var(--sh)}
++.path-heading{display:flex;flex-direction:column;gap:3px;flex:0 1 210px}
++.pathbar .lbl{font-size:14px;color:var(--selection);letter-spacing:.05em}
++#path-context{font-size:12px;color:var(--muted);line-height:1.35}
++.crumbs{flex:1 1 500px;gap:8px;flex-wrap:wrap;overflow:visible}
++.crumbs li{flex:1 1 150px;max-width:320px}
++.crumbs li+li::before{display:none}
++.crumb{display:flex;align-items:center;gap:9px;width:100%;height:100%;padding:9px 12px;border:1px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink);font-size:14px;text-align:left;text-decoration:none;white-space:normal;line-height:1.35}
++.crumb:hover{border-color:var(--selection);background:var(--selection-bg);text-decoration:none}
++.crumb[aria-current]{border:2px solid var(--selection);background:var(--selection-bg);cursor:pointer}
++.crumb small{display:block;font-size:12px;color:var(--muted);font-weight:500;margin-bottom:2px}
++.crumb b{display:block;font-size:14px;overflow-wrap:anywhere}
++.crumb-index{display:grid;place-items:center;flex:none;width:28px;height:28px;background:var(--selection);color:var(--bg);border-radius:50%;font-weight:800}
++.path-change{border:0;background:transparent;color:var(--selection);font-size:14px;font-weight:700;cursor:pointer;text-decoration:underline;text-underline-offset:3px;padding:8px 0}
++.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;border:0}
++.label-help{display:flex;gap:8px;align-items:center;margin-bottom:5px}
++.label-help label{margin:0}
++.help-button{width:28px;height:28px;flex:none;border-radius:50%;border:1px solid currentColor;background:rgba(255,255,255,.15);color:#fff;font-size:16px;font-weight:800;cursor:pointer}
++.fields label{font-size:14px}
++#steps{position:relative;display:flex;flex-direction:column;gap:24px;padding-left:24px}
++.step{position:relative;display:flex;flex-direction:column;gap:16px;padding:22px;border:1px solid var(--line);border-radius:24px;background:var(--bg);scroll-margin-top:calc(var(--route-height) + 18px)}
++.step.has-selection{border-color:var(--selection)}
++.sh{gap:10px 14px;align-items:center}
++.sh h2{font-size:22px;line-height:1.25;flex:1 1 260px}
++.sh h2:focus{outline:none}
++.num{font-size:30px}
++.hint{font-size:14px;flex:1 1 100%}
++.stage-selection{align-self:flex-start;display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:12px;background:var(--selection-bg);border:1px solid var(--selection);color:var(--selection);font-size:14px;max-width:100%}
++.stage-check{display:grid;place-items:center;width:24px;height:24px;flex:none;background:var(--selection);color:var(--bg);border-radius:50%}
++.route-lines{position:absolute;top:0;left:0;pointer-events:none;overflow:visible;z-index:2}
++.route-lines path{fill:none;stroke:var(--selection);stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
++.route-lines circle{fill:var(--selection);stroke:var(--bg);stroke-width:2}
++.restart-hint{margin:0;color:var(--muted);font-size:14px}
++.row{gap:16px;align-items:stretch}
++.opt{flex:1 1 200px;max-width:260px;border:1px solid var(--line);box-shadow:none;overflow:visible}
++.opt .hd{border-radius:17px 17px 0 0;font-size:12px;letter-spacing:.03em}
++.opt.sel{border:2px solid var(--selection);background:var(--selection-bg);box-shadow:0 0 0 3px var(--bg),0 0 0 5px var(--selection);transform:none}
++.opt.sel .hd{border-radius:0}
++.selection-label{padding:8px 12px;border-radius:15px 15px 0 0;background:var(--selection);color:var(--bg);font-size:14px;font-weight:800}
++.bd{flex:1;gap:9px;padding:14px;box-sizing:border-box}
++.t{font-size:16px;line-height:1.4}
++.d{font-size:14px;line-height:1.5}
++.ft{padding:0 14px 14px;gap:8px}
++.lnk{min-height:36px;font-size:13px}
++.big{padding:20px;flex:1 1 270px;box-shadow:none}
++.big p{margin:0;font-size:16px;line-height:1.5}
++.big ul{font-size:16px;line-height:1.5}
++.big .sub{font-size:14px}
++.big .wbtn{font-size:15px;white-space:normal;line-height:1.4;padding:10px 16px;justify-content:center}
++.risk-entry{margin-top:auto;padding-top:20px;display:flex;flex-direction:column;gap:8px;align-items:flex-start}
++.risk-entry .wbtn{background:transparent;color:white;border:2px solid white}
++.risk-notice{padding:16px;background:var(--selection-bg);border-radius:14px;line-height:1.6}
++.risk-options{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px}
++.risk-option{display:flex;flex-direction:column;gap:10px;align-items:flex-start;text-align:left;padding:18px;border:1px solid var(--line);border-radius:16px;background:var(--bg);color:var(--ink);font-size:16px;cursor:pointer}
++.risk-option:hover{border-color:var(--selection)}
++.risk-option>span:not(.risk-tag){color:var(--muted);font-size:14px}
++.risk-option strong{color:var(--selection);font-size:14px;margin-top:auto}
++.risk-tag{font-size:13px;font-weight:700;color:light-dark(#AD1744,#FFA8BF)}
++.version-note{margin-bottom:18px;padding:16px 20px;border:1px solid var(--line);border-radius:16px;font-size:14px;color:var(--muted)}
++.version-note summary{cursor:pointer;color:var(--ink);font-weight:700}
++.version-note a{color:var(--pillink)}
++@media(max-width:800px){.path-heading{flex:1 1 160px}.path-change{margin-left:auto;order:0}.crumbs{order:1;flex-basis:100%}.crumbs li{flex:1 1 120px}.pathbar{gap:8px;padding:10px 16px}.step{padding:18px}.opt{max-width:none}}
++@media(max-width:600px){.bar .tools{width:auto;margin-left:auto}.pathbar .lbl{font-size:13px}.path-heading{flex-basis:60%}#path-context{font-size:11px}.crumbs{gap:6px}.crumbs li{flex:1 1 0}.crumb{padding:8px;gap:5px;align-items:flex-start}.crumb-index{width:20px;height:20px;font-size:12px}.crumb small{font-size:11px}.crumb b{font-size:12px;line-height:1.4}.path-change{font-size:12px}main{padding:16px 12px 0;gap:20px}.hero{border-radius:20px;padding:18px}.hero h1{font-size:28px;line-height:1.1}.hero .theme-note{font-size:14px}#steps{padding-left:18px;gap:18px}.step{padding:16px 12px;border-radius:18px}.sh h2{font-size:19px;flex-basis:200px}.stage-selection{font-size:13px}.opt{flex:1 1 100%}.big{padding:16px}.risk-options{grid-template-columns:1fr}.route-lines path{stroke-width:2}}
++@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}.opt:hover{transform:none}}
++
++.risk-group{display:flex;flex-direction:column;gap:12px;padding-top:8px}.risk-group h4{margin:0;font-size:18px}.risk-options .risk-option{max-width:520px}
++@media(max-width:600px){.path-heading{flex:1 1 100px}.path-change{flex:none}}
+--- a/README.txt
++++ b/README.txt
+@@ -1,3 +1,10 @@
++ФРОНТЕНД v1 · на основе рабочей v8 · 24.11.2026
++Отдельный вариант интерфейса на согласовании. Юридические данные v8 сохранены.
++Полоса связки закреплена; выбранные этапы соединены линией; рискованные разборы открываются отдельным окном.
++Пояснение разделов — под знаком вопроса, версия — в подвале.
++
++История исходного пакета:
++
+ СХЕМА ПРОДВИЖЕНИЯ И МАРКИРОВКИ РЕКЛАМЫ — РФ
+ Рабочая резервная редакция · 24.11.2026 · v5
+ 
+--- a/version.json
++++ b/version.json
+@@ -1,6 +1,6 @@
+ {
+-  "version": "2026-11-24-working-v8",
+-  "status": "Рабочая резервная версия; выдача сайта отложена автором",
++  "version": "2026-11-24-working-v8-frontend-v1",
++  "status": "Отдельная рабочая версия фронтенда на согласовании",
+   "base_repository": "9479797/ru-legal-online",
+   "base_commit": "60bf80361bd757522656631eb45ddb19cc1cee88",
+   "old_book_links_preserved": 56,
+@@ -9,7 +9,7 @@
+   "files": {
+     "CHANGELOG.local.md": "dfb89c08f04f8116ba4a48c7995bc79c34f30c37f2e697d13d6c27aab361bebe",
+     "LEGAL_REVIEW_2026-11-24.md": "e81dd87e65e24cb0aab677593ac2e2b739a6382c4921900c64505903cba9b9fa",
+-    "README.txt": "384e6395938d785de8cd77f7c0bfb0d0ecdd198aed67735541ede0fd581d18af",
++    "README.txt": "31e3788380ebc9b406e312e6422e04334229a5ea23f97789b873dfce01294069",
+     "SOURCES.md": "032f42d2586c4ba7c19ffb66691706528475e7acefdc6523e7b5d215e2fbf535",
+     "TASKS.md": "04426ee75d6d5db65bb288e95a3962204ee8e6575d866b10155445f3df1cc873",
+     "book-ui.js": "2c64e47ad43f55e5ea0d9fe325324d79ea427a4a8c343a41599abc6869ae49db",
+@@ -25,7 +25,8 @@
+     "docs/AUDIT_VK_BOOK_2026-11-24.md": "f0e67431df6c92293fb32f596f7d8305352b53d03adb3d91740efedd007d86d0",
+     "docs/AUDIT_YOUTUBE_TIKTOK_BOOK_2026-11-24.md": "9f50009de772dfb32b0b3f591011d6592feb4d455bd058ab8972aaf54ff887e4",
+     "docs/plan-skhemy.md": "c663b96e6309b7802bc19e5264fb2d4c1240f9bad135209f9294a23ec753a784",
+-    "index.html": "2a54f419627be6dba2795f2166635ea78e4abd031f0c114a597d04ccdab0eaf9",
++    "frontend.css": "c597b8568a167412ebb5931f467bf9b2891463fdb6efe4f56cdd1d5070e1969f",
++    "index.html": "83696681d90b4013842f5f2d0e18ce2c3767c285f4fbb319aab5b39dd1ce5d0d",
+     "markirovka.html": "dd6154817dcbdd9b27bc5d8ae46c9a53efcb2f58888ed338f7df39baaccfd59b",
+     "markirovka.js": "9328d94e80e0a2b695722134c7cb6c0e52cd20b55685b51c1736c7c3cee8cc0d"
+   },
+@@ -96,5 +97,6 @@
+     "PROMO-SCOPE02"
+   ],
+   "publication_platform_options": 9,
+-  "open_telegram_ads_destination": true
++  "open_telegram_ads_destination": true,
++  "frontend_base": "2026-11-24-working-v8"
+ }
