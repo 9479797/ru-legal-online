@@ -1,0 +1,195 @@
+--- a/site/data.js
++++ b/site/data.js
+@@ -3722,3 +3722,71 @@
+   D.review.status = 'Рабочая версия · v5';
+   D.review.scope = 'Согласованные поправки VK, сайта, базы и маркетплейса первой цели. Цифровые модели и открытые условия требуют проверки; первая цель целиком ещё не утверждена.';
+ })();
++
++/* Согласованные пояснения по кнопке и входящий ответ Telegram · рабочая v6.
++   Примеры учебные: оценка конкретной публикации остаётся отдельной проверкой. */
++(function () {
++  const D = window.SCHEMA;
++  const ig = D.start.book.find(p => p.id === 'instagram');
++  const patch = (id, fields) => Object.assign(ig.children.find(c => c.id === id), fields);
++  const note = 'Это учебные примеры. Для вывода нужно увидеть всю публикацию, её оформление и страницу по ссылке. Отсутствие цены или слова «купить» не гарантирует, что рекламы нет. Реклама в Instagram запрещена; маркировка запрет не отменяет.';
++  const guide = (explanation, first, second) => ({ explanation, examples: [first, second], note,
++    sources: [{name:'ФАС: понятие рекламы',url:'https://www.garant.ru/products/ipo/prime/doc/407904467/'},{name:'Закон о рекламе, статья 5',url:'https://www.consultant.ru/document/cons_doc_LAW_58968/f67f81c57fdcdacc2643d19d59369f7e185e1156/'}], checked:'24.11.2026' });
++  patch('author', {
++    short:'Сведения об авторе и книге: проверьте, не стали ли они рекламой.',
++    details:'Можно рассказывать об авторе и его произведениях. Но если публикация продвигает книгу, одного указания авторства недостаточно, чтобы считать её информационной. Оцените весь материал.',
++    guide:guide('Сведения об авторе помогают понять, кто подготовил материал. Рекламное предложение побуждает приобрести книгу. Смотрите, какую задачу выполняет публикация целиком.',
++      {label:'Вариант 1 · сведения об авторе',text:'Иван Петров — автор книги «Семейный бюджет». Здесь он разбирает способы учёта расходов.',why:'Это пример представления автора. Важно, чтобы остальной материал тоже выполнял информационную задачу.'},
++      {label:'Вариант 2 · предложение книги',text:'Мой гайд — всё, что нужно для порядка в финансах. Купите его сегодня по специальной цене.',why:'Текст выделяет продукт и предлагает его приобрести. Такой рекламный материал в Instagram размещать нельзя.'})
++  });
++  patch('bio', {
++    short:'Проверьте описание профиля, кнопки и страницу по ссылке.',
++    details:'Шапку профиля оценивают целиком. Сведения об авторе и книгах могут быть информацией. Цена, скидка и ссылка требуют оценки в общем контексте; один элемент не решает вопрос. Ссылка на главную страницу тоже не гарантирует отсутствие рекламы.',
++    here:{can:['Указывать правдивые сведения об авторе и его произведениях','Оценить описание, кнопки и страницу назначения вместе'],cannot:['Считать главную страницу гарантией отсутствия рекламы','Маскировать рекламное предложение под сведения об авторе']},
++    guide:guide('Не определяйте рекламу только по наличию ссылки или цены. Проверьте, представляет ли шапка автора или выделяет книгу и предлагает её купить.',
++      {label:'Вариант 1 · описание автора',text:'Иван Петров. Автор книги «Семейный бюджет». Статьи об учёте расходов.',why:'Это пример кратких сведений о деятельности. Содержание профиля и ссылки всё равно нужно проверить.'},
++      {label:'Вариант 2 · рекламное предложение',text:'Только сегодня! Купите мой гайд со скидкой 50%. Заказ по ссылке.',why:'Есть выделение продукта, скидка и призыв к покупке. Это пример рекламного предложения, а не разрешённой шапки.'})
++  });
++  patch('source', {
++    short:'Источник в разборе и продвижение книги — разные случаи.',
++    details:'Название книги и авторство могут объяснять, откуда взят материал. Отдельно проверьте, не превратились ли обложка, похвала и ссылка в продвижение книги. Отсутствие ссылки само по себе не исключает рекламу.',
++    here:{can:['Указывать источник внутри самостоятельного экспертного разбора','Оценить текст, обложку, похвалу и ссылку вместе'],cannot:['Считать отсутствие ссылки доказательством отсутствия рекламы','Выдавать продвижение книги за нейтральное указание источника']},
++    guide:guide('Источник объясняет происхождение сведений. При продвижении главным объектом становится сама книга и её покупка. Показ обложки или упоминание названия отдельно не дают готового ответа.',
++      {label:'Вариант 1 · источник в разборе',text:'В книге «Семейный бюджет» я рассматриваю три способа учёта расходов. Ниже подробно разберём один из них.',why:'Продолжение должно быть самостоятельным полезным разбором. Это пример для оценки, а не гарантия отсутствия рекламы.'},
++      {label:'Вариант 2 · продвижение книги',text:'В этой книге собраны все лучшие способы экономии. Обязательно купите её — ссылка в профиле.',why:'Главная задача примера — привлечь внимание к книге и побудить к покупке.'})
++  });
++  patch('dm', {
++    short:'Человек сам спросил о книге — ответьте по существу вопроса.',
++    details:'Отличайте ответ на входящий вопрос от рекламной рассылки. Само использование бота не определяет допустимость переписки. Вопрос о книге не означает согласия на дальнейшую рекламную серию; отдельно проверяют содержание сообщений и обработку данных.',
++    guide:guide('Ответьте на то, что спросил человек. Если затем хотите отправлять ему рекламу, это уже отдельная проверка. Не считайте личную переписку автоматическим освобождением от всех требований.',
++      {label:'Вариант 1 · ответ на вопрос',text:'Читатель: «Есть ли печатная версия и где посмотреть условия?» Автор: «Да, описание и условия покупки находятся на этой странице: [ссылка]».',why:'Ответ связан с конкретным запросом человека. Оценивайте содержание ответа и не добавляйте автоматическую подписку на рекламу.'},
++      {label:'Вариант 2 · дальнейшая рассылка',text:'После одного вопроса о книге автор начинает ежедневно присылать скидки и предложения других продуктов без отдельного согласия.',why:'Первый вопрос не разрешает последующую рекламную рассылку. Её нельзя считать продолжением одного запрошенного ответа.'})
++  });
++  patch('tglink', {
++    short:'Переход в другой канал. Исходное сообщение проверяют отдельно.',
++    details:'Этот маршрут заканчивается переходом аудитории в Telegram. Сначала оцените сообщение в Instagram: если оно рекламное, перевод ссылки в другой канал запрет не отменяет. Публикации в Telegram проверяют отдельно. Переходный период ФАС для Telegram не относится к рекламе в Instagram.',
++    guide:guide('Ссылка может сообщать, где ещё публикуется автор, или быть частью рекламного предложения. Проверьте оба этапа: сообщение в Instagram и содержание канала назначения. Переход сам по себе не означает покупку.',
++      {label:'Вариант 1 · сведения о канале',text:'Мои статьи об учёте расходов также доступны в Telegram: [ссылка].',why:'Это пример сообщения о месте публикации. Нейтральность зависит от всего контекста и содержания назначения.'},
++      {label:'Вариант 2 · продажа через переход',text:'В Telegram только сегодня продаю гайд со скидкой. Переходите и покупайте!',why:'Ссылка включена в рекламное предложение книги. Перенос покупки в другой канал не устраняет рекламу в Instagram.'})
++  });
++  patch('word', {
++    short:'Если пост рекламирует книгу, ответ в директ запрет не отменяет.',
++    details:'Оцените исходную публикацию. Если она продвигает книгу, скрытая в личном ответе ссылка не устраняет рекламу в Instagram. Но просьба написать сообщение или команда боту сама по себе ещё не определяет рекламный характер материала.',
++    guide:guide('Проверяется сам пост, а не только способ получения ссылки. Ключевое слово бывает частью полезного взаимодействия или рекламной продажи. Не используйте директ для маскировки рекламного предложения.',
++      {label:'Вариант 1 · вопрос по теме',text:'Как вы ведёте учёт расходов? Напишите в комментариях, какой способ вам удобнее.',why:'В этом учебном примере нет предложения книги. Само обращение к читателю не делает материал рекламой.'},
++      {label:'Вариант 2 · рекламный пост',text:'Мой гайд поможет навести порядок в финансах. Напишите «ГАЙД», чтобы купить его по специальной цене.',why:'Пост выделяет продукт и подталкивает к покупке. Получение ссылки в директ не устраняет этот риск.'})
++  });
++  patch('target', {guide:guide('Платное рекламное объявление и обычная публикация — разные действия. Маркировка не разрешает рекламу на запрещённой площадке. Другие платные функции и конкретные платежи требуют отдельной оценки.',
++    {label:'Вариант 1 · экспертный материал',text:'Автор публикует самостоятельный разбор учёта расходов без продвижения книги.',why:'Оцените реальный текст. Это информационный пример, а не утверждение, что любой неоплаченный пост безопасен.'},
++    {label:'Вариант 2 · таргетированная реклама',text:'Автор оплачивает показы объявления «Купите мой гайд» в Instagram.',why:'Это рекламное размещение. Полученный erid не отменяет запрета площадки.'})});
++  const tg = D.start.book.find(p => p.id === 'telegram');
++  if (!tg.children.some(c=>c.id==='tg-reply')) tg.children.splice(1,0,{
++    id:'tg-reply',name:'Ответ на входящий вопрос о книге',risk:'y',
++    short:'Человек сам спросил — ответьте в пределах вопроса и дайте нужную ссылку.',
++    details:'Отличайте конкретный запрошенный ответ от публичной рекламы и рассылки. Уточните формат книги и дайте сведения по вопросу. Входящее сообщение не означает согласия на дальнейшую рекламу. Личная переписка не освобождается автоматически от всех правил; бот-магазин проверяется отдельным маршрутом.',
++    here:{can:['Ответить на вопрос о формате, содержании и условиях предложения','Дать ссылку на сайт или карточку печатной книги VK','Отдельно проверить содержание ответа и обработку необходимых данных'],cannot:['Автоматически подписывать обратившегося на рекламную рассылку','Считать единичный вопрос согласием на дальнейшие рекламные сообщения','Переносить вывод о личном ответе на публичную рекламу канала']},
++    fines:['mailing','pd'],dest:['site','vkshop']
++  });
++  D.review.status='Рабочая версия · v6';
++  D.review.scope='Пояснения Instagram с парными примерами открываются по кнопке. Добавлен согласованный входящий ответ Telegram. Полный аудит первой цели ещё продолжается.';
++})();
+--- a/site/index.html
++++ b/site/index.html
+@@ -71,6 +71,8 @@
+ .d{font-size:13px;line-height:1.45;color:var(--muted)}
+ .ft{display:flex;gap:6px;flex-wrap:wrap;padding:0 12px 12px;margin-top:auto}
+ .lnk{display:inline-flex;align-items:center;gap:4px;min-height:32px;padding:0 8px;white-space:nowrap;border-radius:999px;border:1px solid var(--line);background:transparent;font-size:11.5px;font-weight:700;color:var(--pillink);cursor:pointer}
++.lnk.guide-button{border:2px solid var(--pillink);font-size:14px;min-height:40px;padding:4px 10px;white-space:normal;text-align:left}
++.guide-copy{font-size:16px;line-height:1.6}.guide-pair{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.guide-example{padding:18px;border:1px solid var(--line);border-radius:16px;background:var(--soft);font-size:16px;overflow-wrap:anywhere}.guide-example h4{margin:0 0 12px;font-size:17px}.guide-example blockquote{margin:0 0 12px;padding-left:12px;border-left:3px solid var(--pillink)}.guide-example p{color:var(--muted)}.guide-note{padding:14px;border-left:4px solid #e8a52c;background:var(--soft);font-size:16px}.guide-sources{font-size:14px}.guide-sources a{color:var(--pillink)}@media(max-width:700px){.guide-pair{grid-template-columns:1fr}}
+ .big{display:flex;flex-direction:column;gap:10px;flex:1 1 300px;padding:16px 18px;border-radius:20px;color:#fff;box-shadow:0 10px 30px var(--sh)}
+ .big h3{margin:0;font-family:"Arial Narrow",Arial,sans-serif;font-size:20px;font-weight:600;text-transform:uppercase}
+ .big h4{margin:4px 0 0;font-size:12px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;opacity:.92}
+@@ -188,7 +190,7 @@
+ </div>
+ </section>
+ <section class="note" id="scope-help" aria-label="Как выбрать раздел"><p><b>Продвижение</b> — как человек узнаёт о предложении и приходит к нему: публикации, реклама, рекомендации и переходы между площадками.</p><p><b>Продажа</b> — что человек видит в месте продажи: страница товара, карточка или предложение в боте. Здесь проверяем рекламный характер, содержание и необходимые сведения.</p><p>Выдача материалов, доставка и оказание услуг относятся к сопровождению онлайн-бизнеса.</p></section>
+-<section class="note review-banner"><b>Рабочая версия · 24.11.2026 · v5</b><p>Обновлены общие пояснения и первая цель. Другие девять целей сохранены и ждут последовательной проверки. Статус готовности маршрута не подтверждается одним цветом карточки.</p><p><a href="TASKS.md">Задачи и нерешённые вопросы</a> · <a href="LEGAL_REVIEW_2026-11-24.md">Результаты дополнительной сверки</a></p></section>
++<section class="note review-banner"><b>Рабочая версия · 24.11.2026 · v6</b><p>Обновлены общие пояснения и первая цель. Другие девять целей сохранены и ждут последовательной проверки. Статус готовности маршрута не подтверждается одним цветом карточки.</p><p><a href="TASKS.md">Задачи и нерешённые вопросы</a> · <a href="LEGAL_REVIEW_2026-11-24.md">Результаты дополнительной сверки</a></p></section>
+ <section class="note book-settings" id="book-settings" aria-label="Формат текстового материала"><div><label for="format"><b>Что получает покупатель</b></label><select id="format"><option value="file">Цифровой файл</option><option value="print">Печатную книгу</option></select></div><label class="sample-choice"><input type="checkbox" id="sample">Предлагать бесплатный фрагмент перед покупкой</label><p>Фрагмент — необязательный этап знакомства с содержанием. Покупка и рекламная подписка рассматриваются отдельно.</p></section>
+ <div id="steps" style="display:flex;flex-direction:column;gap:28px"></div>
+ </main>
+@@ -280,7 +282,7 @@
+   return '<div class="opt ' + n.risk + (sel ? ' sel' : '') + '">' +
+     '<div class="hd">' + ico(n.risk) + RL[n.risk] + (sel ? '<span class="pick">Выбрано</span>' : '') + '</div>' +
+     '<button class="bd" type="button" data-pick="' + level + '" data-id="' + esc(n.id) + '" aria-pressed="' + sel + '"><span class="t">' + esc(n.name) + '</span><span class="d">' + esc(n.short) + '</span></button>' +
+-    '<div class="ft"><button class="lnk" type="button" data-more="' + level + '" data-id="' + esc(n.id) + '">Подробнее</button>' +
++    '<div class="ft">' + (n.guide ? '<button class="lnk guide-button" type="button" data-guide="' + level + '" data-id="' + esc(n.id) + '" aria-haspopup="dialog" aria-controls="dlg">Пояснение и 2 примера</button>' : '') + '<button class="lnk" type="button" data-more="' + level + '" data-id="' + esc(n.id) + '">Подробнее</button>' +
+     '<button class="lnk" type="button" data-fines="' + level + '" data-id="' + esc(n.id) + '">' + scale + 'Ответственность</button></div></div>';
+ }
+ 
+@@ -489,7 +491,9 @@
+ }
+ 
+ const dlg = $('#dlg');
++let dialogInvoker = null;
+ function openDlg(html, brand, wide) {
++  dialogInvoker = document.activeElement;
+   dlg.classList.toggle('wide', !!wide);
+   dlg.innerHTML = '<div class="dlg' + (brand ? ' brand' : '') + '">' + html + '</div>';
+   try { dlg.showModal(); } catch (e) { dlg.setAttribute('open', ''); }
+@@ -497,6 +501,15 @@
+   if (x) x.focus();
+ }
+ dlg.addEventListener('click', (e) => { if (e.target === dlg || e.target.closest('.x')) dlg.close(); });
++dlg.addEventListener('close', () => { if (dialogInvoker?.isConnected) dialogInvoker.focus(); });
++
++function openGuide(n) {
++  const g = n.guide;
++  if (!g) return;
++  const examples = g.examples.map(x => '<section class="guide-example"><h4>' + esc(x.label) + '</h4><blockquote>' + esc(x.text) + '</blockquote><p>' + esc(x.why) + '</p></section>').join('');
++  const sources = (g.sources || []).map(x => '<a href="' + esc(x.url) + '" target="_blank" rel="noopener noreferrer">' + esc(x.name) + '</a>').join(' · ');
++  openDlg(head(n.name, 'Пояснение и два учебных примера') + '<p class="guide-copy">' + esc(g.explanation) + '</p><div class="guide-pair">' + examples + '</div><p class="guide-note">' + esc(g.note) + '</p><p class="guide-sources">Сверка: ' + esc(g.checked) + '. ' + sources + '</p>', false, true);
++}
+ 
+ function head(title, sub, risk) {
+   return '<div class="dh"><div style="display:flex;flex-direction:column;gap:6px">' + (risk ? '<span class="lab" style="background:var(--' + risk + ');' + (risk === 'y' ? 'color:#2B1F00' : '') + '">' + RL[risk] + '</span>' : '') +
+@@ -517,7 +530,7 @@
+   if (tl) { if (tl.dataset.tool === 'calendar') openCalendar(); else openCompare(); return; }
+   const s = e.target.closest('[data-save]');
+   if (s) { saveResult(s.dataset.save); return; }
+-  const t = e.target.closest('[data-pick],[data-more],[data-fines],[data-crumb],[data-goto],[data-goal],[data-explain],[data-theme-set]');
++  const t = e.target.closest('[data-pick],[data-more],[data-fines],[data-guide],[data-crumb],[data-goto],[data-goal],[data-explain],[data-theme-set]');
+   if (!t) return;
+   if (t.dataset.pick !== undefined) {
+     const lv = +t.dataset.pick;
+@@ -525,6 +538,9 @@
+     S.path = S.path.slice(0, lv).concat(t.dataset.id);
+     render();
+     requestAnimationFrame(() => scrollTo(lv + 2));
++  } else if (t.dataset.guide !== undefined) {
++    const n = findAt(+t.dataset.guide, t.dataset.id);
++    if (n) openGuide(n);
+   } else if (t.dataset.more !== undefined) {
+     const n = findAt(+t.dataset.more, t.dataset.id);
+     if (n) openDlg(head(n.name, 'Подробнее', n.risk) + '<p>' + esc(n.details) + '</p>');
+--- a/site/book-ui.js
++++ b/site/book-ui.js
+@@ -77,8 +77,8 @@
+       return blocks;
+     }
+     function summary() {
+-      if (incompatible() || verification()) return { title: scopes[S.scope] + ' · ' + fmt(), path: selected()[1], blocks: summaryBlocks(), legal: 'Предлагаемая локальная редакция 24.11.2026 · v5. Это разбор, а не юридическое заключение.' };
+-      return { title: scopes[S.scope] + ' · ' + productName() + ' · ' + curForm().name, path: selected()[1], blocks: summaryBlocks().concat([['Проверка предложения', saleItems()]]), legal: 'Предлагаемая локальная редакция 24.11.2026 · v5. Это разбор, а не юридическое заключение. Платежи, договоры и нерешённые условия сервисов проверяются под конкретную модель.' };
++      if (incompatible() || verification()) return { title: scopes[S.scope] + ' · ' + fmt(), path: selected()[1], blocks: summaryBlocks(), legal: 'Предлагаемая локальная редакция 24.11.2026 · v6. Это разбор, а не юридическое заключение.' };
++      return { title: scopes[S.scope] + ' · ' + productName() + ' · ' + curForm().name, path: selected()[1], blocks: summaryBlocks().concat([['Проверка предложения', saleItems()]]), legal: 'Предлагаемая локальная редакция 24.11.2026 · v6. Это разбор, а не юридическое заключение. Платежи, договоры и нерешённые условия сервисов проверяются под конкретную модель.' };
+     }
+     return { renderStage, outcome, summaryBlocks, summary, navigation, incompatible, verification };
+   }
+--- a/scripts/proverka_local.js
++++ b/scripts/proverka_local.js
+@@ -18,7 +18,7 @@
+   assert(n,'Удалена площадка '+p.id);
+   for (const c of p.children||[]) assert(n.children.some(x=>x.id===c.id),'Удалена связка '+c.id);
+ }
+-assert.equal(after.start.book.flatMap(p=>p.children||[]).length,63);
++assert.equal(after.start.book.flatMap(p=>p.children||[]).length,64);
+ for (const [id,p] of Object.entries(after.bookPlaces)) {
+   assert(after.places[id]); assert(p.can && p.cannot && p.check);
+ }
+@@ -100,6 +100,13 @@
+ assert(ui.summaryBlocks(email,{id:'market',name:'Сервис'},platform).some(x=>x[0]==='Риск исходной площадки'));
+ const vk=after.start.book.find(p=>p.id==='vk');
+ assert.equal(vk.children.length,11);
++const tgReply=links.find(b=>b.id==='tg-reply');
++assert(tgReply && tgReply.dest.includes('site') && tgReply.dest.includes('vkshop'));
++assert(tgReply.here.cannot.some(t=>t.includes('Автоматически подписывать')));
++for(const b of after.start.book.find(p=>p.id==='instagram').children) {
++  assert.equal(b.guide.examples.length,2,'Два примера: '+b.id);
++  assert(b.guide.note.includes('учебные'));
++}
+ const reply=links.find(b=>b.id==='vk-reply');
+ assert(reply && reply.here.cannot.some(t=>t.includes('Автоматически подписывать')));
+ assert.deepEqual(Array.from(reply.dest),['site','vkshop']);
+@@ -139,7 +146,7 @@
+   for(const match of text.matchAll(/<script>([\s\S]*?)<\/script>/g)) new vm.Script(match[1],{filename:page});
+   for(const match of text.matchAll(/<script src="([^"]+)"/g)) assert(fs.existsSync(path.join(root,'site',match[1])));
+ }
+-console.log('Проверено: 10 целей, 6 статусов, все 56 прежних связок сохранены, 7 добавлены, другие 9 целей не изменены.');
++console.log('Проверено: 10 целей, 6 статусов, все 56 прежних связок сохранены, 8 добавлены, другие 9 целей не изменены.');
+ console.log('Проверено '+cases+' сочетаний формата, раздела, места заказа и статуса; сохранённые итоги не продолжают тупики и перенос аудитории как покупку.');
+ console.log('Обе HTML-страницы: синтаксис скриптов, относительные зависимости и отсутствие загрузки внешних шрифтов — без ошибок.');
+ console.log('Бот/сайт различаются в итогах; Донат сохраняет подписку; копии видео не превращаются в перенос аудитории или покупку.');
