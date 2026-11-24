@@ -3,7 +3,7 @@
 
 Проверяет каждый skills/<имя>/SKILL.md:
 - есть фронтматтер с name и description;
-- name совпадает с именем папки;
+- name совпадает с именем папки и форматом Agent Skills Specification;
 - description не длиннее 1024 символов;
 - нет запрещённых оборотов из AGENTS.md;
 - данные схемы site/data.js ссылаются только на существующие штрафы и площадки (нужен Node.js).
@@ -68,6 +68,10 @@ def main():
             continue
         if fm.get("name") != papka:
             oshibki.append(f"{papka}: name «{fm.get('name')}» не совпадает с папкой")
+        # Agent Skills Specification: lowercase a-z/0-9 and single hyphens, 1–64 chars.
+        # Directory name and frontmatter name must match exactly.
+        if len(papka) > 64 or not re.fullmatch(r"[a-z0-9]+(?:-[a-z0-9]+)*", papka):
+            oshibki.append(f"{papka}: имя папки нарушает Agent Skills Specification")
         opis = fm.get("description", "")
         if not opis:
             oshibki.append(f"{papka}: пустое description")
