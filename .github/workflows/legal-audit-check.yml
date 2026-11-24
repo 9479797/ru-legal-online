@@ -15,16 +15,8 @@ on:
       - "CHANGELOG.md"
       - ".github/workflows/legal-audit-check.yml"
   pull_request:
-    paths:
-      - "skills/**"
-      - "scripts/**"
-      - "site/**"
-      - "docs/**"
-      - "README.md"
-      - "AGENTS.md"
-      - "CLAUDE.md"
-      - "CHANGELOG.md"
-      - ".github/workflows/legal-audit-check.yml"
+    branches:
+      - main
   workflow_dispatch:
 
 permissions:
