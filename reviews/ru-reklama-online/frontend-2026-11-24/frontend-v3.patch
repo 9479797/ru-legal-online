@@ -1,0 +1,79 @@
+diff --git a/dist/frontend-motion.js b/dist/frontend-motion.js
+index a5f5337..18b2c4c 100644
+--- a/dist/frontend-motion.js
++++ b/dist/frontend-motion.js
+@@ -100,6 +100,7 @@
+   }
+ 
+   function create({ host, bar, reduce = false }) {
++    let following=false;
+     let records = new Map(), signature = '', routeFrame = 0, scrollFrame = 0;
+     const NS = 'http://www.w3.org/2000/svg';
+     const svgEl = (tag, attrs) => { const el = document.createElementNS(NS, tag); for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v); return el; };
+@@ -115,7 +116,9 @@
+         r.head.style.visibility = progress > 0 ? 'visible' : 'hidden';
+         if (progress < 1) unfinished = true;
+       }
+-      if (unfinished) routeFrame = requestAnimationFrame(frame);
++      const active=[...records.values()].find(r=>now>=r.start&&now<r.start+r.duration);
++      if(active && following){const p=active.path.getPointAtLength(active.length*clamp((now-active.start)/active.duration,0,1));const y=host.getBoundingClientRect().top+window.scrollY+p.y;window.scrollTo({top:Math.max(0,y-bar.offsetHeight-window.innerHeight*.38),behavior:'instant'});}
++      if (unfinished) routeFrame = requestAnimationFrame(frame); else following=false;
+     }
+     function sync(context) {
+       document.documentElement.style.setProperty('--route-height', bar.offsetHeight + 'px');
+@@ -128,10 +131,16 @@
+       const routes = [];
+       for (let i = 1; i < cards.length; i++) {
+         const a = rect(cards[i - 1]), b = rect(cards[i]);
+-        const start = { x:round((a.left+a.right)/2), y:a.bottom+8 };
++        const start = { x:round((a.left+a.right)/2), y:a.top-18 };
+         const end = { x:round((b.left+b.right)/2), y:b.top-8 };
+-        const points = routeBetween(start, end, obstacles, box.width);
+-        if (points) routes.push({ key:context + ':' + keys.slice(0,i+1).join('/'), d:roundedPath([{x:start.x,y:a.bottom+4}, ...points, {x:end.x,y:b.top-4}]) });
++        const sourceStep=cards[i-1].closest('.step'), targetStep=cards[i].closest('.step');
++        const sourceTop=rect(sourceStep).top, targetTop=rect(targetStep).top;
++        const sourceRow=cards[i-1].parentElement;
++        const targetRow=cards[i].parentElement;
++        const sy=rect(sourceRow).top-18, ty=rect(targetRow).top-18;
++        const rail=8;
++        const points=[{x:start.x,y:sy},{x:rail,y:sy},{x:rail,y:ty},{x:end.x,y:ty}];
++        if (points) routes.push({ key:context + ':' + keys.slice(0,i+1).join('/'), d:roundedPath([{x:start.x,y:a.top-4}, ...points, {x:end.x,y:b.top-4}]) });
+       }
+       const nextSignature = box.width + '|' + box.height + '|' + JSON.stringify(routes);
+       if (signature === nextSignature && host.querySelector('.route-lines')) return;
+@@ -160,10 +169,11 @@
+       }
+       frame(performance.now());
+     }
+-    function cancelScroll() { if (scrollFrame) cancelAnimationFrame(scrollFrame); scrollFrame = 0; }
++    function cancelScroll() { following=false; if (scrollFrame) cancelAnimationFrame(scrollFrame); scrollFrame = 0; }
+     function scrollToElement(el) {
+       if (!el) return;
+       cancelScroll();
++      if(!reduce && [...records.values()].some(r=>performance.now()<r.start+r.duration)){following=true;return;}
+       const from = window.scrollY;
+       const max = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+       const to = clamp(from + el.getBoundingClientRect().top - bar.offsetHeight - 22, 0, max);
+diff --git a/dist/frontend.css b/dist/frontend.css
+index 744cb3e..6097f06 100644
+--- a/dist/frontend.css
++++ b/dist/frontend.css
+@@ -69,3 +69,5 @@ body{font-size:16px}
+ 
+ .risk-group{display:flex;flex-direction:column;gap:12px;padding-top:8px}.risk-group h4{margin:0;font-size:18px}.risk-options .risk-option{max-width:520px}
+ @media(max-width:600px){.path-heading{flex:1 1 100px}.path-change{flex:none}}
++
++.step>.row{padding-top:22px}.step>.sh{margin-bottom:8px}#steps{padding-left:40px}
+diff --git a/dist/index.html b/dist/index.html
+index 6ff4740..596e66e 100644
+--- a/dist/index.html
++++ b/dist/index.html
+@@ -192,7 +192,7 @@ dialog::backdrop{background:rgba(20,21,34,.45)}
+ <div><label for="goal">Цель</label><div class="sw"><select id="goal"></select><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4F5BD5" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></div></div>
+ </div>
+ </section>
+-<section class="note book-settings" id="book-settings" aria-label="Формат текстового материала"><div><label for="format"><b>Что получает покупатель</b></label><select id="format"><option value="file">Цифровой файл</option><option value="print">Печатную книгу</option></select></div><label class="sample-choice"><input type="checkbox" id="sample">Предлагать бесплатный фрагмент перед покупкой</label><p>Фрагмент — необязательный этап знакомства с содержанием. Покупка и рекламная подписка рассматриваются отдельно.</p></section>
++<section class="note book-settings" id="book-settings" aria-label="Формат текстового материала"><div><label for="format"><b>Что получает покупатель</b></label><select id="format"><option value="file">Цифровой файл</option><option value="print">Печатные материалы</option></select></div><label class="sample-choice"><input type="checkbox" id="sample">Предлагать бесплатный фрагмент перед покупкой</label><p>Фрагмент — необязательный этап знакомства с содержанием. Покупка и рекламная подписка рассматриваются отдельно.</p></section>
+ <div id="steps"></div>
+ </main>
+ <div id="print" aria-hidden="true"></div>
