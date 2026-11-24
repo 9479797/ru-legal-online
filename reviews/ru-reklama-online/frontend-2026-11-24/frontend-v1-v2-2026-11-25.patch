@@ -1,0 +1,462 @@
+--- a/index.html
++++ b/index.html
+@@ -200,7 +200,7 @@
+ <template id="scope-help"><p><b>Продвижение</b> — как человек узнаёт о предложении и приходит к нему: публикации, реклама, рекомендации и переходы между площадками.</p><p><b>Продажа</b> — что человек видит в месте продажи: страница товара, карточка или предложение в боте. Здесь проверяем рекламный характер, содержание и необходимые сведения.</p><p>Выдача материалов, доставка и оказание услуг относятся к сопровождению онлайн-бизнеса.</p></template>
+ 
+ <footer>
+-<details class="version-note"><summary>Рабочая версия · 24.11.2026 · v8 + фронтенд</summary><p>Обновлены общие пояснения и первая цель. Другие девять целей сохранены и ждут последовательной проверки. Статус готовности маршрута не подтверждается одним цветом карточки.</p><p><a href="TASKS.md">Задачи и нерешённые вопросы</a> · <a href="LEGAL_REVIEW_2026-11-24.md">Результаты дополнительной сверки</a></p></details>
++<details class="version-note"><summary>Рабочая версия · 25.11.2026 · v8 + фронтенд v2</summary><p>Обновлены общие пояснения и первая цель. Другие девять целей сохранены и ждут последовательной проверки. Статус готовности маршрута не подтверждается одним цветом карточки.</p><p><a href="TASKS.md">Задачи и нерешённые вопросы</a> · <a href="LEGAL_REVIEW_2026-11-24.md">Результаты дополнительной сверки</a></p></details>
+ <div class="foot">
+ <div style="flex:1 1 340px;display:flex;flex-direction:column;gap:10px">
+ <span class="tag" style="align-self:flex-start">Как пользоваться</span>
+@@ -223,6 +223,7 @@
+ 
+ <script src="data.js"></script>
+ <script src="book-ui.js"></script>
++<script src="frontend-motion.js"></script>
+ <script>
+ {
+ const D = window.SCHEMA;
+@@ -242,6 +243,7 @@
+   set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+ };
+ const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
++const motion = window.FrontendMotion.create({host:$('#steps'), bar:$('.pathbar'), reduce});
+ 
+ let S = Object.assign({ form: 'ip', goal: 'book', path: [], scope: 'promotion', format: 'file', sample: false, salePlace: 'site', publisher:'' }, store.get('skhema-state', {}));
+ if (!D.forms.some((f) => f.id === S.form)) S.form = 'ip';
+@@ -297,8 +299,7 @@
+ 
+ function step(num, title, hint, body) {
+   const selected = S.scope === 'promotion' ? chain()[num - 1] : null;
+-  const choice = selected ? '<div class="stage-selection"><span class="stage-check" aria-hidden="true">✓</span><b>Шаг ' + num + ' · ' + esc(selected.name) + '</b></div>' : '';
+-  return '<section class="step' + (selected ? ' has-selection' : '') + '" id="step-' + num + '" aria-labelledby="st-' + num + '"><div class="sh"><span class="num" aria-hidden="true">0' + num + '</span><h2 id="st-' + num + '" tabindex="-1">' + esc(title) + '</h2>' + (hint ? '<span class="hint">' + esc(hint) + '</span>' : '') + '</div>' + choice + (num === 1 ? '<p class="restart-hint">Чтобы построить другую связку, выберите любую площадку здесь. Следующие шаги обновятся.</p>' : '') + body + '</section>';
++  return '<section class="step' + (selected ? ' has-selection' : '') + '" id="step-' + num + '" aria-labelledby="st-' + num + '"><div class="sh"><span class="num" aria-hidden="true">0' + num + '</span><h2 id="st-' + num + '" tabindex="-1">' + esc(title) + '</h2>' + (hint ? '<span class="hint">' + esc(hint) + '</span>' : '') + '</div>' + (num === 1 ? '<p class="restart-hint">Чтобы построить другую связку, выберите любую площадку здесь. Следующие шаги обновятся.</p>' : '') + body + '</section>';
+ }
+ 
+ /* Сумма штрафа для выбранной формы: своя строка у штрафа или колонка col этой формы */
+@@ -373,26 +374,8 @@
+   openDlg(head('Рискованные варианты', D.goals.find(g => g.id === S.goal).name) + '<p class="risk-notice">Выберите вариант на текущей или другой площадке. Откроется его разбор; запрет или необходимость проверки сохраняются.</p>' + (content || '<p>Для этой цели отдельные рискованные варианты в текущей схеме не описаны.</p>'), false, true);
+ }
+ 
+-function drawRoute() {
+-  const host = $('#steps');
+-  host.querySelector('.route-lines')?.remove();
+-  const anchors = [...host.querySelectorAll('.stage-selection')];
+-  if (anchors.length < 2) return;
+-  const box = host.getBoundingClientRect();
+-  const points = anchors.map(el => { const r = el.getBoundingClientRect(); return {x:r.left-box.left-8,y:r.top-box.top+r.height/2}; });
+-  const rail = 8;
+-  let paths = '';
+-  for (let i=1;i<points.length;i++) {
+-    const a=points[i-1], b=points[i];
+-    paths += '<path d="M '+a.x+' '+a.y+' H '+rail+' V '+b.y+' H '+b.x+'"/>';
+-  }
+-  host.insertAdjacentHTML('afterbegin','<svg class="route-lines" aria-hidden="true" width="'+box.width+'" height="'+box.height+'">'+paths+points.map(p=>'<circle cx="'+p.x+'" cy="'+p.y+'" r="4"/>').join('')+'</svg>');
+-}
+-
+ function syncRouteLayout() {
+-  const bar = $('.pathbar');
+-  document.documentElement.style.setProperty('--route-height', bar.offsetHeight + 'px');
+-  drawRoute();
++  motion.sync(S.goal + '|' + S.scope);
+ }
+ 
+ function render() {
+@@ -572,9 +555,9 @@
+     '<h3 id="dlg-t" class="disp">' + esc(title) + '</h3>' + (sub ? '<span class="hint">' + esc(sub) + '</span>' : '') + '</div><button type="button" class="x" aria-label="Закрыть">' + closeIc + '</button></div>';
+ }
+ 
+-function scrollTo(num) {
++function scrollToStep(num) {
+   const el = document.getElementById('step-' + num);
+-  if (el) el.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
++  if (el) motion.scrollToElement(el);
+ }
+ 
+ document.addEventListener('click', (e) => {
+@@ -584,7 +567,7 @@
+     return;
+   }
+   const nav = e.target.closest('[data-step-nav]');
+-  if (nav) { scrollTo(+nav.dataset.stepNav); document.getElementById('st-' + nav.dataset.stepNav)?.focus({preventScroll:true}); return; }
++  if (nav) { scrollToStep(+nav.dataset.stepNav); document.getElementById('st-' + nav.dataset.stepNav)?.focus({preventScroll:true}); return; }
+   if (e.target.closest('[data-risk-options]')) { openRiskOptions(); return; }
+   const riskPick = e.target.closest('[data-risk-pick]');
+   if (riskPick) {
+@@ -593,7 +576,7 @@
+     if (!n) return;
+     dlg.close(); S.path = [platform.id, n.id]; render();
+     $('#route-status').textContent = 'Выбран рискованный вариант: ' + n.name;
+-    requestAnimationFrame(() => { scrollTo(3); $('#st-3')?.focus({preventScroll:true}); });
++    requestAnimationFrame(() => { scrollToStep(3); $('#st-3')?.focus({preventScroll:true}); });
+     return;
+   }
+   const bs = e.target.closest('[data-book-scope]');
+@@ -612,7 +595,7 @@
+     S.path = S.path.slice(0, lv).concat(t.dataset.id);
+     render();
+     $('#route-status').textContent = 'Шаг ' + (lv + 1) + ': ' + (findAt(lv, t.dataset.id)?.name || '') + '. Следующий этап открыт ниже.';
+-    requestAnimationFrame(() => { scrollTo(lv + 2); const target = document.getElementById('st-' + (lv + 2)) || document.getElementById('st-' + (lv + 1)); target?.focus({preventScroll:true}); });
++    requestAnimationFrame(() => { scrollToStep(lv + 2); const target = document.getElementById('st-' + (lv + 2)) || document.getElementById('st-' + (lv + 1)); target?.focus({preventScroll:true}); });
+   } else if (t.dataset.guide !== undefined) {
+     const n = findAt(+t.dataset.guide, t.dataset.id);
+     if (n) openGuide(n);
+@@ -634,7 +617,7 @@
+     S.path = [S.path[0], t.dataset.goto];
+     render();
+     $('#route-status').textContent = 'Способ на шаге 2 изменён: ' + chain()[1].name;
+-    requestAnimationFrame(() => { scrollTo(2); $('#steps [data-pick="1"][aria-pressed="true"]')?.focus({preventScroll:true}); });
++    requestAnimationFrame(() => { scrollToStep(2); $('#steps [data-pick="1"][aria-pressed="true"]')?.focus({preventScroll:true}); });
+   } else if (t.dataset.goal) {
+     S.goal = t.dataset.goal; S.path = []; $('#goal').value = S.goal; render();
+   } else if (t.dataset.explain) {
+--- a/frontend.css
++++ b/frontend.css
+@@ -18,9 +18,10 @@
+ .crumb-index{display:grid;place-items:center;flex:none;width:28px;height:28px;background:var(--selection);color:var(--bg);border-radius:50%;font-weight:800}
+ .path-change{border:0;background:transparent;color:var(--selection);font-size:14px;font-weight:700;cursor:pointer;text-decoration:underline;text-underline-offset:3px;padding:8px 0}
+ .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;border:0}
+-.label-help{display:flex;gap:8px;align-items:center;margin-bottom:5px}
++.label-help{position:relative;display:inline-flex;align-items:flex-start;padding-right:16px;margin-bottom:7px}
+ .label-help label{margin:0}
+-.help-button{width:28px;height:28px;flex:none;border-radius:50%;border:1px solid currentColor;background:rgba(255,255,255,.15);color:#fff;font-size:16px;font-weight:800;cursor:pointer}
++.winbtn[data-help] span[aria-hidden]{position:relative;top:-4px;font-size:9px;line-height:1}
++.help-button{position:absolute;right:0;top:-5px;display:grid;place-items:center;width:14px;height:14px;padding:0;border-radius:50%;border:1px solid rgba(255,255,255,.75);background:rgba(255,255,255,.08);color:#fff;font-size:10px;font-weight:700;line-height:1;cursor:pointer}.help-button::after{content:"";position:absolute;inset:-7px}.help-button:hover{background:rgba(255,255,255,.3)}
+ .fields label{font-size:14px}
+ #steps{position:relative;display:flex;flex-direction:column;gap:24px;padding-left:24px}
+ .step{position:relative;display:flex;flex-direction:column;gap:16px;padding:22px;border:1px solid var(--line);border-radius:24px;background:var(--bg);scroll-margin-top:calc(var(--route-height) + 18px)}
+@@ -30,11 +31,9 @@
+ .sh h2:focus{outline:none}
+ .num{font-size:30px}
+ .hint{font-size:14px;flex:1 1 100%}
+-.stage-selection{align-self:flex-start;display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:12px;background:var(--selection-bg);border:1px solid var(--selection);color:var(--selection);font-size:14px;max-width:100%}
+-.stage-check{display:grid;place-items:center;width:24px;height:24px;flex:none;background:var(--selection);color:var(--bg);border-radius:50%}
+ .route-lines{position:absolute;top:0;left:0;pointer-events:none;overflow:visible;z-index:2}
+ .route-lines path{fill:none;stroke:var(--selection);stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+-.route-lines circle{fill:var(--selection);stroke:var(--bg);stroke-width:2}
++.route-lines .route-head{stroke-width:3;filter:drop-shadow(0 0 3px var(--selection))}.route-lines .route-stroke{opacity:.9}
+ .restart-hint{margin:0;color:var(--muted);font-size:14px}
+ .row{gap:16px;align-items:stretch}
+ .opt{flex:1 1 200px;max-width:260px;border:1px solid var(--line);box-shadow:none;overflow:visible}
+@@ -65,7 +64,7 @@
+ .version-note summary{cursor:pointer;color:var(--ink);font-weight:700}
+ .version-note a{color:var(--pillink)}
+ @media(max-width:800px){.path-heading{flex:1 1 160px}.path-change{margin-left:auto;order:0}.crumbs{order:1;flex-basis:100%}.crumbs li{flex:1 1 120px}.pathbar{gap:8px;padding:10px 16px}.step{padding:18px}.opt{max-width:none}}
+-@media(max-width:600px){.bar .tools{width:auto;margin-left:auto}.pathbar .lbl{font-size:13px}.path-heading{flex-basis:60%}#path-context{font-size:11px}.crumbs{gap:6px}.crumbs li{flex:1 1 0}.crumb{padding:8px;gap:5px;align-items:flex-start}.crumb-index{width:20px;height:20px;font-size:12px}.crumb small{font-size:11px}.crumb b{font-size:12px;line-height:1.4}.path-change{font-size:12px}main{padding:16px 12px 0;gap:20px}.hero{border-radius:20px;padding:18px}.hero h1{font-size:28px;line-height:1.1}.hero .theme-note{font-size:14px}#steps{padding-left:18px;gap:18px}.step{padding:16px 12px;border-radius:18px}.sh h2{font-size:19px;flex-basis:200px}.stage-selection{font-size:13px}.opt{flex:1 1 100%}.big{padding:16px}.risk-options{grid-template-columns:1fr}.route-lines path{stroke-width:2}}
++@media(max-width:600px){.bar .tools{width:auto;margin-left:auto}.pathbar .lbl{font-size:13px}.path-heading{flex-basis:60%}#path-context{font-size:11px}.crumbs{gap:6px}.crumbs li{flex:1 1 0}.crumb{padding:8px;gap:5px;align-items:flex-start}.crumb-index{width:20px;height:20px;font-size:12px}.crumb small{font-size:11px}.crumb b{font-size:12px;line-height:1.4}.path-change{font-size:12px}main{padding:16px 12px 0;gap:20px}.hero{border-radius:20px;padding:18px}.hero h1{font-size:28px;line-height:1.1}.hero .theme-note{font-size:14px}#steps{padding-left:18px;gap:18px}.step{padding:16px 12px;border-radius:18px}.sh h2{font-size:19px;flex-basis:200px}.opt{flex:1 1 100%}.big{padding:16px}.risk-options{grid-template-columns:1fr}.route-lines path{stroke-width:2}}
+ @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}.opt:hover{transform:none}}
+ 
+ .risk-group{display:flex;flex-direction:column;gap:12px;padding-top:8px}.risk-group h4{margin:0;font-size:18px}.risk-options .risk-option{max-width:520px}
+--- /dev/null
++++ b/frontend-motion.js
+@@ -0,0 +1,186 @@
++/* Orthogonal card routing and interruptible motion. No changes to legal data. */
++(function (root) {
++  'use strict';
++  const clamp = (n, a, b) => Math.max(a, Math.min(b, n));
++  const round = n => Math.round(n * 2) / 2;
++
++  function intersects(a, b, r) {
++    return a.x === b.x
++      ? a.x > r.left && a.x < r.right && Math.max(a.y, b.y) > r.top && Math.min(a.y, b.y) < r.bottom
++      : a.y > r.top && a.y < r.bottom && Math.max(a.x, b.x) > r.left && Math.min(a.x, b.x) < r.right;
++  }
++
++  // Coordinate-compressed A*: gaps between rows/columns are valid corridors.
++  function routeBetween(start, end, obstacles, width) {
++    const yMin = Math.min(start.y, end.y) - 28;
++    const yMax = Math.max(start.y, end.y) + 28;
++    const blocks = obstacles.filter(r => r.bottom >= yMin && r.top <= yMax);
++    const unique = values => [...new Set(values.map(round))].sort((a, b) => a - b);
++    const xs = unique([8, width - 8, start.x, end.x, ...blocks.flatMap(r => [r.left - 1, r.right + 1])]).filter(x => x >= 4 && x <= width - 4);
++    const ys = unique([start.y, end.y, ...blocks.flatMap(r => [r.top - 1, r.bottom + 1])]).filter(y => y >= yMin && y <= yMax);
++    const nx = xs.length, size = nx * ys.length;
++    const begin = ys.indexOf(round(start.y)) * nx + xs.indexOf(round(start.x));
++    const finish = ys.indexOf(round(end.y)) * nx + xs.indexOf(round(end.x));
++    if (begin < 0 || finish < 0) return null;
++    const point = id => ({ x: xs[id % nx], y: ys[Math.floor(id / nx)] });
++    const blocked = new Uint8Array(size);
++    for (let id = 0; id < size; id++) {
++      const p = point(id);
++      blocked[id] = blocks.some(r => p.x > r.left && p.x < r.right && p.y > r.top && p.y < r.bottom) ? 1 : 0;
++    }
++    if (blocked[begin] || blocked[finish]) return null;
++    const costs = new Float64Array(size * 3).fill(Infinity);
++    const parents = new Int32Array(size * 3).fill(-1);
++    const heap = [];
++    const push = item => {
++      heap.push(item); let i = heap.length - 1;
++      while (i) { const p = (i - 1) >> 1; if (heap[p].f <= item.f) break; heap[i] = heap[p]; i = p; }
++      heap[i] = item;
++    };
++    const pop = () => {
++      const first = heap[0], last = heap.pop();
++      if (heap.length) {
++        let i = 0;
++        while (i * 2 + 1 < heap.length) {
++          let c = i * 2 + 1;
++          if (c + 1 < heap.length && heap[c + 1].f < heap[c].f) c++;
++          if (heap[c].f >= last.f) break;
++          heap[i] = heap[c]; i = c;
++        }
++        heap[i] = last;
++      }
++      return first;
++    };
++    const heuristic = id => { const p = point(id); return Math.abs(p.x - end.x) + Math.abs(p.y - end.y); };
++    costs[begin * 3] = 0;
++    push({ state: begin * 3, cost: 0, f: heuristic(begin) });
++    let found = -1;
++    while (heap.length) {
++      const current = pop();
++      if (current.cost !== costs[current.state]) continue;
++      const id = Math.floor(current.state / 3), oldDir = current.state % 3;
++      if (id === finish) { found = current.state; break; }
++      const x = id % nx, y = Math.floor(id / nx), a = point(id);
++      const next = [];
++      if (x > 0) next.push([id - 1, 1]);
++      if (x + 1 < nx) next.push([id + 1, 1]);
++      if (y > 0) next.push([id - nx, 2]);
++      if ((y + 1) * nx < size) next.push([id + nx, 2]);
++      for (const [nid, dir] of next) {
++        if (blocked[nid]) continue;
++        const b = point(nid);
++        if (blocks.some(r => intersects(a, b, r))) continue;
++        const state = nid * 3 + dir;
++        const cost = current.cost + Math.abs(a.x - b.x) + Math.abs(a.y - b.y) + (oldDir && dir !== oldDir ? 18 : 0);
++        if (cost >= costs[state]) continue;
++        costs[state] = cost; parents[state] = current.state;
++        push({ state, cost, f: cost + heuristic(nid) });
++      }
++    }
++    if (found < 0) return null;
++    const points = [];
++    for (let state = found; state >= 0; state = parents[state]) points.push(point(Math.floor(state / 3)));
++    points.reverse();
++    return points.filter((p, i) => !i || i === points.length - 1 || !((points[i - 1].x === p.x && p.x === points[i + 1].x) || (points[i - 1].y === p.y && p.y === points[i + 1].y)));
++  }
++
++  function roundedPath(points) {
++    let d = 'M ' + points[0].x + ' ' + points[0].y;
++    for (let i = 1; i < points.length - 1; i++) {
++      const a = points[i - 1], p = points[i], b = points[i + 1];
++      const before = Math.hypot(p.x - a.x, p.y - a.y), after = Math.hypot(b.x - p.x, b.y - p.y);
++      const radius = Math.min(9, before / 2, after / 2);
++      if (!before || !after) continue;
++      const x1 = p.x + (a.x - p.x) * radius / before, y1 = p.y + (a.y - p.y) * radius / before;
++      const x2 = p.x + (b.x - p.x) * radius / after, y2 = p.y + (b.y - p.y) * radius / after;
++      d += ' L ' + x1 + ' ' + y1 + ' Q ' + p.x + ' ' + p.y + ' ' + x2 + ' ' + y2;
++    }
++    const last = points[points.length - 1];
++    return d + ' L ' + last.x + ' ' + last.y;
++  }
++
++  function create({ host, bar, reduce = false }) {
++    let records = new Map(), signature = '', routeFrame = 0, scrollFrame = 0;
++    const NS = 'http://www.w3.org/2000/svg';
++    const svgEl = (tag, attrs) => { const el = document.createElementNS(NS, tag); for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v); return el; };
++    function frame(now) {
++      routeFrame = 0;
++      let unfinished = false;
++      for (const r of records.values()) {
++        const progress = reduce ? 1 : clamp((now - r.start) / r.duration, 0, 1);
++        const distance = r.length * progress;
++        r.path.style.strokeDashoffset = String(r.length - distance);
++        const p = r.path.getPointAtLength(distance), a = r.path.getPointAtLength(Math.max(0, distance - 1)), b = r.path.getPointAtLength(Math.min(r.length, distance + 1));
++        r.head.setAttribute('transform', 'translate(' + p.x + ' ' + p.y + ') rotate(' + Math.atan2(b.y - a.y, b.x - a.x) * 180 / Math.PI + ')');
++        r.head.style.visibility = progress > 0 ? 'visible' : 'hidden';
++        if (progress < 1) unfinished = true;
++      }
++      if (unfinished) routeFrame = requestAnimationFrame(frame);
++    }
++    function sync(context) {
++      document.documentElement.style.setProperty('--route-height', bar.offsetHeight + 'px');
++      const box = host.getBoundingClientRect();
++      const cards = [...host.querySelectorAll('.opt.sel')].filter(el => el.querySelector('[data-pick]'));
++      cards.sort((a, b) => Number(a.querySelector('[data-pick]').dataset.pick) - Number(b.querySelector('[data-pick]').dataset.pick));
++      const rect = el => { const r = el.getBoundingClientRect(); return { left: round(r.left - box.left), right: round(r.right - box.left), top: round(r.top - box.top), bottom: round(r.bottom - box.top) }; };
++      const obstacles = [...host.querySelectorAll('.opt,.sh,.restart-hint,.publication-settings')].map(rect).map(r => ({ left:r.left-5, right:r.right+5, top:r.top-5, bottom:r.bottom+5 }));
++      const keys = cards.map(el => el.querySelector('[data-pick]').dataset.id);
++      const routes = [];
++      for (let i = 1; i < cards.length; i++) {
++        const a = rect(cards[i - 1]), b = rect(cards[i]);
++        const start = { x:round((a.left+a.right)/2), y:a.bottom+8 };
++        const end = { x:round((b.left+b.right)/2), y:b.top-8 };
++        const points = routeBetween(start, end, obstacles, box.width);
++        if (points) routes.push({ key:context + ':' + keys.slice(0,i+1).join('/'), d:roundedPath([{x:start.x,y:a.bottom+4}, ...points, {x:end.x,y:b.top-4}]) });
++      }
++      const nextSignature = box.width + '|' + box.height + '|' + JSON.stringify(routes);
++      if (signature === nextSignature && host.querySelector('.route-lines')) return;
++      signature = nextSignature;
++      host.querySelector('.route-lines')?.remove();
++      if (routeFrame) cancelAnimationFrame(routeFrame);
++      routeFrame = 0;
++      const previous = records;
++      records = new Map();
++      if (!routes.length) return;
++      const svg = svgEl('svg', { class:'route-lines', 'aria-hidden':'true', width:box.width, height:box.height });
++      host.prepend(svg);
++      let nextStart = performance.now() + 120;
++      for (const r of routes) {
++        const path = svgEl('path', { d:r.d, class:'route-stroke' });
++        const head = svgEl('path', { d:'M -8 -5 L 0 0 L -8 5', class:'route-head' });
++        svg.append(path, head);
++        const length = path.getTotalLength();
++        const old = previous.get(r.key);
++        const duration = old?.duration || clamp(length * 2.1, 1500, 2900);
++        const start = old?.start ?? nextStart;
++        nextStart = Math.max(nextStart, start + duration);
++        path.style.strokeDasharray = length + ' ' + length;
++        path.style.strokeDashoffset = String(length);
++        records.set(r.key, { path, head, length, start, duration });
++      }
++      frame(performance.now());
++    }
++    function cancelScroll() { if (scrollFrame) cancelAnimationFrame(scrollFrame); scrollFrame = 0; }
++    function scrollToElement(el) {
++      if (!el) return;
++      cancelScroll();
++      const from = window.scrollY;
++      const max = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
++      const to = clamp(from + el.getBoundingClientRect().top - bar.offsetHeight - 22, 0, max);
++      const distance = Math.abs(to - from);
++      if (reduce || distance < 3) { window.scrollTo({ top:to, behavior:'instant' }); return; }
++      const start = performance.now() + 160, duration = clamp(distance * 2.1, 1450, 2800);
++      const move = now => {
++        const t = clamp((now - start) / duration, 0, 1);
++        const eased = t * t * (3 - 2 * t);
++        window.scrollTo({ top:from + (to - from) * eased, behavior:'instant' });
++        if (t < 1) scrollFrame = requestAnimationFrame(move); else scrollFrame = 0;
++      };
++      scrollFrame = requestAnimationFrame(move);
++    }
++    for (const event of ['wheel','touchstart','pointerdown']) window.addEventListener(event, cancelScroll, { passive:true });
++    window.addEventListener('keydown', e => { if (['ArrowUp','ArrowDown','PageUp','PageDown','Home','End',' '].includes(e.key)) cancelScroll(); });
++    return { sync, scrollToElement, cancelScroll };
++  }
++  root.FrontendMotion = { create, routeBetween, roundedPath };
++})(typeof window === 'undefined' ? globalThis : window);
+--- /dev/null
++++ b/checks/frontend_motion.test.js
+@@ -0,0 +1,65 @@
++const assert = require('node:assert/strict');
++const fs = require('node:fs');
++const vm = require('node:vm');
++const scope = {};
++vm.runInNewContext(fs.readFileSync(__dirname + '/../frontend-motion.js', 'utf8'), scope);
++const { routeBetween, roundedPath } = scope.FrontendMotion;
++function crosses(a, b, r) {
++  return a.x === b.x
++    ? a.x > r.left && a.x < r.right && Math.max(a.y,b.y) > r.top && Math.min(a.y,b.y) < r.bottom
++    : a.y > r.top && a.y < r.bottom && Math.max(a.x,b.x) > r.left && Math.min(a.x,b.x) < r.right;
++}
++let cases = 0;
++// A selected card may be in any row/column. All other cards remain obstacles.
++for (const columns of [1,3,5]) {
++  const width = 80 + columns * 156;
++  const rects = [];
++  for (const stageY of [100,700]) for (let row=0;row<2;row++) for (let col=0;col<columns;col++) {
++    const left=40+col*156, top=stageY+row*196;
++    rects.push({left:left-5,right:left+140+5,top:top-5,bottom:top+180+5});
++  }
++  const headings = [
++    {left:35,right:width-30,top:25,bottom:75},
++    {left:35,right:width-30,top:620,bottom:675}
++  ];
++  const blocks=rects.concat(headings);
++  for(let source=0;source<columns*2;source++) for(let target=columns*2;target<rects.length;target++) {
++    const a=rects[source],b=rects[target];
++    const start={x:(a.left+a.right)/2,y:a.bottom+3},end={x:(b.left+b.right)/2,y:b.top-3};
++    const points=routeBetween(start,end,blocks,width);
++    assert(points && points.length>=2,`No route: ${columns}/${source}/${target}`);
++    assert.equal(points[0].x,start.x); assert.equal(points[0].y,start.y);
++    assert.equal(points.at(-1).x,end.x); assert.equal(points.at(-1).y,end.y);
++    for(let i=1;i<points.length;i++) {
++      const p=points[i-1],q=points[i];
++      assert(p.x===q.x||p.y===q.y,'Diagonal segment');
++      assert(!blocks.some(r=>crosses(p,q,r)),`Crossed a card or heading: ${columns}/${source}/${target}`);
++    }
++    assert(!/NaN|undefined|Infinity/.test(roundedPath(points)));
++    cases++;
++  }
++}
++assert.equal(routeBetween({x:20,y:30},{x:40,y:90},[{left:0,right:200,top:40,bottom:70}],100),null,'A closed corridor must not get an unsafe fallback');
++console.log(`Frontend routing: ${cases} row/column selections avoid cards and headings; blocked corridor stays closed.`);
++
++function motionRuntime(reduce) {
++  let clock=0,id=0;
++  const pending=new Map(),listeners={};
++  const win={scrollY:100,innerHeight:800,scrollTo({top}){this.scrollY=top;},addEventListener(type,fn){listeners[type]=fn;}};
++  const c={window:win,document:{documentElement:{scrollHeight:4000}},performance:{now:()=>clock},requestAnimationFrame(fn){pending.set(++id,fn);return id;},cancelAnimationFrame(key){pending.delete(key);}};
++  vm.runInNewContext(fs.readFileSync(__dirname + '/../frontend-motion.js','utf8'),c);
++  const motion=win.FrontendMotion.create({host:{},bar:{offsetHeight:100},reduce});
++  const target={getBoundingClientRect:()=>({top:2000-win.scrollY})};
++  return {win,motion,target,listeners,pending,tick(now){clock=now;const frames=[...pending.values()];pending.clear();frames.forEach(fn=>fn(now));}};
++}
++const moving=motionRuntime(false);
++moving.motion.scrollToElement(moving.target);
++assert.equal(moving.win.scrollY,100,'Scroll must not jump immediately');
++moving.tick(100); assert.equal(moving.win.scrollY,100,'Keep the selected card visible briefly');
++moving.tick(1560); assert(moving.win.scrollY>700&&moving.win.scrollY<1300,'Scroll passes through the middle');
++moving.listeners.wheel(); assert.equal(moving.pending.size,0,'Wheel input cancels automatic scrolling');
++const stoppedAt=moving.win.scrollY;moving.tick(5000);assert.equal(moving.win.scrollY,stoppedAt);
++moving.motion.scrollToElement(moving.target); moving.tick(8000);assert.equal(moving.win.scrollY,1878);
++const still=motionRuntime(true);still.motion.scrollToElement(still.target);
++assert.equal(still.win.scrollY,1878);assert.equal(still.pending.size,0,'Reduced motion skips animation');
++console.log('Scroll: gradual movement, brief selection pause, manual interruption and reduced-motion behavior verified.');
+--- a/README.txt
++++ b/README.txt
+@@ -1,3 +1,6 @@
++ФРОНТЕНД v2 · 25.11.2026 · продолжение v1
++Маленький надстрочный знак вопроса; замедленная прерываемая прокрутка; стрелки дорисовываются между выбранными карточками, без повторяющих плашек.
++
+ ФРОНТЕНД v1 · на основе рабочей v8 · 24.11.2026
+ Отдельный вариант интерфейса на согласовании. Юридические данные v8 сохранены.
+ Полоса связки закреплена; выбранные этапы соединены линией; рискованные разборы открываются отдельным окном.
+--- a/version.json
++++ b/version.json
+@@ -1,6 +1,6 @@
+ {
+-  "version": "2026-11-24-working-v8-frontend-v1",
+-  "status": "Отдельная рабочая версия фронтенда на согласовании",
++  "version": "2026-11-25-working-v8-frontend-v2",
++  "status": "Рабочая версия фронтенда v2; изменения сохранены отдельным коммитом",
+   "base_repository": "9479797/ru-legal-online",
+   "base_commit": "60bf80361bd757522656631eb45ddb19cc1cee88",
+   "old_book_links_preserved": 56,
+@@ -9,12 +9,13 @@
+   "files": {
+     "CHANGELOG.local.md": "dfb89c08f04f8116ba4a48c7995bc79c34f30c37f2e697d13d6c27aab361bebe",
+     "LEGAL_REVIEW_2026-11-24.md": "e81dd87e65e24cb0aab677593ac2e2b739a6382c4921900c64505903cba9b9fa",
+-    "README.txt": "31e3788380ebc9b406e312e6422e04334229a5ea23f97789b873dfce01294069",
++    "README.txt": "25966f7ef050278a4a9e64d090cca5149960258f44dc47a7114866a311ee3da0",
+     "SOURCES.md": "032f42d2586c4ba7c19ffb66691706528475e7acefdc6523e7b5d215e2fbf535",
+     "TASKS.md": "04426ee75d6d5db65bb288e95a3962204ee8e6575d866b10155445f3df1cc873",
+     "book-ui.js": "2c64e47ad43f55e5ea0d9fe325324d79ea427a4a8c343a41599abc6869ae49db",
+     "changes-v3-v4.patch": "1c1a0799728b8645e4f5f17c0f579c73192766893ba58e621674d2abf95c9bd7",
+     "changes-v4-v5.patch": "6fe69b80e46fc2288556914b419d61ad8c267c6305f47d1bd9a219ca48c6f0e6",
++    "checks/frontend_motion.test.js": "3099d8ac4ecf1a29456dbe7a06c29fc407d7ad0591aa8ddf3e64c91ab9fd566f",
+     "checks/proverka_local.js": "317dc5842c64502b8197c54d49adfb0956239b44315fb2a1ebca581230de0924",
+     "checks/proverka_skhemy.js": "a5e269b276122e8149065fa3e683e1fe2e8b4311a896f62251212d44ea6c268f",
+     "data.js": "81963f3461f50071693d7c5d40ff685d0510e90cd24c030dbf83edb43e877fcf",
+@@ -25,8 +26,9 @@
+     "docs/AUDIT_VK_BOOK_2026-11-24.md": "f0e67431df6c92293fb32f596f7d8305352b53d03adb3d91740efedd007d86d0",
+     "docs/AUDIT_YOUTUBE_TIKTOK_BOOK_2026-11-24.md": "9f50009de772dfb32b0b3f591011d6592feb4d455bd058ab8972aaf54ff887e4",
+     "docs/plan-skhemy.md": "c663b96e6309b7802bc19e5264fb2d4c1240f9bad135209f9294a23ec753a784",
+-    "frontend.css": "c597b8568a167412ebb5931f467bf9b2891463fdb6efe4f56cdd1d5070e1969f",
+-    "index.html": "83696681d90b4013842f5f2d0e18ce2c3767c285f4fbb319aab5b39dd1ce5d0d",
++    "frontend-motion.js": "5d1f8583228cd12dd4f2f8898aac66da1555db26b8bb3722d67d0d8b2a9f70ec",
++    "frontend.css": "2c8d3009c8a0f49fc9c3ec77c99f2047c1239f1a3c357a54591da5e408a5c62d",
++    "index.html": "4657a9ea229406a1d62fa5e965e9f8ebc78b06331e2e7ccb85bb5d948425a1c1",
+     "markirovka.html": "dd6154817dcbdd9b27bc5d8ae46c9a53efcb2f58888ed338f7df39baaccfd59b",
+     "markirovka.js": "9328d94e80e0a2b695722134c7cb6c0e52cd20b55685b51c1736c7c3cee8cc0d"
+   },
+@@ -98,5 +100,6 @@
+   ],
+   "publication_platform_options": 9,
+   "open_telegram_ads_destination": true,
+-  "frontend_base": "2026-11-24-working-v8"
++  "frontend_base": "2026-11-24-working-v8",
++  "frontend_previous": "2026-11-24-working-v8-frontend-v1"
+ }
