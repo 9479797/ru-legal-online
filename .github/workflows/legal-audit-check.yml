@@ -3,13 +3,27 @@ name: Legal audit technical checks
 on:
   push:
     branches:
-      - pravka/audit-online-2026-11
+      - main
+    paths:
+      - "skills/**"
+      - "scripts/**"
+      - "site/**"
+      - "docs/**"
+      - "README.md"
+      - "AGENTS.md"
+      - "CLAUDE.md"
+      - "CHANGELOG.md"
+      - ".github/workflows/legal-audit-check.yml"
   pull_request:
     paths:
       - "skills/**"
       - "scripts/**"
       - "site/**"
       - "docs/**"
+      - "README.md"
+      - "AGENTS.md"
+      - "CLAUDE.md"
+      - "CHANGELOG.md"
       - ".github/workflows/legal-audit-check.yml"
   workflow_dispatch:
 
