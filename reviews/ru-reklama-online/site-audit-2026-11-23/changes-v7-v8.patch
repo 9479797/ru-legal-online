@@ -1,0 +1,397 @@
+--- v7/site/data.js
++++ v8/site/data.js
+@@ -3865,3 +3865,87 @@
+   D.review.status = 'Рабочая версия · v7';
+   D.review.scope = 'Разобраны все 64 карточки первой цели. Внесены согласованные исправления YouTube/TikTok и уточнения Rutube/Дзена. Открытые правовые условия и отдельные предложения сохраняются; первая цель целиком ещё не утверждена.';
+ })();
++
++/* Рабочая v8 · 24.11.2026. Принятые PROMO-PLACE/GIFT/RETARGET и Telegram.
++   Площадка публикации отделена от способа закупки и места предложения. */
++(function () {
++  const D = window.SCHEMA;
++  const nodes = D.start.book;
++  const find = id => nodes.flatMap(n => n.children || []).find(c => c.id === id);
++  const patch = (id, fields) => Object.assign(find(id), fields);
++  const period = nodes.find(n => n.id === 'telegram').details;
++  D.bookPublishers = [
++    {id:'instagram', name:'Instagram'}, {id:'telegram', name:'Telegram'},
++    {id:'youtube', name:'YouTube'}, {id:'tiktok', name:'TikTok'},
++    {id:'vk', name:'VK'}, {id:'rutube', name:'Rutube'},
++    {id:'dzen', name:'Дзен'}, {id:'site', name:'Сайт блогера'},
++    {id:'other', name:'Другая площадка — требуется проверка'}
++  ];
++  const bloggers = nodes.find(n => n.id === 'bloggers');
++  bloggers.short = 'Сначала укажите, где выйдет публикация о книге.';
++  bloggers.details = 'Блогер — способ привлечения аудитории, а не название площадки. Для рекламного размещения проверьте фактическую страницу, содержание, маркировку и учёт. Распределение действий в договоре не отменяет ответственность сторон, установленную законом. Подарок без обязательства публикации рассматривается отдельно.';
++  patch('bl-gift', {
++    uncommitted:true,
++    short:'Книга передана без обязательства публикации. Обзор не гарантирован.',
++    details:'Подарок без договорённости об обзоре не подтверждает рекламное размещение или продажу. Если обзор появится, отдельно оцените его содержание и отношения сторон. Обмен книги на обязанность публикации — другой сценарий, бартер.',
++    here:{can:['Передать книгу без обязательства обзора','Если публикация появится — оценить её отдельно'],cannot:['Обещать выход обзора или переходы покупателей без договорённости','Называть подарком без условий обмен книги на обязательную публикацию']}
++  });
++  patch('dir-retarget', {
++    name:'Ретаргетинг: контакты или посетители сайта',
++    short:'Две аудитории: загруженная база контактов или посетители сайта.',
++    details:'Контакты: загружаете имеющиеся телефоны или email для показа объявлений. Посетители сайта: используете аудиторию людей, которые уже заходили на сайт. Для каждого варианта проверьте основания использования данных и условия сервиса. Показ объявления и рекламная рассылка — разные действия; подробную модель проверяют перед кампанией.',
++    here:{can:['Выбрать источник аудитории: свои контакты или посетители сайта','Проверить основания сбора, передачи и рекламного использования данных'],cannot:['Считать покупку книги согласием на любое дальнейшее использование данных','Считать уведомление о cookie полной проверкой обработки данных']},
++    fines:['pd']
++  });
++  patch('dir-tg', {
++    publicationPlatform:'telegram',
++    short:'Закупка через Директ, публикация — в Telegram. Учитывайте риск этой площадки.',
++    details:'Директ — инструмент закупки; рекламный пост появляется в Telegram. Автоматизация сервиса не меняет правовой статус места публикации. ' + period + ' Срок показа и удаления проверяют по выбранному формату Директа.',
++    here:{can:['Проверить актуальные условия формата и фактическую площадку публикации','Проверить сведения рекламодателя и автоматическую маркировку','Повторно проверить условия размещения перед выходом'],cannot:['Считать размещение через Директ освобождением от ограничений Telegram','Считать переходную позицию ФАС разрешением любых будущих размещений']},
++    fines:['marking','adlabel','erir','content']
++  });
++  find('tg-post').short = 'Рекламное предложение книги: маркировка, учёт и риск площадки.';
++  patch('tg-posev', {
++    here:{can:['Согласовать креатив, период размещения и действия сторон по маркировке и учёту','Проверить конкретный канал в перечне РКН при аудитории более 10 000','Учитывать переходную позицию ФАС и повторно проверить условия перед выходом'],cannot:['Размещать рекламу в подлежащем включению канале с аудиторией более 10 000 без записи в перечне РКН','Публиковать рекламу без предусмотренной маркировки','Считать конец 2026 года автоматическим разрешением рекламного размещения']},
++    fines:['marking','adlabel','erir','registry','content']
++  });
++  patch('tg-ads', {
++    short:'До запуска уточните формат, страницу назначения и действия по маркировке.',
++    details:period + ' Условия разных форматов Telegram Ads могут различаться. Доступные инструкции неоднозначно описывают внешние сайты: перед запуском подтвердите назначение выбранного формата. Агентство и способ оплаты не заменяют проверку площадки и рекламных обязанностей.',
++    here:{can:['Подтвердить допустимое назначение объявления выбранного формата','Определить действия рекламодателя и посредника по маркировке и учёту'],cannot:['Считать любую внешнюю ссылку поддерживаемой любым форматом Telegram Ads','Считать оплату через посредника подтверждением законности размещения']}
++  });
++  patch('tg-bot', {
++    short:'Выберите место предложения: бот или сайт.',
++    details:'Проверьте описание книги, цену, рекламный характер сообщения и страницу назначения. Для цифровых товаров внутри ботов и мини-приложений Telegram требует Stars — это правило сервиса. Печатная книга рассматривается отдельно. Ссылка на внешний сайт не подтверждает соблюдение правил при продаже, фактически происходящей внутри Telegram. Оформление и выполнение заказа проверяются в проекте сопровождения онлайн-бизнеса.',
++    here:{can:['Указать состав, формат и цену материала','Различить предложение внутри бота и переход на сайт','Проверить рекламный характер сообщения и применимые условия Telegram'],cannot:['Считать команду боту согласием на любую последующую рекламу','Считать внешнюю ссылку автоматическим подтверждением соблюдения правил Telegram']},
++    fines:['marking','adlabel','erir','mailing','pd']
++  });
++  patch('tg-promo', {
++    short:'Проверьте условия участия и рекламный характер объявления.',
++    here:{can:['Понятно описать сроки, приз и условия участия','Если объявление рекламное — проверить маркировку и учёт','Если участие связано с покупкой — проверить специальные сведения по статье 9'],cannot:['Скрывать существенные условия или обещать отсутствующий приз','Автоматически применять статью 9 к любому бесплатному розыгрышу']},
++    fines:['promo','marking','adlabel','erir']
++  });
++  patch('tg-vpn', {
++    name:'Реклама VPN и средств доступа к ограниченным ресурсам',
++    short:'Предупреждение о прямом запрете рекламы таких средств.',
++    details:'Эта карточка описывает рекламу средств доступа, запрещённую частью 10.8 статьи 5 закона о рекламе. Не каждое техническое упоминание является рекламой; другие информационные ограничения оцениваются по содержанию.',
++    why:['Прямой запрет рекламы таких средств по части 10.8 статьи 5','Маркировка не отменяет запрет']
++  });
++  const bot = D.bookPlaces.tgbot;
++  Object.assign(bot, {
++    name:'Предложение книги в Telegram-боте',
++    short:'Описание материала, цена и переход к оформлению заказа.',
++    details:find('tg-bot').details,
++    can:['Показать состав, формат, цену и правдивые условия предложения','Проверить рекламный характер сообщений и условия сервиса'],
++    cannot:['Выдавать техническую возможность оплаты за готовность всей модели продажи','Считать обращение к боту согласием на любые рекламные сообщения'],
++    check:[{text:'Проверить сведения о материале, цену и согласованность предложения с рекламой'},{text:'Определить применимые маркировку и учёт, отдельно проверить условия Telegram'}], fines:[]
++  });
++  // Общие рекламные назначения book: без повторного исследования функций VK.
++  for(const id of ['vk','tg']) {
++    const p=D.bookPlaces[id];
++    p.short='Описание материала и условия предложения. Покупка проверяется отдельно.';
++    p.check=[{text:'Указать продавца, формат материала, цену и правдивые условия предложения'},{text:'Оценить рекламный характер, маркировку и учёт конкретного материала'},{text:'Определить применимость возрастной классификации и категорию произведения'}];
++  }
++  D.review.status='Рабочая версия · v8';
++  D.review.scope='Внесены принятые уточнения площадки публикации, подарка, ретаргетинга и Telegram. Исполнение исключено из описания бота. Открытые правовые условия и отдельный режим рисков сохраняются.';
++})();
+--- v7/site/index.html
++++ v8/site/index.html
+@@ -136,6 +136,7 @@
+ .review-banner p,.book-settings p{margin:6px 0 0;color:var(--muted);font-size:13px}
+ .book-settings{display:flex;flex-wrap:wrap;align-items:center;gap:14px 24px}
+ .book-settings select{display:block;margin-top:6px;min-height:42px;padding:6px 12px;border:1px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink)}
++.publication-settings{margin-bottom:18px}.publication-settings label{display:block;font-size:16px;font-weight:700}.publication-settings select{display:block;max-width:100%;min-height:44px;margin-top:8px;font-size:16px}.publication-settings p{margin:10px 0 0;font-size:14px;color:var(--muted)}
+ .sample-choice{display:flex;align-items:center;gap:10px;font-weight:600}
+ .sample-choice input{width:20px;height:20px;flex:none;accent-color:#6e5bd8}
+ .journey h3{margin:0 0 12px;font-size:20px}.journey p{margin:8px 0;color:var(--muted)}
+@@ -190,7 +191,7 @@
+ </div>
+ </section>
+ <section class="note" id="scope-help" aria-label="Как выбрать раздел"><p><b>Продвижение</b> — как человек узнаёт о предложении и приходит к нему: публикации, реклама, рекомендации и переходы между площадками.</p><p><b>Продажа</b> — что человек видит в месте продажи: страница товара, карточка или предложение в боте. Здесь проверяем рекламный характер, содержание и необходимые сведения.</p><p>Выдача материалов, доставка и оказание услуг относятся к сопровождению онлайн-бизнеса.</p></section>
+-<section class="note review-banner"><b>Рабочая версия · 24.11.2026 · v7</b><p>Обновлены общие пояснения и первая цель. Другие девять целей сохранены и ждут последовательной проверки. Статус готовности маршрута не подтверждается одним цветом карточки.</p><p><a href="TASKS.md">Задачи и нерешённые вопросы</a> · <a href="LEGAL_REVIEW_2026-11-24.md">Результаты дополнительной сверки</a></p></section>
++<section class="note review-banner"><b>Рабочая версия · 24.11.2026 · v8</b><p>Обновлены общие пояснения и первая цель. Другие девять целей сохранены и ждут последовательной проверки. Статус готовности маршрута не подтверждается одним цветом карточки.</p><p><a href="TASKS.md">Задачи и нерешённые вопросы</a> · <a href="LEGAL_REVIEW_2026-11-24.md">Результаты дополнительной сверки</a></p></section>
+ <section class="note book-settings" id="book-settings" aria-label="Формат текстового материала"><div><label for="format"><b>Что получает покупатель</b></label><select id="format"><option value="file">Цифровой файл</option><option value="print">Печатную книгу</option></select></div><label class="sample-choice"><input type="checkbox" id="sample">Предлагать бесплатный фрагмент перед покупкой</label><p>Фрагмент — необязательный этап знакомства с содержанием. Покупка и рекламная подписка рассматриваются отдельно.</p></section>
+ <div id="steps" style="display:flex;flex-direction:column;gap:28px"></div>
+ </main>
+@@ -239,7 +240,7 @@
+ };
+ const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+ 
+-let S = Object.assign({ form: 'ip', goal: 'book', path: [], scope: 'promotion', format: 'file', sample: false, salePlace: 'site' }, store.get('skhema-state', {}));
++let S = Object.assign({ form: 'ip', goal: 'book', path: [], scope: 'promotion', format: 'file', sample: false, salePlace: 'site', publisher:'' }, store.get('skhema-state', {}));
+ if (!D.forms.some((f) => f.id === S.form)) S.form = 'ip';
+ if (!D.goals.some((g) => g.id === S.goal)) S.goal = 'book';
+ if (!Array.isArray(S.path)) S.path = [];
+@@ -248,6 +249,7 @@
+ if (!['file','print'].includes(S.format)) S.format = 'file';
+ S.sample = S.sample === true;
+ if (!['site','vkshop','market','donut','tgbot'].includes(S.salePlace)) S.salePlace = 'site';
++if (!(D.bookPublishers || []).some(p => p.id === S.publisher)) S.publisher = '';
+ const bookUI = window.BookUI.create({ D, S, esc, curForm, saveBar });
+ 
+ const place = (k, id) => Object.assign({ id: id || k }, S.goal === 'book' && D.bookPlaces[k] ? D.bookPlaces[k] : D.places[k]);
+@@ -258,12 +260,15 @@
+   if (n.transfer) return Object.assign(p, { short: 'Переход в другой канал. Покупка проверяется отдельно.', details: n.details });
+   const q = bookUI.verification(p, n);
+   if (q) return Object.assign(p, { risk: 'y', short: q.title, details: q.text });
+-  if (n.id === 'tg-bot' && k === 'site') return Object.assign(p, { short: 'Бот даёт ссылку; заказ, оплата и получение — по модели сайта.' });
++  if (n.id === 'tg-bot' && k === 'site') return Object.assign(p, { short: 'Бот даёт ссылку на предложение книги на сайте.' });
+   return p;
+ };
+ const resolve = (n) => (n.place ? place(n.place, n.id) : n);
+ const level1 = () => (D.start[S.goal] || []).map(resolve);
+-const childrenOf = (n) => (n.children ? n.children : n.dest ? n.dest.map((k) => routePlace(n, k)) : null);
++const childrenOf = (n) => {
++  if (S.goal === 'book' && n.dest && (n.uncommitted || bookUI.publicationIssue(level1().find(a => a.id === S.path[0]), n))) return null;
++  return n.children ? n.children : n.dest ? n.dest.map((k) => routePlace(n, k)) : null;
++};
+ 
+ function chain() {
+   const out = [];
+@@ -317,7 +322,10 @@
+ /* Итог пути. link — способ из шага 2, from — площадка шага 1, p — место шага 3 (или площадка шага 1, если пути дальше нет) */
+ function finalPanel(link, p, from) {
+   const platform = S.goal === 'book' ? level1().find(n => n.id === S.path[0]) : null;
+-  const warning = platform && ['instagram','telegram','youtube','tiktok'].includes(platform.id) ? '<div class="note attention"><b>Условия исходной площадки: ' + esc(platform.name) + '</b><p>' + esc(platform.details) + '</p></div>' : '';
++  const publication = S.goal === 'book' ? bookUI.publicationInfo(platform, link) : null;
++  if (publication && !publication.needsCheck) from = publication.name;
++  const publicationWarning = S.goal === 'book' ? bookUI.publicationNotice(platform, link) : '';
++  const warning = publicationWarning || (platform && ['instagram','telegram','youtube','tiktok'].includes(platform.id) ? '<div class="note attention"><b>Условия исходной площадки: ' + esc(platform.name) + '</b><p>' + esc(platform.details) + '</p></div>' : '');
+   if (S.goal === 'book' && bookUI.incompatible(p)) return warning + bookUI.outcome(link, p);
+   if (S.goal === 'book' && bookUI.verification(p, link)) {
+     const actions = link ? '<section class="note"><h3>Что проверить в выбранном способе</h3>' + list(link.here.can) + '<h4>Что нельзя делать</h4>' + list(link.here.cannot) + '</section>' : '';
+@@ -384,13 +392,18 @@
+     html += step(1, goal.startTitle || 'Где вы начинаете', goal.startHint || 'цвет полосы — риск рекламы на площадке', '<div class="row">' + level1().map((n) => card(n, 0, S.path[0])).join('') + '</div>');
+     const [a, b, d] = c;
+     if (a && a.children) {
+-      html += step(2, a.nextTitle, '', '<div class="row">' + a.children.map((n) => card(n, 1, S.path[1])).join('') + '</div>');
+-      if (b && b.dest) {
++      html += step(2, a.nextTitle, '', (S.goal === 'book' ? bookUI.publicationChoice(a) : '') + '<div class="row">' + a.children.map((n) => card(n, 1, S.path[1])).join('') + '</div>');
++      const publicationIssue = S.goal === 'book' ? bookUI.publicationIssue(a, b) : null;
++      if (S.goal === 'book' && b?.uncommitted) {
++        html += step(3, 'Итог подарка без условий', '', bookUI.giftOutcome(b) + saveBar());
++      } else if (publicationIssue) {
++        html += step(3, publicationIssue.title, '', bookUI.publicationNotice(a, b) + saveBar());
++      } else if (b && b.dest) {
+         const destinationHint = S.goal === 'book' ? (b.republish ? 'где публикуете копию' : b.transfer ? 'куда переводите аудиторию' : b.id === 'tg-bot' ? 'где оформляется заказ' : goal.destHint || 'где продаёте') : goal.destHint || 'где продаёте';
+         html += step(3, 'Куда ведёт «' + b.name + '»', destinationHint, '<div class="row">' + b.dest.map((k) => card(routePlace(b, k), 2, S.path[2])).join('') + '</div>');
+-        if (d) html += step(4, 'Итог: ' + a.name + ' → ' + d.name, '', finalPanel(b, d, a.name) + saveBar());
++        if (d) html += step(4, 'Итог: ' + (S.goal === 'book' ? bookUI.publicationInfo(a, b)?.name || a.name : a.name) + ' → ' + d.name, '', finalPanel(b, d, a.name) + saveBar());
+       } else if (b) {
+-        html += step(3, b.review ? 'Требуется отдельная проверка' : 'Почему так нельзя', '', redPanel(b, a.children) + saveBar());
++        html += step(3, b.review ? 'Требуется отдельная проверка' : 'Почему так нельзя', '', (S.goal === 'book' ? bookUI.publicationNotice(a, b) : '') + redPanel(b, a.children) + saveBar());
+       }
+     } else if (a) {
+       html += step(2, a.name + ': если продаёте здесь', '', finalPanel(null, a) + saveBar());
+@@ -410,9 +423,13 @@
+   const goal = D.goals.find((g) => g.id === S.goal);
+   const [a, b, d] = chain();
+   const F = (keys) => [...new Set(keys)].map((k) => D.fines[k]).filter(Boolean).map((f) => f.title + ': ' + fv(f) + ' (' + f.law + ')' + (f.verify ? ' — сверить' : ''));
+-  const out = { title: goal.name + ' · ' + curForm().name, path: [a, b, d].filter(Boolean).map((n) => n.name).join(' → '), blocks: [] };
++  const publication = S.goal === 'book' ? bookUI.publicationInfo(a, b) : null;
++  const out = { title: goal.name + ' · ' + curForm().name, path: [a, b, d].filter(Boolean).map((n, i) => n.name + (i === 0 && publication ? ' (' + publication.name + ')' : '')).join(' → '), blocks: [] };
+   if (curForm().note) out.blocks.push(['Ваш статус', [curForm().note]]);
+-  if (b && b.why) {
++  const publicationIssue = S.goal === 'book' ? bookUI.publicationIssue(a, b) : null;
++  if (S.goal === 'book' && (b?.uncommitted || publicationIssue)) {
++    out.blocks.push(['Действия выбранного маршрута', b.here?.can || []], ['Ограничения', b.here?.cannot || []]);
++  } else if (b && b.why) {
+     out.blocks.push([b.review ? 'Что нужно проверить' : 'Почему нельзя', b.why], ['Как сделать безопаснее', [b.safer]], ['Ответственность', F(b.fines || [])]);
+   } else if (S.goal === 'book' && b && d && (b.transfer || b.republish || bookUI.incompatible(d) || bookUI.verification(d, b))) {
+     if (!bookUI.incompatible(d)) out.blocks.push(['Действия выбранного маршрута', b.here.can], ['Ограничения', b.here.cannot], ['Ответственность при наличии рекламы и соответствующего нарушения', F(b.fines || [])]);
+@@ -580,7 +597,8 @@
+   store.set('skhema-theme', m);
+ }
+ 
+-$('#reset').addEventListener('click', () => { S.path = []; S.scope = 'promotion'; S.format = 'file'; S.sample = false; S.salePlace = 'site'; render(); window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' }); });
++$('#reset').addEventListener('click', () => { S.path = []; S.scope = 'promotion'; S.format = 'file'; S.sample = false; S.salePlace = 'site'; S.publisher = ''; render(); window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' }); });
++document.addEventListener('change', e => { if (e.target.id === 'publisher') { S.publisher = (D.bookPublishers || []).some(p => p.id === e.target.value) ? e.target.value : ''; render(); $('#publisher')?.focus(); } });
+ $('#form').innerHTML = D.forms.map((f) => '<option value="' + f.id + '">' + esc(f.name) + '</option>').join('');
+ $('#goal').innerHTML = D.goals.map((g) => '<option value="' + g.id + '">' + esc(g.name) + '</option>').join('');
+ $('#form').value = S.form; $('#goal').value = S.goal;
+--- v7/site/book-ui.js
++++ v8/site/book-ui.js
+@@ -15,7 +15,34 @@
+     const box = (title, content, extra = '') => '<section class="note journey ' + extra + '"><h3>' + esc(title) + '</h3>' + content + '</section>';
+     const placeId = p => p?.id || selected()[0];
+     const incompatible = p => S.format === 'print' && placeId(p) === 'donut';
++    function publicationInfo(a, b) {
++      if (!b || b.uncommitted) return null;
++      const id = b.publicationPlatform || (a?.id === 'bloggers' ? S.publisher || '' : null);
++      if (id === null) return null;
++      const option = (D.bookPublishers || []).find(p => p.id === id);
++      if (!option || id === 'other') return {name:option?.name || 'Не выбрана', risk:'y', needsCheck:true, title:'Уточните площадку публикации', text:'Способ договорённости с блогером не определяет место размещения. Выберите площадку, прежде чем оценивать рекламный путь.'};
++      if (id === 'site') return {name:option.name, risk:'g', text:'Это сайт блогера, а не собственный сайт продавца. Отдельно проверьте публикацию, рекламные обязанности и страницу предложения.'};
++      const source = D.start.book.find(n => n.id === (id === 'dzen' ? 'rutube' : id));
++      return {name:option.name, risk:source.risk, text:source.details, blocked:id === 'instagram', needsCheck:id === 'tiktok', title:id === 'instagram' ? 'Рекламное размещение в Instagram запрещено' : 'Подтвердите текущую допустимость рекламы в TikTok'};
++    }
++    function publicationIssue(a, b) {
++      if (b?.why || b?.uncommitted) return null;
++      const info = publicationInfo(a, b);
++      return info && (info.blocked || info.needsCheck) ? info : null;
++    }
++    function publicationNotice(a, b) {
++      const info = publicationInfo(a, b);
++      return info ? box('Площадка публикации: ' + info.name, '<p>' + esc(info.text) + '</p>', info.risk === 'g' ? '' : 'attention') : '';
++    }
++    function publicationChoice(a) {
++      if (a?.id !== 'bloggers') return '';
++      return '<div class="note publication-settings"><label for="publisher">Где выйдет публикация?</label><select id="publisher" aria-describedby="publisher-help"><option value="">Не выбрана</option>' + (D.bookPublishers || []).map(p => '<option value="' + esc(p.id) + '"' + (S.publisher === p.id ? ' selected' : '') + '>' + esc(p.name) + '</option>').join('') + '</select><p id="publisher-help">Выберите площадку, на которой блогер расскажет о вашей книге. Место продажи выбирается отдельно. Для взаимного пиара проверьте оба размещения.</p></div>';
++    }
++    function giftOutcome(b) {
++      return box('Результат: книга передана без обязательства обзора', '<p>Публикация и переходы покупателей не гарантированы. Если обзор появится, оцените его отдельно. При договорённости об обязательном размещении выберите бартер.</p>' + list(b.here.can));
++    }
+     function verification(p, b) {
++      if (b?.id === 'tg-ads' && placeId(p) === 'site') return {title:'Telegram Ads: подтвердите страницу назначения', text:'До запуска подтвердите, поддерживает ли выбранный формат прямую ссылку на сайт. Инструкции платформы описывают назначения неоднозначно. До подтверждения этот маршрут не считается готовым переходом к покупке.'};
+       if (S.format !== 'print' && placeId(p) === 'vkshop') return { title: 'Цифровой файл в «Товарах» VK: требуется проверка', text: 'Актуальные правила размещения цифрового файла в каталоге VK не подтверждены. До проверки маршрут к оформлению заказа здесь не показывается. Это не вывод о законодательном запрете. Можно выбрать свой сайт; печатная книга рассматривается отдельно.' };
+       if (S.format !== 'print' && placeId(p) === 'market') return { title: 'Электронная книга: уточните книжный сервис', text: 'Выберите конкретный книжный сервис и подтвердите поддержку выбранного формата. Наличие электронных книг на площадке не подтверждает приём произвольного файла от любого продавца. До проверки путь к оформлению здесь не подтверждён; это не законодательный запрет цифровых книг.' + (b?.marketReview ? ' Для перехода из VK также проверьте условия ссылки, а для VK Рекламы — поддержку внешней карточки выбранным форматом.' : '') };
+       if (placeId(p) === 'market' && b?.marketReview) return { title: 'Переход на маркетплейс: проверьте условия', text: 'Уточните конкретный маркетплейс и карточку книги. Для VK Рекламы проверьте поддержку внешней ссылки выбранным форматом объявления; для цифрового файла — также правила его размещения на маркетплейсе. После подтверждения условий маршрут ведёт к карточке предложения.' };
+@@ -60,6 +87,11 @@
+     }
+     function summaryBlocks(b, p, a) {
+       const blocks = [['Раздел и формат', [scopes[S.scope] + ' · ' + fmt()]]];
++      if (b?.uncommitted) { blocks.push(['Результат', ['Книга передана без обязательства обзора. Публикация и переходы покупателей не гарантированы. Если обзор появится — оцените его отдельно.']]); return blocks; }
++      const publication = publicationInfo(a, b);
++      if (publication) blocks.push(['Фактическая площадка публикации', [publication.name, publication.text]]);
++      const issue = publicationIssue(a, b);
++      if (issue) { blocks.push(['Статус маршрута', [issue.title, issue.blocked ? 'Рекламный путь здесь не продолжается.' : 'Готовность рекламного размещения не подтверждена.']]); return blocks; }
+       if (a && ['telegram', 'youtube'].includes(a.id)) blocks.push(['Риск исходной площадки', [a.details]]);
+       if (a && ['instagram', 'tiktok'].includes(a.id)) blocks.push(['Условия исходной площадки', [a.details]]);
+       if (b?.why) { blocks.push(['Результат', [b.review ? 'Требуется проверка. Маршрут покупки не подтверждён.' : 'Предупреждающий тупик. Путь покупки здесь не продолжается.']]); return blocks; }
+@@ -77,9 +109,9 @@
+       return blocks;
+     }
+     function summary() {
+-      if (incompatible() || verification()) return { title: scopes[S.scope] + ' · ' + fmt(), path: selected()[1], blocks: summaryBlocks(), legal: 'Предлагаемая локальная редакция 24.11.2026 · v7. Это разбор, а не юридическое заключение.' };
+-      return { title: scopes[S.scope] + ' · ' + productName() + ' · ' + curForm().name, path: selected()[1], blocks: summaryBlocks().concat([['Проверка предложения', saleItems()]]), legal: 'Предлагаемая локальная редакция 24.11.2026 · v7. Это разбор, а не юридическое заключение. Платежи, договоры и нерешённые условия сервисов проверяются под конкретную модель.' };
++      if (incompatible() || verification()) return { title: scopes[S.scope] + ' · ' + fmt(), path: selected()[1], blocks: summaryBlocks(), legal: 'Предлагаемая локальная редакция 24.11.2026 · v8. Это разбор, а не юридическое заключение.' };
++      return { title: scopes[S.scope] + ' · ' + productName() + ' · ' + curForm().name, path: selected()[1], blocks: summaryBlocks().concat([['Проверка предложения', saleItems()]]), legal: 'Предлагаемая локальная редакция 24.11.2026 · v8. Это разбор, а не юридическое заключение. Платежи, договоры и нерешённые условия сервисов проверяются под конкретную модель.' };
+     }
+-    return { renderStage, outcome, summaryBlocks, summary, navigation, incompatible, verification };
++    return { renderStage, outcome, summaryBlocks, summary, navigation, incompatible, verification, publicationInfo, publicationIssue, publicationNotice, publicationChoice, giftOutcome };
+   }
+ };
+--- v7/site/version.json
++++ v8/site/version.json
+@@ -1,5 +1,5 @@
+ {
+-  "version": "2026-11-24-working-v7",
++  "version": "2026-11-24-working-v8",
+   "status": "Рабочая резервная версия; выдача сайта отложена автором",
+   "base_repository": "9479797/ru-legal-online",
+   "base_commit": "60bf80361bd757522656631eb45ddb19cc1cee88",
+@@ -7,25 +7,25 @@
+   "added_book_links": 8,
+   "remaining_goals_not_audited": 9,
+   "files": {
+-    "CHANGELOG.local.md": "3c9e0580d3ed3f21e69ad99fd0ecd11c58af69c9564c761d8b3ce28d58855fe7",
++    "CHANGELOG.local.md": "dfb89c08f04f8116ba4a48c7995bc79c34f30c37f2e697d13d6c27aab361bebe",
+     "LEGAL_REVIEW_2026-11-24.md": "e81dd87e65e24cb0aab677593ac2e2b739a6382c4921900c64505903cba9b9fa",
+-    "README.txt": "d6d77a0fa36839235a03e4499b1865106a800f9537727c6edf95722eaf82633e",
+-    "SOURCES.md": "a4c6ce98853c9d71f658c3344ad624abca8311353d2970fb9739983a3b5e7f3e",
+-    "TASKS.md": "62f3d9d0abc4b44130e2131b4bfabf2bae25da84b22f31a37c7fbf9149989a97",
+-    "book-ui.js": "ca95c2ff9f85cf498a799875bfdff5f4c907b40b4f8cbde01bcbd48157100450",
++    "README.txt": "384e6395938d785de8cd77f7c0bfb0d0ecdd198aed67735541ede0fd581d18af",
++    "SOURCES.md": "032f42d2586c4ba7c19ffb66691706528475e7acefdc6523e7b5d215e2fbf535",
++    "TASKS.md": "04426ee75d6d5db65bb288e95a3962204ee8e6575d866b10155445f3df1cc873",
++    "book-ui.js": "2c64e47ad43f55e5ea0d9fe325324d79ea427a4a8c343a41599abc6869ae49db",
+     "changes-v3-v4.patch": "1c1a0799728b8645e4f5f17c0f579c73192766893ba58e621674d2abf95c9bd7",
+     "changes-v4-v5.patch": "6fe69b80e46fc2288556914b419d61ad8c267c6305f47d1bd9a219ca48c6f0e6",
+-    "checks/proverka_local.js": "7ec26023441b3a9ec989b99dd5cea8ccc5cb43631c86d58b3a194ba6f4ea9f97",
++    "checks/proverka_local.js": "317dc5842c64502b8197c54d49adfb0956239b44315fb2a1ebca581230de0924",
+     "checks/proverka_skhemy.js": "a5e269b276122e8149065fa3e683e1fe2e8b4311a896f62251212d44ea6c268f",
+-    "data.js": "2ab04b41df9bb8896d08cf4984aa37b4761bacf532335a4c16def83004c1871c",
++    "data.js": "81963f3461f50071693d7c5d40ff685d0510e90cd24c030dbf83edb43e877fcf",
+     "docs/AUDIT_DIRECT_BLOGGERS_BOOK_2026-11-24.md": "ee7f73acd8bae55a754302c7e0716053c0b6bc1a274b68aedb175c769319e725",
+-    "docs/AUDIT_GOAL1_RESULTS_2026-11-24.md": "20b456e6157907fd80a89056a16bc5dad4d8d71275c6db13c25b21a84dbb4467",
++    "docs/AUDIT_GOAL1_RESULTS_2026-11-24.md": "b1d0cd23b4bf79265f1abdc61170e9648c62c98d29e16f88d04f9f551379df36",
+     "docs/AUDIT_INSTAGRAM_TELEGRAM_BOOK_2026-11-24.md": "cae767aa55639bcc17cca3830783936667fd05b04c19b09ccf27edc1e502a2a4",
+     "docs/AUDIT_SITE_MARKET_BOOK_2026-11-24.md": "360afd8308133250b11efea49993e50aacae33f54b9f4a67d234f7be3fd91288",
+     "docs/AUDIT_VK_BOOK_2026-11-24.md": "f0e67431df6c92293fb32f596f7d8305352b53d03adb3d91740efedd007d86d0",
+     "docs/AUDIT_YOUTUBE_TIKTOK_BOOK_2026-11-24.md": "9f50009de772dfb32b0b3f591011d6592feb4d455bd058ab8972aaf54ff887e4",
+-    "docs/plan-skhemy.md": "c073041bca309a1cb3018dbc603a41e24bbc6620e0f0b90e7a93d8706a03515e",
+-    "index.html": "e1b9dbaeeacfc6afd9468c15b27cbb18fbe66451368b33037e648b7c6e589ae2",
++    "docs/plan-skhemy.md": "c663b96e6309b7802bc19e5264fb2d4c1240f9bad135209f9294a23ec753a784",
++    "index.html": "2a54f419627be6dba2795f2166635ea78e4abd031f0c114a597d04ccdab0eaf9",
+     "markirovka.html": "dd6154817dcbdd9b27bc5d8ae46c9a53efcb2f58888ed338f7df39baaccfd59b",
+     "markirovka.js": "9328d94e80e0a2b695722134c7cb6c0e52cd20b55685b51c1736c7c3cee8cc0d"
+   },
+@@ -86,5 +86,15 @@
+     "VIDEO-VPN01",
+     "VIDEO-DISCLOSE01:YouTube;TikTok-conditional",
+     "RT01"
+-  ]
++  ],
++  "implemented_route_fixes": [
++    "PROMO-PLACE01",
++    "PROMO-GIFT01",
++    "PROMO-RETARGET01:short",
++    "TG-PERIOD01",
++    "TG-PROMO01",
++    "PROMO-SCOPE02"
++  ],
++  "publication_platform_options": 9,
++  "open_telegram_ads_destination": true
+ }
+--- v7/scripts/proverka_local.js
++++ v8/scripts/proverka_local.js
+@@ -55,7 +55,7 @@
+   if(format==='file'&&salePlace==='tgbot') assert(result.blocks.find(b=>b[0]==='Путь до оформления заказа')[1].includes('Переход к оформлению заказа в боте'));
+   cases++;
+ }
+-const S={goal:'book',format:'file',scope:'promotion',salePlace:'site',form:'ip',sample:false};
++const S={goal:'book',format:'file',scope:'promotion',salePlace:'site',form:'ip',sample:false,publisher:'vk'};
+ const ui=afterWindow.BookUI.create({D:after,S,esc:String,curForm:()=>after.forms[3],saveBar:()=>''});
+ assert(!JSON.stringify(ui.summaryBlocks({why:['запрет']},{name:'тест'})).includes('Путь до оформления заказа'));
+ assert(!JSON.stringify(ui.summaryBlocks({transfer:true},{name:'VK'})).includes('Путь до оформления заказа'));
+@@ -141,7 +141,7 @@
+ S.format='file';
+ // VIDEO/RT v7: проверяется реальный экспорт маршрута, а не только строки данных.
+ const v6=run(source.slice(0,source.indexOf('/* Рабочая v7'))).SCHEMA;
+-for(const p of after.start.book.filter(p=>!['youtube','tiktok','rutube'].includes(p.id))) assert.equal(JSON.stringify(p),JSON.stringify(v6.start.book.find(n=>n.id===p.id)),'Изменён несогласованный участок: '+p.id);
++for(const p of after.start.book.filter(p=>!['youtube','tiktok','rutube','telegram','bloggers','direct'].includes(p.id))) assert.equal(JSON.stringify(p),JSON.stringify(v6.start.book.find(n=>n.id===p.id)),'Изменён несогласованный участок: '+p.id);
+ for(const id of ['book-yt-tg','book-tt-tg']) {
+   const b=links.find(c=>c.id===id),a=after.start.book.find(n=>n.children?.some(c=>c.id===id));
+   assert(!b.fines.includes('vpn'));
+@@ -170,6 +170,47 @@
+   const old=v6.start.book.find(p=>p.id===a.id).children.find(c=>c.id===b.id);
+   assert(old && JSON.stringify(b.dest)===JSON.stringify(old.dest),'Изменены назначения: '+b.id);
+ }
++// v8: настоящий проход цепочки и экспорт учитывают площадку, подарок и сохранённые старые пути.
++const routingSource=pageSource.slice(pageSource.indexOf('const place ='),pageSource.indexOf('function card('));
++const routing={D:after,S,bookUI:ui};
++vm.runInNewContext(routingSource+'\nthis.actualChain=chain;',routing);
++context.chain=()=>routing.actualChain();
++let publicationCases=0;
++for(const publisher of ['',...after.bookPublishers.map(p=>p.id)]) {
++  S.publisher=publisher;
++  S.path=['bloggers','bl-paid','site'];
++  const result=context.summaryParts();
++  const gated=['','other','instagram','tiktok'].includes(publisher);
++  assert.equal(result.blocks.some(x=>x[0]==='Путь до оформления заказа'),!gated,publisher);
++  assert(result.blocks.some(x=>x[0]==='Фактическая площадка публикации'),publisher);
++  if(publisher==='instagram') assert(JSON.stringify(result).includes('запрещено'));
++  if(publisher==='telegram'||publisher==='youtube') assert(JSON.stringify(result).includes('переходный период'));
++  S.path=['bloggers','bl-gift','site'];
++  const gift=context.summaryParts();
++  assert.equal(routing.actualChain().length,2,'Старое назначение подарка не продолжается');
++  assert(gift.blocks.some(x=>x[0]==='Результат'&&x[1].some(t=>t.includes('не гарантированы'))));
++  assert(!gift.blocks.some(x=>x[0]==='Путь до оформления заказа'||x[0].startsWith('Ответственность')));
++  publicationCases++;
++}
++S.publisher='instagram'; S.path=['direct','dir-tg','site'];
++let published=context.summaryParts();
++assert(published.blocks.some(x=>x[0]==='Фактическая площадка публикации'&&x[1][0]==='Telegram'));
++assert(published.blocks.some(x=>x[0]==='Путь до оформления заказа'));
++S.path=['telegram','tg-ads','site'];
++published=context.summaryParts();
++assert(published.blocks.some(x=>x[0]==='Telegram Ads: подтвердите страницу назначения'));
++assert(!published.blocks.some(x=>x[0]==='Путь до оформления заказа'));
++assert(!after.start.book.flatMap(p=>p.children||[]).find(c=>c.id==='tg-bot').fines.includes('kassa'));
++assert(!after.start.book.flatMap(p=>p.children||[]).find(c=>c.id==='dir-retarget').fines.includes('mailing'));
++assert(!JSON.stringify(after.bookPlaces.tgbot.check).match(/выдач|достав|чек|налог/));
++const v7=run(source.slice(0,source.indexOf('/* Рабочая v8'))).SCHEMA;
++for(const p of after.start.book.filter(p=>!['telegram','bloggers','direct'].includes(p.id))) assert.equal(JSON.stringify(p),JSON.stringify(v7.start.book.find(n=>n.id===p.id)),'v8 изменила другую площадку: '+p.id);
++for(const n of after.start.book) for(const c of n.children||[]) {
++  const old=v7.start.book.flatMap(p=>p.children||[]).find(n=>n.id===c.id);
++  assert.equal(JSON.stringify(c.dest),JSON.stringify(old.dest),'v8 изменила назначения '+c.id);
++}
++S.publisher='vk'; S.path=[];
++console.log('v8: '+publicationCases+' вариантов площадки в реальной цепочке и экспорте; подарок не обещает обзор/покупку, Директ учитывает Telegram, условия Ads и граница бота сохранены.');
+ for(const page of ['index.html','markirovka.html']) {
+   const text=fs.readFileSync(path.join(root,'site',page),'utf8');
+   assert(!text.includes('fonts.googleapis.com'));
