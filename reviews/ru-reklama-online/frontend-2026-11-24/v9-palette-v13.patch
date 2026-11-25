@@ -1,0 +1,180 @@
+diff --git a/dist/frontend.css b/dist/frontend.css
+index 2b5c0c3..2f1ab79 100644
+--- a/dist/frontend.css
++++ b/dist/frontend.css
+@@ -144,12 +144,27 @@ footer{max-width:1680px;padding:0 24px}.version-note{padding:10px 16px;margin-bo
+ .route-board .t{font-size:15px;line-height:1.35}.route-board .d{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;font-size:14px;line-height:1.4;color:var(--muted)}
+ .platform-risk{display:inline-block;vertical-align:middle;margin-left:6px;border-radius:5px;padding:1px 5px;font-size:12px;font-weight:600;line-height:1.4;white-space:nowrap;background:light-dark(#FFF0C4,#473914);color:light-dark(#6C4800,#FFE197)}
+ .platform-risk.r{background:light-dark(#FFE2EB,#4D2434);color:light-dark(#A51544,#FFB6CD)}
+-[data-brand=instagram]{--platform:#C13584}[data-brand=telegram],[data-brand=tg]{--platform:#229ED9}[data-brand=youtube]{--platform:#EE2624}[data-brand=tiktok]{--platform:#00A6A5}[data-brand=vk]{--platform:#0077FF}[data-brand=direct]{--platform:#D5A600}[data-brand=rutube]{--platform:#315BBB}[data-brand=bloggers]{--platform:#8960CC}[data-brand=site]{--platform:#09826C}[data-brand=book-market]{--platform:#9946BC}
+-.route-board #step-1>.row>.opt[data-brand]{border-left:5px solid var(--platform,var(--line));background:color-mix(in srgb,var(--platform,#8175D0) 13%,var(--card))}
+-.route-board #step-1>.row>.opt[data-brand=instagram]{background:linear-gradient(115deg,color-mix(in srgb,#FCAF45 16%,var(--card)),color-mix(in srgb,#C13584 16%,var(--card)),color-mix(in srgb,#833AB4 14%,var(--card)))}
+-.route-board #step-1>.row>.opt[data-brand=tiktok]{background:linear-gradient(110deg,color-mix(in srgb,#25F4EE 12%,var(--card)),color-mix(in srgb,#FE2C55 10%,var(--card)))}
+-.route-board #step-2[data-brand]>.row>.opt{background:color-mix(in srgb,var(--platform,#8175D0) 5%,var(--card))}
+ .route-board #step-1>.row>.opt.sel,.route-board #step-2>.row>.opt.sel{outline:2px solid var(--selection);outline-offset:1px}
+ body[data-density=compact] .route-board .d{display:none}body[data-density=compact] .route-board .step>.row>.opt>.bd{min-height:34px;padding-block:6px;gap:0}
+ .sale-context{border-left:4px solid var(--selection)}.sale-context h3{font-size:23px}.sale-context p{max-width:1000px}.sale-context .wbtn{margin-top:8px;background:var(--selection-bg);color:var(--selection);border:1px solid var(--selection)}
+ @media(min-width:1050px){.fields{grid-template-columns:150px 170px minmax(230px,1fr) 210px}.fields>div:first-child .sw select{padding-right:20px}}
++/* v13: exact v9 fills and risk gradients; current three-column layout. */
++.hero{display:flex;flex-wrap:wrap;align-items:flex-start;gap:16px 24px;background:var(--brand);color:#fff;border:0;box-shadow:0 16px 40px rgba(91,103,221,.28);border-radius:20px;padding:16px 20px}
++.hero-about{display:block;flex:0 0 190px;max-width:190px}.hero h1{color:#fff}.hero p,.hero .fields label{color:rgba(255,255,255,.96)}.site-about summary{color:#fff}.hero .theme-note{background:rgba(255,255,255,.16)}
++.hero .fields{display:flex;flex-wrap:wrap;align-items:flex-start;gap:12px 18px;flex:0 0 auto;width:max-content;max-width:100%}
++.hero .fields>div,.hero .fields #book-settings{flex:0 0 auto;max-width:100%}
++.hero .fields>div>label,.hero .fields #book-settings>div>label{display:block;height:24px;margin:0;line-height:20px;white-space:nowrap}
++.hero .fields .label-help{display:flex;align-items:flex-start;height:24px;margin:0;line-height:20px;white-space:nowrap;padding-right:18px}
++.hero .fields .label-help label{margin:0;line-height:20px}.hero .help-button{color:#fff;border-color:rgba(255,255,255,.8);top:-2px}
++.hero .fields .sw{width:max-content;max-width:100%}
++.hero .fields .sw select,.hero .fields #book-settings select{height:40px;min-height:40px;max-width:100%;padding:0 36px 0 14px;border:1px solid rgba(255,255,255,.7);border-radius:999px;background:#fff;color:#1F2033;box-shadow:0 6px 16px rgba(31,32,51,.14);font-size:14px;font-weight:700;line-height:normal}
++.hero .fields .sw svg{top:11px;right:14px}.hero .fields #book-settings{gap:6px}.hero .fields #book-settings>div{gap:0}
++.hero .fields #book-settings .sample-choice{height:auto;color:rgba(255,255,255,.96);white-space:nowrap;font-weight:500}.hero .sample-choice input{accent-color:#D81F6E}
++.route-board .step,.route-board .step.has-selection{border:1px solid var(--line);box-shadow:none}
++.route-board .step>.row>.opt{border:1px solid var(--line);background:var(--card);outline:none;box-shadow:none;overflow:hidden}
++.route-board #step-1>.row>.opt.sel,.route-board #step-2>.row>.opt.sel,.route-board .step>.row>.opt.sel{border:2px solid var(--selection);background:var(--selection-bg);outline:none;outline-offset:0;box-shadow:none}
++.route-board .step>.row>.opt>.hd{position:static;clip-path:none;width:auto;height:auto;overflow:visible;grid-column:1/-1;border-radius:8px 8px 0 0;padding:4px 9px;font-size:12px;line-height:1.4;letter-spacing:.02em}
++.route-board .step>.row>.opt.g>.hd{background:var(--g);color:#fff}.route-board .step>.row>.opt.y>.hd{background:var(--y);color:#2B1F00}.route-board .step>.row>.opt.r>.hd{background:var(--r);color:#fff}
++.route-board .platform-risk{display:none}
++.route-pages a[aria-current=page]{background:var(--brand);color:#fff;border-color:transparent}body[data-route-mode=risk] .route-pages a[aria-current=page]{background:var(--r);color:#fff}
++@media(max-width:700px){.hero-about{flex:1 1 100%;max-width:none}.hero .fields{flex:1 1 100%;width:100%}.hero .fields>div,.hero .fields #book-settings,.hero .fields .sw{width:100%}.hero .fields .sw select,.hero .fields #book-settings select{width:100%!important}.hero .fields .label-help{width:max-content}.hero{padding:16px}}
+diff --git a/dist/index.html b/dist/index.html
+index a815379..27951c5 100644
+--- a/dist/index.html
++++ b/dist/index.html
+@@ -202,7 +202,7 @@ dialog::backdrop{background:rgba(20,21,34,.45)}
+ <template id="scope-help"><p><b>Продвижение</b> — как человек узнаёт о предложении и приходит к нему: публикации, реклама, рекомендации и переходы между площадками.</p><p><b>Продажа</b> — что человек видит в месте продажи: страница товара, карточка или предложение в боте. Здесь проверяем рекламный характер, содержание и необходимые сведения.</p><p>Выдача материалов, доставка и оказание услуг относятся к сопровождению онлайн-бизнеса.</p></template>
+ 
+ <footer>
+-<details class="version-note"><summary>Рабочая версия · 25.11.2026 · v12 · пояснения и ориентиры</summary><p>Обновлены общие пояснения и первая цель. Другие девять целей сохранены и ждут последовательной проверки. Статус готовности маршрута не подтверждается одним цветом карточки.</p><p><a href="TASKS.md">Задачи и нерешённые вопросы</a> · <a href="LEGAL_REVIEW_2026-11-24.md">Результаты дополнительной сверки</a></p></details>
++<details class="version-note"><summary>Рабочая версия · 25.11.2026 · v13 · палитра v9 и ровные настройки</summary><p>Обновлены общие пояснения и первая цель. Другие девять целей сохранены и ждут последовательной проверки. Статус готовности маршрута не подтверждается одним цветом карточки.</p><p><a href="TASKS.md">Задачи и нерешённые вопросы</a> · <a href="LEGAL_REVIEW_2026-11-24.md">Результаты дополнительной сверки</a></p></details>
+ <div class="foot">
+ <div style="flex:1 1 340px;display:flex;flex-direction:column;gap:10px">
+ <span class="tag" style="align-self:flex-start">Как пользоваться</span>
+@@ -230,6 +230,7 @@ dialog::backdrop{background:rgba(20,21,34,.45)}
+ <script src="goal1-copy.js"></script>
+ <script src="frontend-motion.js"></script>
+ <script src="desktop-board.js"></script>
++<script src="settings-layout.js"></script>
+ <script>
+ {
+ const D = window.SCHEMA;
+@@ -472,6 +473,7 @@ function render() {
+   }
+   $('#steps').innerHTML = html;
+   document.body.dataset.routeScope = S.scope;
++  window.SettingsLayout.fit();
+   $('#route-page-note').textContent=S.scope==='sale'?'Сейчас: проверка предложения в месте продажи':routeMode==='risk'?'Ограничения площадок и действия с высоким риском':'Условия конкретной публикации всё равно нужно проверить';
+   if(S.scope === 'promotion') window.DesktopBoard.decorate($('#steps'),{goal:S.goal,platform:S.path[0]});
+   requestAnimationFrame(syncRouteLayout);
+@@ -688,7 +690,8 @@ function setTheme(m) {
+ }
+ 
+ if (typeof ResizeObserver !== 'undefined') { const routeObserver = new ResizeObserver(() => requestAnimationFrame(syncRouteLayout)); routeObserver.observe($('.pathbar')); routeObserver.observe($('#steps')); }
+-window.addEventListener('resize', () => requestAnimationFrame(syncRouteLayout));
++window.addEventListener('resize', () => {requestAnimationFrame(syncRouteLayout);window.SettingsLayout.fit();});
++if(document.fonts)document.fonts.ready.then(()=>window.SettingsLayout.fit());
+ document.addEventListener('change', e => { if (e.target.id === 'publisher') { S.publisher = (D.bookPublishers || []).some(p => p.id === e.target.value) ? e.target.value : ''; render(); $('#publisher')?.focus(); } });
+ $('#form').innerHTML = D.forms.map((f) => '<option value="' + f.id + '">' + esc(f.name) + '</option>').join('');
+ $('#goal').innerHTML = D.goals.map((g) => '<option value="' + g.id + '">' + esc(g.name) + '</option>').join('');
+diff --git a/dist/risk.html b/dist/risk.html
+index 6260331..9d80f2e 100644
+--- a/dist/risk.html
++++ b/dist/risk.html
+@@ -202,7 +202,7 @@ dialog::backdrop{background:rgba(20,21,34,.45)}
+ <template id="scope-help"><p><b>Продвижение</b> — как человек узнаёт о предложении и приходит к нему: публикации, реклама, рекомендации и переходы между площадками.</p><p><b>Продажа</b> — что человек видит в месте продажи: страница товара, карточка или предложение в боте. Здесь проверяем рекламный характер, содержание и необходимые сведения.</p><p>Выдача материалов, доставка и оказание услуг относятся к сопровождению онлайн-бизнеса.</p></template>
+ 
+ <footer>
+-<details class="version-note"><summary>Рабочая версия · 25.11.2026 · v12 · пояснения и ориентиры</summary><p>Обновлены общие пояснения и первая цель. Другие девять целей сохранены и ждут последовательной проверки. Статус готовности маршрута не подтверждается одним цветом карточки.</p><p><a href="TASKS.md">Задачи и нерешённые вопросы</a> · <a href="LEGAL_REVIEW_2026-11-24.md">Результаты дополнительной сверки</a></p></details>
++<details class="version-note"><summary>Рабочая версия · 25.11.2026 · v13 · палитра v9 и ровные настройки</summary><p>Обновлены общие пояснения и первая цель. Другие девять целей сохранены и ждут последовательной проверки. Статус готовности маршрута не подтверждается одним цветом карточки.</p><p><a href="TASKS.md">Задачи и нерешённые вопросы</a> · <a href="LEGAL_REVIEW_2026-11-24.md">Результаты дополнительной сверки</a></p></details>
+ <div class="foot">
+ <div style="flex:1 1 340px;display:flex;flex-direction:column;gap:10px">
+ <span class="tag" style="align-self:flex-start">Как пользоваться</span>
+@@ -230,6 +230,7 @@ dialog::backdrop{background:rgba(20,21,34,.45)}
+ <script src="goal1-copy.js"></script>
+ <script src="frontend-motion.js"></script>
+ <script src="desktop-board.js"></script>
++<script src="settings-layout.js"></script>
+ <script>
+ {
+ const D = window.SCHEMA;
+@@ -472,6 +473,7 @@ function render() {
+   }
+   $('#steps').innerHTML = html;
+   document.body.dataset.routeScope = S.scope;
++  window.SettingsLayout.fit();
+   $('#route-page-note').textContent=S.scope==='sale'?'Сейчас: проверка предложения в месте продажи':routeMode==='risk'?'Ограничения площадок и действия с высоким риском':'Условия конкретной публикации всё равно нужно проверить';
+   if(S.scope === 'promotion') window.DesktopBoard.decorate($('#steps'),{goal:S.goal,platform:S.path[0]});
+   requestAnimationFrame(syncRouteLayout);
+@@ -688,7 +690,8 @@ function setTheme(m) {
+ }
+ 
+ if (typeof ResizeObserver !== 'undefined') { const routeObserver = new ResizeObserver(() => requestAnimationFrame(syncRouteLayout)); routeObserver.observe($('.pathbar')); routeObserver.observe($('#steps')); }
+-window.addEventListener('resize', () => requestAnimationFrame(syncRouteLayout));
++window.addEventListener('resize', () => {requestAnimationFrame(syncRouteLayout);window.SettingsLayout.fit();});
++if(document.fonts)document.fonts.ready.then(()=>window.SettingsLayout.fit());
+ document.addEventListener('change', e => { if (e.target.id === 'publisher') { S.publisher = (D.bookPublishers || []).some(p => p.id === e.target.value) ? e.target.value : ''; render(); $('#publisher')?.focus(); } });
+ $('#form').innerHTML = D.forms.map((f) => '<option value="' + f.id + '">' + esc(f.name) + '</option>').join('');
+ $('#goal').innerHTML = D.goals.map((g) => '<option value="' + g.id + '">' + esc(g.name) + '</option>').join('');
+diff --git a/dist/version.json b/dist/version.json
+index 7423b4c..fed7dd1 100644
+--- a/dist/version.json
++++ b/dist/version.json
+@@ -1,6 +1,6 @@
+ {
+-  "version": "2026-11-25-working-v12-orientation",
+-  "status": "Рабочая версия: формат в настройках, фирменные цвета и понятный переход к предложению",
++  "version": "2026-11-25-working-v13-v9-palette",
++  "status": "Рабочая версия: точная палитра v9, верхние полосы риска и ровные настройки",
+   "base_repository": "9479797/ru-legal-online",
+   "base_commit": "60bf80361bd757522656631eb45ddb19cc1cee88",
+   "old_book_links_preserved": 56,
+@@ -35,13 +35,14 @@
+     "docs/AUDIT_YOUTUBE_TIKTOK_BOOK_2026-11-24.md": "9f50009de772dfb32b0b3f591011d6592feb4d455bd058ab8972aaf54ff887e4",
+     "docs/plan-skhemy.md": "c663b96e6309b7802bc19e5264fb2d4c1240f9bad135209f9294a23ec753a784",
+     "frontend-motion.js": "0c335a2b8709541b5bd92fb2a8f69b2da72ab4ad5a2faed8637c1f8a2561ee32",
+-    "frontend.css": "91ba21795c3794a44a13628e4bac5be0d8aba96aa7641617dc24385437a73fad",
++    "frontend.css": "4ef898a9a655dcfe276f96feccf76fecad57186c29c617f87078297901d8cec0",
+     "goal1-copy.js": "7b880404e80f57782f493f2a43b29604fc5351d81e8ea66aa2f74e21e1285cd2",
+-    "index.html": "a17a5ad79d233339df5153f0a22164d15bc3b29f6c625dfc93692a8b0d14bed4",
++    "index.html": "df96050898b693cff9f2be64deb58243945edab3f588cf276d16b0b8ff40c6ee",
+     "markirovka.html": "dd6154817dcbdd9b27bc5d8ae46c9a53efcb2f58888ed338f7df39baaccfd59b",
+     "markirovka.js": "9328d94e80e0a2b695722134c7cb6c0e52cd20b55685b51c1736c7c3cee8cc0d",
+-    "risk.html": "853afe5a294aac870dbe069b2a59610755eefb09397943a7b041b19ee7e8c646",
+-    "route-matrix.js": "65acedc3049e8f5bd85b0f8b470cf8424aaef84622157e31f7e917b36beebd82"
++    "risk.html": "9caef302eada0185176d17081df176572dc54ee04c3a053406ff45b34135f338",
++    "route-matrix.js": "65acedc3049e8f5bd85b0f8b470cf8424aaef84622157e31f7e917b36beebd82",
++    "settings-layout.js": "1613c4c6772338063b21f62addb8be0916affb907686c035c9d61d8eb3f7285e"
+   },
+   "canonical_main_modified": false,
+   "backup_location": "reviews/ru-reklama-online/site-audit-2026-11-23/ in pravka/reklama-audit-checkpoint-2026-11",
+@@ -128,7 +129,11 @@
+   "desktop_board": true,
+   "desktop_qa": "Browser: VK 11 actions, reply/site result dialog, risk page and red scenario, saved page selections",
+   "visible_card_descriptions": true,
+-  "platform_colors": true,
++  "platform_colors": false,
+   "sale_orientation": true,
+-  "density_toggle": true
++  "density_toggle": true,
++  "palette_source_commit": "ce3ae10d2822a8a275c9c89891bba2f0fb435093",
++  "risk_top_headers": true,
++  "intrinsic_select_widths": true,
++  "browser_qa": "Not performed: browser auto-review rejected preview due to usage limit. Source and automated checks completed."
+ }
+diff --git a/dist/settings-layout.js b/dist/settings-layout.js
+new file mode 100644
+index 0000000..103a769
+--- /dev/null
++++ b/dist/settings-layout.js
+@@ -0,0 +1,13 @@
++(function(root){
++ const widestLabel=(options,measure)=>Math.max(0,...Array.from(options,o=>measure(o.label||o.textContent||'')));
++ function fit(){
++  const ctx=document.createElement('canvas').getContext('2d');if(!ctx)return;
++  document.querySelectorAll('.fields select').forEach(select=>{
++   const style=getComputedStyle(select);ctx.font=style.font||style.fontWeight+' '+style.fontSize+' '+style.fontFamily;
++   const content=widestLabel(select.options,text=>ctx.measureText(text).width);
++   const extra=['paddingLeft','paddingRight','borderLeftWidth','borderRightWidth'].reduce((n,k)=>n+(parseFloat(style[k])||0),18);
++   select.style.width=Math.ceil(content+extra)+'px';
++  });
++ }
++ root.SettingsLayout={fit,widestLabel};
++})(window);
