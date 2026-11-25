@@ -1,0 +1,406 @@
+diff --git a/dist/book-ui.js b/dist/book-ui.js
+index fd7ec27..1f385fc 100644
+--- a/dist/book-ui.js
++++ b/dist/book-ui.js
+@@ -65,7 +65,7 @@ window.BookUI = {
+     }
+     function pathway(items) { return '<ol class="journey-path">' + items.map(t => '<li>' + esc(t) + '</li>').join('') + '</ol>'; }
+     function navigation() {
+-      return '<div class="journey-nav"><button type="button" class="wbtn" data-book-scope="'+(S.scope==='promotion'?'sale':'promotion')+'">'+(S.scope==='promotion'?'Посмотреть условия в месте продажи':'Вернуться к выбору продвижения')+'</button></div><p class="sub">'+(S.scope==='promotion'?'Откроется раздел «Продажа». Если вы выбрали конкретное место заказа, оно сохранится.':'Откроется выбор площадки и способа продвижения. Ранее выбранная связка сохранится.')+'</p>';
++      return '<div class="journey-nav"><button type="button" class="wbtn" data-book-scope="'+(S.scope==='promotion'?'sale':'promotion')+'">'+(S.scope==='promotion'?'Посмотреть условия в месте продажи':'Вернуться к собранной связке')+'</button></div><p class="sub">'+(S.scope==='promotion'?'Откроется раздел «Продажа». Если вы выбрали конкретное место заказа, оно сохранится.':'Откроется выбор площадки и способа продвижения. Ранее выбранная связка сохранится.')+'</p>';
+     }
+     function buyerExample(p) {
+       const print=S.format==='print', id=placeId(p);
+@@ -91,8 +91,14 @@ window.BookUI = {
+     }
+     function renderStage() {
+       const section = scopes[S.scope];
+-      const cards = channels.map(([id, title, desc]) => '<button type="button" class="sale-choice' + (selected()[0] === id ? ' chosen' : '') + '" data-sale-place="' + id + '" aria-pressed="' + (selected()[0] === id) + '"><b>' + esc(title) + '</b><span>' + esc(desc) + '</span></button>').join('');
+-      return box(section + ': ' + productName().toLowerCase(), '<p>Выберите фактическое место заказа. Раздел продвижения и выбранный рекламный маршрут сохраняются.</p><div class="sale-choices">' + cards + '</div>') +
++      const chosen=S.saleChosen!==false;
++      const origin=(D.start.book||[]).find(n=>n.id===S.path?.[0]);
++      const method=origin?.children?.find(n=>n.id===S.path?.[1]);
++      const context=box(chosen?'Вы проверяете предложение: '+selected()[1]:'Выберите, где размещено предложение', '<p>'+esc(origin&&method?'Вы перешли из связки: '+origin.name+' → '+method.name+'.':'Вы открыли раздел проверки предложения в месте продажи.')+'</p><p>Здесь разбираем описание материала, цену и условия, которые увидит покупатель.</p><button type="button" class="wbtn" data-book-scope="promotion">Вернуться к собранной связке</button>', 'sale-context');
++      const cards = channels.map(([id, title, desc]) => '<button type="button" class="sale-choice' + (chosen && selected()[0] === id ? ' chosen' : '') + '" data-sale-place="' + id + '" aria-pressed="' + (chosen && selected()[0] === id) + '"><b>' + esc(title) + '</b><span>' + esc(desc) + '</span></button>').join('');
++      const choices=box('Где покупатель увидит ваше предложение?', '<p>Выберите сайт, каталог, подписку или бота. После выбора ниже появятся пояснение и пример для этого места.</p><div class="sale-choices">' + cards + '</div>');
++      if(!chosen) return context + choices;
++      return context + choices +
+         (incompatible() ? box('Подписка и печатный экземпляр — разные продукты', '<p>Донат открывает доступ к материалам. Для продажи и доставки печатных материалов выберите сайт, карточку VK, маркетплейс или отдельно проверяемую модель бота.</p>') : verification() ? verificationBox(verification()) + exampleBox() + (S.sample ? box('Бесплатный фрагмент', list(sampleItems())) : '') :
+         box('Предложение в месте продажи', pathway(paymentPath()) + exampleBox()) +
+         box('Что проверить в предложении', list(saleItems())) +
+@@ -128,6 +134,7 @@ window.BookUI = {
+       return blocks;
+     }
+     function summary() {
++      if(S.saleChosen===false) return {title:'Проверка предложения',path:'Место предложения не выбрано',blocks:[['Следующий шаг',['Выберите сайт, каталог, подписку или бота. Итог для конкретного места ещё не сформирован.']]],legal:'Рабочая версия 25.11.2026. Это разбор, а не юридическое заключение.'};
+       if (incompatible() || verification()) return { title: scopes[S.scope] + ' · ' + fmt(), path: selected()[1], blocks: summaryBlocks(), legal: 'Рабочая версия 25.11.2026 · v10. Пояснения и примеры. Это разбор, а не юридическое заключение.' };
+       return { title: scopes[S.scope] + ' · ' + productName() + ' · ' + curForm().name, path: selected()[1], blocks: summaryBlocks().concat([['Проверка предложения', saleItems()]]), legal: 'Рабочая версия 25.11.2026 · v10. Пояснения и примеры. Это разбор, а не юридическое заключение. Платежи, договоры и нерешённые условия сервисов проверяются под конкретную модель.' };
+     }
+diff --git a/dist/desktop-board.js b/dist/desktop-board.js
+index f13a533..83aecd6 100644
+--- a/dist/desktop-board.js
++++ b/dist/desktop-board.js
+@@ -5,13 +5,14 @@
+    return nodes.map(p=>p.children ? {...p,...(mode==='risk'&&p.risk==='g'?{name:p.name+' · опасные действия',details:'В этом разделе показаны действия с высоким риском, а не все варианты на площадке. '+(p.details||'')}:{}),children:p.children.filter(n=>isRisk(p,n)===(mode==='risk'))} : p)
+      .filter(p=>p.children?p.children.length:isRisk(p)===(mode==='risk'));
+  }
+- function decorate(host){
++ function decorate(host, context={}){
+    const stages=[1,2,3].map(n=>host.querySelector('#step-'+n));
+    if(!stages[0])return;
+    const board=document.createElement('div');board.className='route-board';board.setAttribute('aria-label','Обзор трёх этапов');
+-   const titles=['Площадка','Действие','Результат'];
++   const titles=['Площадка',context.goal==='book'?'Как вы рассказываете о материале':'Как вы привлекаете аудиторию','Чем заканчивается связка'];
+    stages.forEach((stage,i)=>{
+-     if(!stage){stage=document.createElement('section');stage.className='step board-empty';stage.innerHTML='<div class="sh"><span class="num">0'+(i+1)+'</span><h2>'+titles[i]+'</h2></div><p>Выберите '+(i===1?'площадку в первой колонке.':'действие во второй колонке.')+'</p>';}
++     if(!stage){stage=document.createElement('section');stage.className='step board-empty';stage.innerHTML='<div class="sh"><span class="num">0'+(i+1)+'</span><h2>'+titles[i]+'</h2></div><p>Выберите '+(i===1?'площадку в первой колонке.':'способ рассказать о материале во второй колонке.')+'</p>';}
++     if(i===1 && context.platform) stage.dataset.brand=context.platform;
+      const title=stage.querySelector('h2');
+      if(title){title.setAttribute('aria-label',title.textContent);title.textContent=titles[i];}
+      const choices=stage.querySelector(':scope > .row:has(> .opt)');
+diff --git a/dist/frontend.css b/dist/frontend.css
+index 9d973e6..2b5c0c3 100644
+--- a/dist/frontend.css
++++ b/dist/frontend.css
+@@ -128,3 +128,28 @@ footer{max-width:1680px;padding:0 24px}.version-note{padding:10px 16px;margin-bo
+ .route-board .step>.row>.opt{min-height:38px}
+ @media(min-width:1050px){.hero{padding:8px 16px}.pathbar{padding-block:6px}.path-heading #path-context{display:none}.fields .sw select{min-height:36px}.fields .sw svg{top:10px}}
+ @media(max-width:1049px){.route-board .step>.row.board-choices{max-height:none}}
++/* v12: visible explanations, platform identity and one settings row. */
++.compact-toggle{display:inline-flex;align-items:center;gap:6px;font-size:14px;color:var(--muted);padding:6px;cursor:pointer}.compact-toggle input{width:16px;height:16px;accent-color:var(--selection)}
++.fields #book-settings{display:flex;flex-direction:column;align-items:stretch;padding:0;border:0;background:transparent;box-shadow:none;gap:4px;border-radius:0}
++.fields #book-settings>div{display:flex;flex-direction:column;align-items:stretch;gap:0}
++.fields #book-settings label{font-size:14px;line-height:1.4}.fields #book-settings select{margin:0;min-height:36px;padding:4px 10px;border-radius:10px;font-weight:700}
++.fields #book-settings .sample-choice{display:flex;align-items:center;gap:6px;margin:0;font-size:14px;font-weight:500;color:var(--muted)}
++.fields #book-settings .sample-choice input{width:16px;height:16px;margin:0}
++@media(min-width:1050px){.hero{display:grid;grid-template-columns:190px minmax(0,1fr);gap:16px}.hero-about{max-width:none}.fields{display:grid;grid-template-columns:120px 170px minmax(230px,1fr) 210px;gap:12px}.fields>div:last-child{grid-column:auto}}
++@media(min-width:1050px) and (max-width:1240px){.hero{grid-template-columns:1fr}.hero-about{display:none}}
++@media(max-width:1049px){.fields #book-settings{grid-column:2;grid-row:1/3}.fields>div:last-of-type{grid-column:1/-1}.fields{grid-template-columns:1fr 1fr}}
++@media(max-width:600px){.fields{grid-template-columns:1fr}.fields #book-settings{grid-column:1;grid-row:auto}.fields>div:last-of-type{grid-column:1}}
++.route-board .step>.row>.opt>.bd{min-height:60px;padding:8px 10px;gap:4px}
++.route-board .step>.row>.opt.sel>.bd{padding-left:26px}
++.route-board .t{font-size:15px;line-height:1.35}.route-board .d{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;font-size:14px;line-height:1.4;color:var(--muted)}
++.platform-risk{display:inline-block;vertical-align:middle;margin-left:6px;border-radius:5px;padding:1px 5px;font-size:12px;font-weight:600;line-height:1.4;white-space:nowrap;background:light-dark(#FFF0C4,#473914);color:light-dark(#6C4800,#FFE197)}
++.platform-risk.r{background:light-dark(#FFE2EB,#4D2434);color:light-dark(#A51544,#FFB6CD)}
++[data-brand=instagram]{--platform:#C13584}[data-brand=telegram],[data-brand=tg]{--platform:#229ED9}[data-brand=youtube]{--platform:#EE2624}[data-brand=tiktok]{--platform:#00A6A5}[data-brand=vk]{--platform:#0077FF}[data-brand=direct]{--platform:#D5A600}[data-brand=rutube]{--platform:#315BBB}[data-brand=bloggers]{--platform:#8960CC}[data-brand=site]{--platform:#09826C}[data-brand=book-market]{--platform:#9946BC}
++.route-board #step-1>.row>.opt[data-brand]{border-left:5px solid var(--platform,var(--line));background:color-mix(in srgb,var(--platform,#8175D0) 13%,var(--card))}
++.route-board #step-1>.row>.opt[data-brand=instagram]{background:linear-gradient(115deg,color-mix(in srgb,#FCAF45 16%,var(--card)),color-mix(in srgb,#C13584 16%,var(--card)),color-mix(in srgb,#833AB4 14%,var(--card)))}
++.route-board #step-1>.row>.opt[data-brand=tiktok]{background:linear-gradient(110deg,color-mix(in srgb,#25F4EE 12%,var(--card)),color-mix(in srgb,#FE2C55 10%,var(--card)))}
++.route-board #step-2[data-brand]>.row>.opt{background:color-mix(in srgb,var(--platform,#8175D0) 5%,var(--card))}
++.route-board #step-1>.row>.opt.sel,.route-board #step-2>.row>.opt.sel{outline:2px solid var(--selection);outline-offset:1px}
++body[data-density=compact] .route-board .d{display:none}body[data-density=compact] .route-board .step>.row>.opt>.bd{min-height:34px;padding-block:6px;gap:0}
++.sale-context{border-left:4px solid var(--selection)}.sale-context h3{font-size:23px}.sale-context p{max-width:1000px}.sale-context .wbtn{margin-top:8px;background:var(--selection-bg);color:var(--selection);border:1px solid var(--selection)}
++@media(min-width:1050px){.fields{grid-template-columns:150px 170px minmax(230px,1fr) 210px}.fields>div:first-child .sw select{padding-right:20px}}
+diff --git a/dist/index.html b/dist/index.html
+index c2fd4cb..a815379 100644
+--- a/dist/index.html
++++ b/dist/index.html
+@@ -178,7 +178,7 @@ dialog::backdrop{background:rgba(20,21,34,.45)}
+ <div class="sr-only" id="route-status" role="status" aria-live="polite"></div>
+ 
+ <main>
+-<nav class="route-pages" aria-label="Разделы схемы"><a href="index.html" data-route-page="ordinary">Обычные варианты</a><a href="risk.html" data-route-page="risk">Рискованные и запрещённые</a><span id="route-page-note"></span></nav>
++<nav class="route-pages" aria-label="Разделы схемы"><a href="index.html" data-route-page="ordinary">Обычные варианты</a><a href="risk.html" data-route-page="risk">Рискованные и запрещённые</a><label class="compact-toggle"><input type="checkbox" id="compact-view">Краткий вид</label><span id="route-page-note"></span></nav>
+ <section class="hero" aria-labelledby="h0">
+ <div class="hero-about">
+ <h1 id="h0">Проверка рекламной связки</h1>
+@@ -191,9 +191,10 @@ dialog::backdrop{background:rgba(20,21,34,.45)}
+ <div><div class="label-help"><label for="scope">Что проверяем</label><button type="button" class="help-button" data-help="scope" aria-label="Чем отличаются продвижение и продажа" aria-haspopup="dialog">?</button></div><div class="sw"><select id="scope"><option value="promotion">Продвижение</option><option value="sale">Продажу</option></select></div></div>
+ <div><label for="form">Как вы оформлены</label><div class="sw"><select id="form"></select><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4F5BD5" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></div></div>
+ <div><label for="goal">Цель</label><div class="sw"><select id="goal"></select><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4F5BD5" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></div></div>
++<section class="note book-settings" id="book-settings" aria-label="Формат текстового материала"><div><label for="format"><b>Формат материала</b></label><select id="format"><option value="file">Цифровой файл</option><option value="print">Печатные материалы</option></select></div><label class="sample-choice"><input type="checkbox" id="sample" aria-label="Предлагать бесплатный фрагмент перед покупкой">Бесплатный фрагмент</label><p>Фрагмент — необязательный этап знакомства с содержанием. Покупка и рекламная подписка рассматриваются отдельно.</p></section>
+ </div>
+ </section>
+-<section class="note book-settings" id="book-settings" aria-label="Формат текстового материала"><div><label for="format"><b>Что получает покупатель</b></label><select id="format"><option value="file">Цифровой файл</option><option value="print">Печатные материалы</option></select></div><label class="sample-choice"><input type="checkbox" id="sample">Предлагать бесплатный фрагмент перед покупкой</label><p>Фрагмент — необязательный этап знакомства с содержанием. Покупка и рекламная подписка рассматриваются отдельно.</p></section>
++
+ <div id="steps"></div>
+ </main>
+ <div id="print" aria-hidden="true"></div>
+@@ -201,7 +202,7 @@ dialog::backdrop{background:rgba(20,21,34,.45)}
+ <template id="scope-help"><p><b>Продвижение</b> — как человек узнаёт о предложении и приходит к нему: публикации, реклама, рекомендации и переходы между площадками.</p><p><b>Продажа</b> — что человек видит в месте продажи: страница товара, карточка или предложение в боте. Здесь проверяем рекламный характер, содержание и необходимые сведения.</p><p>Выдача материалов, доставка и оказание услуг относятся к сопровождению онлайн-бизнеса.</p></template>
+ 
+ <footer>
+-<details class="version-note"><summary>Рабочая версия · 25.11.2026 · v11 · компактный обзор этапов</summary><p>Обновлены общие пояснения и первая цель. Другие девять целей сохранены и ждут последовательной проверки. Статус готовности маршрута не подтверждается одним цветом карточки.</p><p><a href="TASKS.md">Задачи и нерешённые вопросы</a> · <a href="LEGAL_REVIEW_2026-11-24.md">Результаты дополнительной сверки</a></p></details>
++<details class="version-note"><summary>Рабочая версия · 25.11.2026 · v12 · пояснения и ориентиры</summary><p>Обновлены общие пояснения и первая цель. Другие девять целей сохранены и ждут последовательной проверки. Статус готовности маршрута не подтверждается одним цветом карточки.</p><p><a href="TASKS.md">Задачи и нерешённые вопросы</a> · <a href="LEGAL_REVIEW_2026-11-24.md">Результаты дополнительной сверки</a></p></details>
+ <div class="foot">
+ <div style="flex:1 1 340px;display:flex;flex-direction:column;gap:10px">
+ <span class="tag" style="align-self:flex-start">Как пользоваться</span>
+@@ -257,6 +258,9 @@ $('#route-page-note').textContent = routeMode === 'risk' ? 'Ограничени
+ let S = Object.assign({ form: 'ip', goal: 'book', path: [], scope: 'promotion', format: 'file', sample: false, salePlace: 'site', publisher:'' }, store.get(stateKey, store.get('skhema-state', {})));
+ Object.assign(S, store.get('skhema-settings', {}));
+ if (!store.get(stateKey, null)) S.scope = 'promotion';
++document.body.dataset.density=store.get('skhema-density','described');
++$('#compact-view').checked=document.body.dataset.density==='compact';
++if(typeof S.saleChosen !== 'boolean') S.saleChosen=false;
+ if (!D.forms.some((f) => f.id === S.form)) S.form = 'ip';
+ if (!D.goals.some((g) => g.id === S.goal)) S.goal = 'book';
+ if (!Array.isArray(S.path)) S.path = [];
+@@ -304,10 +308,10 @@ function chain() {
+ 
+ function card(n, level, selected) {
+   const sel = selected === n.id;
+-  return '<div class="opt ' + n.risk + (sel ? ' sel' : '') + '">' +
++  return '<div class="opt ' + n.risk + (sel ? ' sel' : '') + '"' + (level===0?' data-brand="'+esc(n.id)+'"':'') + '>' +
+     (sel ? '<div class="selection-label">✓ Шаг ' + (level + 1) + ' · Ваш выбор</div>' : '') +
+     '<div class="hd">' + ico(n.risk) + RL[n.risk] + '</div>' +
+-    '<button class="bd" type="button" data-pick="' + level + '" data-id="' + esc(n.id) + '" aria-pressed="' + sel + '"><span class="t">' + esc(n.name) + '</span><span class="d">' + esc(n.short) + '</span></button>' +
++    '<button class="bd" type="button" data-pick="' + level + '" data-id="' + esc(n.id) + '" aria-pressed="' + sel + '"><span class="t">' + esc(n.name) + (n.risk!=='g' ? '<span class="platform-risk '+n.risk+'">'+(n.risk==='r'?'Высокий риск':'Есть условия')+'</span>' : '') + '</span><span class="d">' + esc(n.short) + '</span></button>' +
+     '<div class="ft"><button class="lnk" type="button" title="Подробнее: ' + esc(n.name) + '" data-more="' + level + '" data-id="' + esc(n.id) + '" aria-haspopup="dialog" aria-controls="dlg">Подробнее</button>' +
+     '<button class="lnk" type="button" title="Ответственность: ' + esc(n.name) + '" data-fines="' + level + '" data-id="' + esc(n.id) + '">' + scale + 'Ответственность</button></div></div>';
+ }
+@@ -434,7 +438,7 @@ function render() {
+   let crumbs = c.map((n, i) => '<li><button type="button" class="crumb" data-step-nav="' + (i + 1) + '"' + (i === c.length - 1 ? ' aria-current="step"' : '') + '><span class="crumb-index">' + (i + 1) + '</span><span><small>' + labels[i] + '</small><b>' + esc(n.name) + '</b></span></button></li>');
+   if (!c.length) crumbs = ['<li><button type="button" class="crumb empty" data-step-nav="1">Выберите площадку на шаге 1</button></li>'];
+   if (S.goal === 'book' && S.scope !== 'promotion') {
+-    const orderName = S.salePlace === 'tgbot' ? 'Telegram-бот' : (D.bookPlaces[S.salePlace]?.name || S.salePlace);
++    const orderName = S.saleChosen===false ? 'Выберите место предложения' : S.salePlace === 'tgbot' ? 'Telegram-бот' : (D.bookPlaces[S.salePlace]?.name || S.salePlace);
+     crumbs = ['<li><span class="crumb" aria-current="step"><span><small>Продажа · ' + (S.format === 'print' ? 'печатные материалы' : S.salePlace === 'donut' ? 'подписка' : 'цифровой файл') + '</small><b>' + esc(orderName) + '</b></span></span></li>'];
+   }
+   $('#crumbs').innerHTML = crumbs.join('');
+@@ -468,7 +472,8 @@ function render() {
+   }
+   $('#steps').innerHTML = html;
+   document.body.dataset.routeScope = S.scope;
+-  if(S.scope === 'promotion') window.DesktopBoard.decorate($('#steps'));
++  $('#route-page-note').textContent=S.scope==='sale'?'Сейчас: проверка предложения в месте продажи':routeMode==='risk'?'Ограничения площадок и действия с высоким риском':'Условия конкретной публикации всё равно нужно проверить';
++  if(S.scope === 'promotion') window.DesktopBoard.decorate($('#steps'),{goal:S.goal,platform:S.path[0]});
+   requestAnimationFrame(syncRouteLayout);
+   $('#legal').textContent = 'Это разбор, а не юридическое заключение. Матрица окончаний первой цели: 25.11.2026; прежняя правовая сверка: 24.11.2026. Другие цели и исходные суммы: ' + D.checked + ', их проверка продолжается. Неопределённые условия не являются подтверждённым разрешением или запретом.';
+ }
+@@ -586,6 +591,14 @@ function head(title, sub, risk) {
+     '<h3 id="dlg-t" class="disp">' + esc(title) + '</h3>' + (sub ? '<span class="hint">' + esc(sub) + '</span>' : '') + '</div><button type="button" class="x" aria-label="Закрыть">' + closeIc + '</button></div>';
+ }
+ 
++function changeScope(next) {
++  if(next==='sale' && S.scope!=='sale'){
++    S.saleChosen=['site','vkshop','market','donut','tgbot'].includes(S.path[2]);
++    if(S.saleChosen) S.salePlace=S.path[2];
++  }
++  S.scope=next;render();
++}
++
+ function scrollToStep(num) {
+   if (S.scope === 'promotion' && window.matchMedia('(min-width: 1050px)').matches) return;
+   if (num === 4 && S.scope === 'promotion') num = 3;
+@@ -619,9 +632,9 @@ document.addEventListener('click', (e) => {
+     return;
+   }
+   const bs = e.target.closest('[data-book-scope]');
+-  if (bs) { if(dlg.open) dlg.close(); const wasPromotion = S.scope === 'promotion'; S.scope = bs.dataset.bookScope; if (wasPromotion && S.scope !== 'promotion' && ['site','vkshop','market','donut','tgbot'].includes(S.path[2])) S.salePlace = S.path[2]; render(); return; }
++  if (bs) { if(dlg.open) dlg.close(); changeScope(bs.dataset.bookScope); return; }
+   const sp = e.target.closest('[data-sale-place]');
+-  if (sp) { if(dlg.open) dlg.close(); S.salePlace = sp.dataset.salePlace; render(); return; }
++  if (sp) { if(dlg.open) dlg.close(); S.salePlace = sp.dataset.salePlace; S.saleChosen=true; render(); return; }
+   const tl = e.target.closest('[data-tool]');
+   if (tl) { if (tl.dataset.tool === 'calendar') openCalendar(); else openCompare(); return; }
+   const s = e.target.closest('[data-save]');
+@@ -682,7 +695,8 @@ $('#goal').innerHTML = D.goals.map((g) => '<option value="' + g.id + '">' + esc(
+ $('#form').value = S.form; $('#goal').value = S.goal;
+ $('#form').addEventListener('change', (e) => { S.form = e.target.value; render(); });
+ $('#goal').addEventListener('change', (e) => { S.goal = e.target.value; S.path = []; render(); });
+-$('#scope').addEventListener('change', e => { const wasPromotion = S.scope === 'promotion'; S.scope = e.target.value; if (wasPromotion && S.scope !== 'promotion' && ['site','vkshop','market','donut','tgbot'].includes(S.path[2])) S.salePlace = S.path[2]; render(); });
++$('#scope').addEventListener('change', e => changeScope(e.target.value));
++$('#compact-view').addEventListener('change',e=>{document.body.dataset.density=e.target.checked?'compact':'described';store.set('skhema-density',document.body.dataset.density);});
+ $('#format').addEventListener('change', e => { S.format = e.target.value; render(); });
+ $('#sample').addEventListener('change', e => { S.sample = e.target.checked; render(); });
+ $('#explain').innerHTML = D.explain.map((x) => '<button type="button" class="wbtn" data-explain="' + x.id + '">' + esc(x.title) + '</button>').join('');
+diff --git a/dist/risk.html b/dist/risk.html
+index 311be80..6260331 100644
+--- a/dist/risk.html
++++ b/dist/risk.html
+@@ -178,7 +178,7 @@ dialog::backdrop{background:rgba(20,21,34,.45)}
+ <div class="sr-only" id="route-status" role="status" aria-live="polite"></div>
+ 
+ <main>
+-<nav class="route-pages" aria-label="Разделы схемы"><a href="index.html" data-route-page="ordinary">Обычные варианты</a><a href="risk.html" data-route-page="risk">Рискованные и запрещённые</a><span id="route-page-note"></span></nav>
++<nav class="route-pages" aria-label="Разделы схемы"><a href="index.html" data-route-page="ordinary">Обычные варианты</a><a href="risk.html" data-route-page="risk">Рискованные и запрещённые</a><label class="compact-toggle"><input type="checkbox" id="compact-view">Краткий вид</label><span id="route-page-note"></span></nav>
+ <section class="hero" aria-labelledby="h0">
+ <div class="hero-about">
+ <h1 id="h0">Проверка рекламной связки</h1>
+@@ -191,9 +191,10 @@ dialog::backdrop{background:rgba(20,21,34,.45)}
+ <div><div class="label-help"><label for="scope">Что проверяем</label><button type="button" class="help-button" data-help="scope" aria-label="Чем отличаются продвижение и продажа" aria-haspopup="dialog">?</button></div><div class="sw"><select id="scope"><option value="promotion">Продвижение</option><option value="sale">Продажу</option></select></div></div>
+ <div><label for="form">Как вы оформлены</label><div class="sw"><select id="form"></select><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4F5BD5" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></div></div>
+ <div><label for="goal">Цель</label><div class="sw"><select id="goal"></select><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4F5BD5" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></div></div>
++<section class="note book-settings" id="book-settings" aria-label="Формат текстового материала"><div><label for="format"><b>Формат материала</b></label><select id="format"><option value="file">Цифровой файл</option><option value="print">Печатные материалы</option></select></div><label class="sample-choice"><input type="checkbox" id="sample" aria-label="Предлагать бесплатный фрагмент перед покупкой">Бесплатный фрагмент</label><p>Фрагмент — необязательный этап знакомства с содержанием. Покупка и рекламная подписка рассматриваются отдельно.</p></section>
+ </div>
+ </section>
+-<section class="note book-settings" id="book-settings" aria-label="Формат текстового материала"><div><label for="format"><b>Что получает покупатель</b></label><select id="format"><option value="file">Цифровой файл</option><option value="print">Печатные материалы</option></select></div><label class="sample-choice"><input type="checkbox" id="sample">Предлагать бесплатный фрагмент перед покупкой</label><p>Фрагмент — необязательный этап знакомства с содержанием. Покупка и рекламная подписка рассматриваются отдельно.</p></section>
++
+ <div id="steps"></div>
+ </main>
+ <div id="print" aria-hidden="true"></div>
+@@ -201,7 +202,7 @@ dialog::backdrop{background:rgba(20,21,34,.45)}
+ <template id="scope-help"><p><b>Продвижение</b> — как человек узнаёт о предложении и приходит к нему: публикации, реклама, рекомендации и переходы между площадками.</p><p><b>Продажа</b> — что человек видит в месте продажи: страница товара, карточка или предложение в боте. Здесь проверяем рекламный характер, содержание и необходимые сведения.</p><p>Выдача материалов, доставка и оказание услуг относятся к сопровождению онлайн-бизнеса.</p></template>
+ 
+ <footer>
+-<details class="version-note"><summary>Рабочая версия · 25.11.2026 · v11 · компактный обзор этапов</summary><p>Обновлены общие пояснения и первая цель. Другие девять целей сохранены и ждут последовательной проверки. Статус готовности маршрута не подтверждается одним цветом карточки.</p><p><a href="TASKS.md">Задачи и нерешённые вопросы</a> · <a href="LEGAL_REVIEW_2026-11-24.md">Результаты дополнительной сверки</a></p></details>
++<details class="version-note"><summary>Рабочая версия · 25.11.2026 · v12 · пояснения и ориентиры</summary><p>Обновлены общие пояснения и первая цель. Другие девять целей сохранены и ждут последовательной проверки. Статус готовности маршрута не подтверждается одним цветом карточки.</p><p><a href="TASKS.md">Задачи и нерешённые вопросы</a> · <a href="LEGAL_REVIEW_2026-11-24.md">Результаты дополнительной сверки</a></p></details>
+ <div class="foot">
+ <div style="flex:1 1 340px;display:flex;flex-direction:column;gap:10px">
+ <span class="tag" style="align-self:flex-start">Как пользоваться</span>
+@@ -257,6 +258,9 @@ $('#route-page-note').textContent = routeMode === 'risk' ? 'Ограничени
+ let S = Object.assign({ form: 'ip', goal: 'book', path: [], scope: 'promotion', format: 'file', sample: false, salePlace: 'site', publisher:'' }, store.get(stateKey, store.get('skhema-state', {})));
+ Object.assign(S, store.get('skhema-settings', {}));
+ if (!store.get(stateKey, null)) S.scope = 'promotion';
++document.body.dataset.density=store.get('skhema-density','described');
++$('#compact-view').checked=document.body.dataset.density==='compact';
++if(typeof S.saleChosen !== 'boolean') S.saleChosen=false;
+ if (!D.forms.some((f) => f.id === S.form)) S.form = 'ip';
+ if (!D.goals.some((g) => g.id === S.goal)) S.goal = 'book';
+ if (!Array.isArray(S.path)) S.path = [];
+@@ -304,10 +308,10 @@ function chain() {
+ 
+ function card(n, level, selected) {
+   const sel = selected === n.id;
+-  return '<div class="opt ' + n.risk + (sel ? ' sel' : '') + '">' +
++  return '<div class="opt ' + n.risk + (sel ? ' sel' : '') + '"' + (level===0?' data-brand="'+esc(n.id)+'"':'') + '>' +
+     (sel ? '<div class="selection-label">✓ Шаг ' + (level + 1) + ' · Ваш выбор</div>' : '') +
+     '<div class="hd">' + ico(n.risk) + RL[n.risk] + '</div>' +
+-    '<button class="bd" type="button" data-pick="' + level + '" data-id="' + esc(n.id) + '" aria-pressed="' + sel + '"><span class="t">' + esc(n.name) + '</span><span class="d">' + esc(n.short) + '</span></button>' +
++    '<button class="bd" type="button" data-pick="' + level + '" data-id="' + esc(n.id) + '" aria-pressed="' + sel + '"><span class="t">' + esc(n.name) + (n.risk!=='g' ? '<span class="platform-risk '+n.risk+'">'+(n.risk==='r'?'Высокий риск':'Есть условия')+'</span>' : '') + '</span><span class="d">' + esc(n.short) + '</span></button>' +
+     '<div class="ft"><button class="lnk" type="button" title="Подробнее: ' + esc(n.name) + '" data-more="' + level + '" data-id="' + esc(n.id) + '" aria-haspopup="dialog" aria-controls="dlg">Подробнее</button>' +
+     '<button class="lnk" type="button" title="Ответственность: ' + esc(n.name) + '" data-fines="' + level + '" data-id="' + esc(n.id) + '">' + scale + 'Ответственность</button></div></div>';
+ }
+@@ -434,7 +438,7 @@ function render() {
+   let crumbs = c.map((n, i) => '<li><button type="button" class="crumb" data-step-nav="' + (i + 1) + '"' + (i === c.length - 1 ? ' aria-current="step"' : '') + '><span class="crumb-index">' + (i + 1) + '</span><span><small>' + labels[i] + '</small><b>' + esc(n.name) + '</b></span></button></li>');
+   if (!c.length) crumbs = ['<li><button type="button" class="crumb empty" data-step-nav="1">Выберите площадку на шаге 1</button></li>'];
+   if (S.goal === 'book' && S.scope !== 'promotion') {
+-    const orderName = S.salePlace === 'tgbot' ? 'Telegram-бот' : (D.bookPlaces[S.salePlace]?.name || S.salePlace);
++    const orderName = S.saleChosen===false ? 'Выберите место предложения' : S.salePlace === 'tgbot' ? 'Telegram-бот' : (D.bookPlaces[S.salePlace]?.name || S.salePlace);
+     crumbs = ['<li><span class="crumb" aria-current="step"><span><small>Продажа · ' + (S.format === 'print' ? 'печатные материалы' : S.salePlace === 'donut' ? 'подписка' : 'цифровой файл') + '</small><b>' + esc(orderName) + '</b></span></span></li>'];
+   }
+   $('#crumbs').innerHTML = crumbs.join('');
+@@ -468,7 +472,8 @@ function render() {
+   }
+   $('#steps').innerHTML = html;
+   document.body.dataset.routeScope = S.scope;
+-  if(S.scope === 'promotion') window.DesktopBoard.decorate($('#steps'));
++  $('#route-page-note').textContent=S.scope==='sale'?'Сейчас: проверка предложения в месте продажи':routeMode==='risk'?'Ограничения площадок и действия с высоким риском':'Условия конкретной публикации всё равно нужно проверить';
++  if(S.scope === 'promotion') window.DesktopBoard.decorate($('#steps'),{goal:S.goal,platform:S.path[0]});
+   requestAnimationFrame(syncRouteLayout);
+   $('#legal').textContent = 'Это разбор, а не юридическое заключение. Матрица окончаний первой цели: 25.11.2026; прежняя правовая сверка: 24.11.2026. Другие цели и исходные суммы: ' + D.checked + ', их проверка продолжается. Неопределённые условия не являются подтверждённым разрешением или запретом.';
+ }
+@@ -586,6 +591,14 @@ function head(title, sub, risk) {
+     '<h3 id="dlg-t" class="disp">' + esc(title) + '</h3>' + (sub ? '<span class="hint">' + esc(sub) + '</span>' : '') + '</div><button type="button" class="x" aria-label="Закрыть">' + closeIc + '</button></div>';
+ }
+ 
++function changeScope(next) {
++  if(next==='sale' && S.scope!=='sale'){
++    S.saleChosen=['site','vkshop','market','donut','tgbot'].includes(S.path[2]);
++    if(S.saleChosen) S.salePlace=S.path[2];
++  }
++  S.scope=next;render();
++}
++
+ function scrollToStep(num) {
+   if (S.scope === 'promotion' && window.matchMedia('(min-width: 1050px)').matches) return;
+   if (num === 4 && S.scope === 'promotion') num = 3;
+@@ -619,9 +632,9 @@ document.addEventListener('click', (e) => {
+     return;
+   }
+   const bs = e.target.closest('[data-book-scope]');
+-  if (bs) { if(dlg.open) dlg.close(); const wasPromotion = S.scope === 'promotion'; S.scope = bs.dataset.bookScope; if (wasPromotion && S.scope !== 'promotion' && ['site','vkshop','market','donut','tgbot'].includes(S.path[2])) S.salePlace = S.path[2]; render(); return; }
++  if (bs) { if(dlg.open) dlg.close(); changeScope(bs.dataset.bookScope); return; }
+   const sp = e.target.closest('[data-sale-place]');
+-  if (sp) { if(dlg.open) dlg.close(); S.salePlace = sp.dataset.salePlace; render(); return; }
++  if (sp) { if(dlg.open) dlg.close(); S.salePlace = sp.dataset.salePlace; S.saleChosen=true; render(); return; }
+   const tl = e.target.closest('[data-tool]');
+   if (tl) { if (tl.dataset.tool === 'calendar') openCalendar(); else openCompare(); return; }
+   const s = e.target.closest('[data-save]');
+@@ -682,7 +695,8 @@ $('#goal').innerHTML = D.goals.map((g) => '<option value="' + g.id + '">' + esc(
+ $('#form').value = S.form; $('#goal').value = S.goal;
+ $('#form').addEventListener('change', (e) => { S.form = e.target.value; render(); });
+ $('#goal').addEventListener('change', (e) => { S.goal = e.target.value; S.path = []; render(); });
+-$('#scope').addEventListener('change', e => { const wasPromotion = S.scope === 'promotion'; S.scope = e.target.value; if (wasPromotion && S.scope !== 'promotion' && ['site','vkshop','market','donut','tgbot'].includes(S.path[2])) S.salePlace = S.path[2]; render(); });
++$('#scope').addEventListener('change', e => changeScope(e.target.value));
++$('#compact-view').addEventListener('change',e=>{document.body.dataset.density=e.target.checked?'compact':'described';store.set('skhema-density',document.body.dataset.density);});
+ $('#format').addEventListener('change', e => { S.format = e.target.value; render(); });
+ $('#sample').addEventListener('change', e => { S.sample = e.target.checked; render(); });
+ $('#explain').innerHTML = D.explain.map((x) => '<button type="button" class="wbtn" data-explain="' + x.id + '">' + esc(x.title) + '</button>').join('');
+diff --git a/dist/version.json b/dist/version.json
+index 13357ce..7423b4c 100644
+--- a/dist/version.json
++++ b/dist/version.json
+@@ -1,6 +1,6 @@
+ {
+-  "version": "2026-11-25-working-v11-compact-desktop",
+-  "status": "Рабочая версия: три колонки и две страницы сценариев",
++  "version": "2026-11-25-working-v12-orientation",
++  "status": "Рабочая версия: формат в настройках, фирменные цвета и понятный переход к предложению",
+   "base_repository": "9479797/ru-legal-online",
+   "base_commit": "60bf80361bd757522656631eb45ddb19cc1cee88",
+   "old_book_links_preserved": 56,
+@@ -12,7 +12,7 @@
+     "README.txt": "25966f7ef050278a4a9e64d090cca5149960258f44dc47a7114866a311ee3da0",
+     "SOURCES.md": "032f42d2586c4ba7c19ffb66691706528475e7acefdc6523e7b5d215e2fbf535",
+     "TASKS.md": "04426ee75d6d5db65bb288e95a3962204ee8e6575d866b10155445f3df1cc873",
+-    "book-ui.js": "9e33badb87c0b8c7c508c2c65180368f877d0f0e36164c0a754e936417d9bd4d",
++    "book-ui.js": "f88041f1d5b434f9d754e2e1fa9f2e1e80bd38c8c7bdeb707772abe9dcc436b8",
+     "card-help.js": "259add8eb7e56392064eb575625b9a7a83e19744cfabd7d8b54b8cd7994961ac",
+     "changes-v3-v4.patch": "1c1a0799728b8645e4f5f17c0f579c73192766893ba58e621674d2abf95c9bd7",
+     "changes-v4-v5.patch": "6fe69b80e46fc2288556914b419d61ad8c267c6305f47d1bd9a219ca48c6f0e6",
+@@ -24,8 +24,9 @@
+     "checks/proverka_local.js": "f38c1621cb679e4edbafdbafe7948894ca54f01797689388349e8bb320bc8564",
+     "checks/proverka_skhemy.js": "a5e269b276122e8149065fa3e683e1fe2e8b4311a896f62251212d44ea6c268f",
+     "checks/route_matrix.test.js": "158a0fb121fc859c33a72888326ea55405423a1df75fc3cbcb5d0071319879e3",
++    "checks/sale_orientation.test.js": "e60c019242144eaef1a955cc77207914fd2bc112e5a706e96240ee66c42080ed",
+     "data.js": "be3bdc24c97f83493a16c450929343801df29d8f476b8a28a5193a704ca95d62",
+-    "desktop-board.js": "384720d485753209e35850ee03f32a586f953e060bb0a7ef12628794379de759",
++    "desktop-board.js": "062664add7155e7cae16f95e51735f5f9a113cd7dbc4c1179094ab228a0d2873",
+     "docs/AUDIT_DIRECT_BLOGGERS_BOOK_2026-11-24.md": "ee7f73acd8bae55a754302c7e0716053c0b6bc1a274b68aedb175c769319e725",
+     "docs/AUDIT_GOAL1_RESULTS_2026-11-24.md": "b1d0cd23b4bf79265f1abdc61170e9648c62c98d29e16f88d04f9f551379df36",
+     "docs/AUDIT_INSTAGRAM_TELEGRAM_BOOK_2026-11-24.md": "cae767aa55639bcc17cca3830783936667fd05b04c19b09ccf27edc1e502a2a4",
+@@ -34,12 +35,12 @@
+     "docs/AUDIT_YOUTUBE_TIKTOK_BOOK_2026-11-24.md": "9f50009de772dfb32b0b3f591011d6592feb4d455bd058ab8972aaf54ff887e4",
+     "docs/plan-skhemy.md": "c663b96e6309b7802bc19e5264fb2d4c1240f9bad135209f9294a23ec753a784",
+     "frontend-motion.js": "0c335a2b8709541b5bd92fb2a8f69b2da72ab4ad5a2faed8637c1f8a2561ee32",
+-    "frontend.css": "6a079e543116412796dcb71aeae9df3761a1dbac45c9c51aa4ddd0955d54f208",
++    "frontend.css": "91ba21795c3794a44a13628e4bac5be0d8aba96aa7641617dc24385437a73fad",
+     "goal1-copy.js": "7b880404e80f57782f493f2a43b29604fc5351d81e8ea66aa2f74e21e1285cd2",
+-    "index.html": "2d229eb0fd411373d628b32f08a76ba5f02beeaf62d69ae94b564cda8a393ce1",
++    "index.html": "a17a5ad79d233339df5153f0a22164d15bc3b29f6c625dfc93692a8b0d14bed4",
+     "markirovka.html": "dd6154817dcbdd9b27bc5d8ae46c9a53efcb2f58888ed338f7df39baaccfd59b",
+     "markirovka.js": "9328d94e80e0a2b695722134c7cb6c0e52cd20b55685b51c1736c7c3cee8cc0d",
+-    "risk.html": "b9410e2eaf254e6459c971c61f5d41ff0428835cf70fccc27d920db4d417c378",
++    "risk.html": "853afe5a294aac870dbe069b2a59610755eefb09397943a7b041b19ee7e8c646",
+     "route-matrix.js": "65acedc3049e8f5bd85b0f8b470cf8424aaef84622157e31f7e917b36beebd82"
+   },
+   "canonical_main_modified": false,
+@@ -125,5 +126,9 @@
+     "risk.html"
+   ],
+   "desktop_board": true,
+-  "desktop_qa": "Browser: VK 11 actions, reply/site result dialog, risk page and red scenario, saved page selections"
++  "desktop_qa": "Browser: VK 11 actions, reply/site result dialog, risk page and red scenario, saved page selections",
++  "visible_card_descriptions": true,
++  "platform_colors": true,
++  "sale_orientation": true,
++  "density_toggle": true
+ }
+diff --git a/dist/checks/sale_orientation.test.js b/dist/checks/sale_orientation.test.js
+new file mode 100644
+index 0000000..d0794c3
+--- /dev/null
++++ b/dist/checks/sale_orientation.test.js
+@@ -0,0 +1,21 @@
++const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
++const root=__dirname+'/../',c={window:{}};
++for(const f of ['data.js','route-matrix.js','book-ui.js'])vm.runInNewContext(fs.readFileSync(root+f,'utf8'),c);
++const D=c.window.SCHEMA,S={goal:'book',scope:'promotion',format:'file',sample:false,salePlace:'donut',saleChosen:true,path:['telegram','tg-reply']};
++c.S=S;c.render=()=>{};
++const html=fs.readFileSync(root+'index.html','utf8');
++vm.runInNewContext(html.slice(html.indexOf('function changeScope('),html.indexOf('function scrollToStep(')),c);
++c.changeScope('sale');assert.equal(S.saleChosen,false,'An old Donat selection must not replace an unspecified destination');
++const ui=c.window.BookUI.create({D,S,esc:String,curForm:()=>D.forms[0],saveBar:()=>''});
++assert(!ui.renderStage().includes('aria-pressed="true"'));
++assert(ui.renderStage().includes('Выберите, где размещено предложение'));
++assert(!ui.summary().blocks.some(b=>b[0]==='Путь до оформления заказа'));
++c.changeScope('promotion');assert.equal(S.path.join('/'),'telegram/tg-reply');
++S.path.push('site');c.changeScope('sale');assert.equal(S.saleChosen,true);assert.equal(S.salePlace,'site');
++assert(ui.renderStage().includes('Вы проверяете предложение: Свой сайт'));
++assert(ui.renderStage().includes('Вы перешли из связки: Telegram'));
++assert(ui.renderStage().includes('Вернуться к собранной связке'));
++assert(!ui.renderStage().includes('Продажа: доступ по подписке'));
++assert(html.indexOf('id="book-settings"')<html.indexOf('id="steps"'));
++assert.equal((html.match(/id="book-settings"/g)||[]).length,1);
++console.log('Sale orientation: stale destination ignored, chosen route destination retained, back navigation preserves path; format setting remains unique.');
