@@ -1,0 +1,111 @@
+diff --git a/dist/frontend-motion.js b/dist/frontend-motion.js
+index 18b2c4c..7f1a698 100644
+--- a/dist/frontend-motion.js
++++ b/dist/frontend-motion.js
+@@ -100,26 +100,9 @@
+   }
+ 
+   function create({ host, bar, reduce = false }) {
+-    let following=false;
+-    let records = new Map(), signature = '', routeFrame = 0, scrollFrame = 0;
++    let signature = '', scrollFrame = 0;
+     const NS = 'http://www.w3.org/2000/svg';
+     const svgEl = (tag, attrs) => { const el = document.createElementNS(NS, tag); for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v); return el; };
+-    function frame(now) {
+-      routeFrame = 0;
+-      let unfinished = false;
+-      for (const r of records.values()) {
+-        const progress = reduce ? 1 : clamp((now - r.start) / r.duration, 0, 1);
+-        const distance = r.length * progress;
+-        r.path.style.strokeDashoffset = String(r.length - distance);
+-        const p = r.path.getPointAtLength(distance), a = r.path.getPointAtLength(Math.max(0, distance - 1)), b = r.path.getPointAtLength(Math.min(r.length, distance + 1));
+-        r.head.setAttribute('transform', 'translate(' + p.x + ' ' + p.y + ') rotate(' + Math.atan2(b.y - a.y, b.x - a.x) * 180 / Math.PI + ')');
+-        r.head.style.visibility = progress > 0 ? 'visible' : 'hidden';
+-        if (progress < 1) unfinished = true;
+-      }
+-      const active=[...records.values()].find(r=>now>=r.start&&now<r.start+r.duration);
+-      if(active && following){const p=active.path.getPointAtLength(active.length*clamp((now-active.start)/active.duration,0,1));const y=host.getBoundingClientRect().top+window.scrollY+p.y;window.scrollTo({top:Math.max(0,y-bar.offsetHeight-window.innerHeight*.38),behavior:'instant'});}
+-      if (unfinished) routeFrame = requestAnimationFrame(frame); else following=false;
+-    }
+     function sync(context) {
+       document.documentElement.style.setProperty('--route-height', bar.offsetHeight + 'px');
+       const box = host.getBoundingClientRect();
+@@ -146,34 +129,24 @@
+       if (signature === nextSignature && host.querySelector('.route-lines')) return;
+       signature = nextSignature;
+       host.querySelector('.route-lines')?.remove();
+-      if (routeFrame) cancelAnimationFrame(routeFrame);
+-      routeFrame = 0;
+-      const previous = records;
+-      records = new Map();
+       if (!routes.length) return;
+       const svg = svgEl('svg', { class:'route-lines', 'aria-hidden':'true', width:box.width, height:box.height });
+       host.prepend(svg);
+-      let nextStart = performance.now() + 120;
+       for (const r of routes) {
+         const path = svgEl('path', { d:r.d, class:'route-stroke' });
+         const head = svgEl('path', { d:'M -8 -5 L 0 0 L -8 5', class:'route-head' });
+         svg.append(path, head);
+         const length = path.getTotalLength();
+-        const old = previous.get(r.key);
+-        const duration = old?.duration || clamp(length * 2.1, 1500, 2900);
+-        const start = old?.start ?? nextStart;
+-        nextStart = Math.max(nextStart, start + duration);
+-        path.style.strokeDasharray = length + ' ' + length;
+-        path.style.strokeDashoffset = String(length);
+-        records.set(r.key, { path, head, length, start, duration });
++        const end = path.getPointAtLength(length);
++        const before = path.getPointAtLength(Math.max(0, length - 1));
++        head.setAttribute('transform', 'translate(' + end.x + ' ' + end.y + ') rotate(' + Math.atan2(end.y-before.y,end.x-before.x)*180/Math.PI + ')');
+       }
+-      frame(performance.now());
+     }
+-    function cancelScroll() { following=false; if (scrollFrame) cancelAnimationFrame(scrollFrame); scrollFrame = 0; }
++
++    function cancelScroll() { if (scrollFrame) cancelAnimationFrame(scrollFrame); scrollFrame = 0; }
+     function scrollToElement(el) {
+       if (!el) return;
+       cancelScroll();
+-      if(!reduce && [...records.values()].some(r=>performance.now()<r.start+r.duration)){following=true;return;}
+       const from = window.scrollY;
+       const max = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+       const to = clamp(from + el.getBoundingClientRect().top - bar.offsetHeight - 22, 0, max);
+diff --git a/dist/index.html b/dist/index.html
+index 596e66e..f54c8ca 100644
+--- a/dist/index.html
++++ b/dist/index.html
+@@ -200,7 +200,7 @@ dialog::backdrop{background:rgba(20,21,34,.45)}
+ <template id="scope-help"><p><b>Продвижение</b> — как человек узнаёт о предложении и приходит к нему: публикации, реклама, рекомендации и переходы между площадками.</p><p><b>Продажа</b> — что человек видит в месте продажи: страница товара, карточка или предложение в боте. Здесь проверяем рекламный характер, содержание и необходимые сведения.</p><p>Выдача материалов, доставка и оказание услуг относятся к сопровождению онлайн-бизнеса.</p></template>
+ 
+ <footer>
+-<details class="version-note"><summary>Рабочая версия · 25.11.2026 · v8 + фронтенд v2</summary><p>Обновлены общие пояснения и первая цель. Другие девять целей сохранены и ждут последовательной проверки. Статус готовности маршрута не подтверждается одним цветом карточки.</p><p><a href="TASKS.md">Задачи и нерешённые вопросы</a> · <a href="LEGAL_REVIEW_2026-11-24.md">Результаты дополнительной сверки</a></p></details>
++<details class="version-note"><summary>Рабочая версия · 25.11.2026 · v8 + фронтенд v4</summary><p>Обновлены общие пояснения и первая цель. Другие девять целей сохранены и ждут последовательной проверки. Статус готовности маршрута не подтверждается одним цветом карточки.</p><p><a href="TASKS.md">Задачи и нерешённые вопросы</a> · <a href="LEGAL_REVIEW_2026-11-24.md">Результаты дополнительной сверки</a></p></details>
+ <div class="foot">
+ <div style="flex:1 1 340px;display:flex;flex-direction:column;gap:10px">
+ <span class="tag" style="align-self:flex-start">Как пользоваться</span>
+diff --git a/dist/version.json b/dist/version.json
+index 2e78696..40ebfdd 100644
+--- a/dist/version.json
++++ b/dist/version.json
+@@ -1,6 +1,6 @@
+ {
+-  "version": "2026-11-25-working-v8-frontend-v2",
+-  "status": "Рабочая версия фронтенда v2; изменения сохранены отдельным коммитом",
++  "version": "2026-11-25-working-v8-frontend-v4-static",
++  "status": "Рабочий вариант: статичные связи без прокрутки за стрелкой",
+   "base_repository": "9479797/ru-legal-online",
+   "base_commit": "60bf80361bd757522656631eb45ddb19cc1cee88",
+   "old_book_links_preserved": 56,
+@@ -26,9 +26,9 @@
+     "docs/AUDIT_VK_BOOK_2026-11-24.md": "f0e67431df6c92293fb32f596f7d8305352b53d03adb3d91740efedd007d86d0",
+     "docs/AUDIT_YOUTUBE_TIKTOK_BOOK_2026-11-24.md": "9f50009de772dfb32b0b3f591011d6592feb4d455bd058ab8972aaf54ff887e4",
+     "docs/plan-skhemy.md": "c663b96e6309b7802bc19e5264fb2d4c1240f9bad135209f9294a23ec753a784",
+-    "frontend-motion.js": "5d1f8583228cd12dd4f2f8898aac66da1555db26b8bb3722d67d0d8b2a9f70ec",
+-    "frontend.css": "2c8d3009c8a0f49fc9c3ec77c99f2047c1239f1a3c357a54591da5e408a5c62d",
+-    "index.html": "4657a9ea229406a1d62fa5e965e9f8ebc78b06331e2e7ccb85bb5d948425a1c1",
++    "frontend-motion.js": "50a970f36f3c8d77e081a073bdfba3ce0b61156d7108c14740b11cd82a0a7d67",
++    "frontend.css": "3ad91cdb1654e3960e287569b1e55b4775aaf1aaefa93410cf90e2aeba5f2951",
++    "index.html": "d986e62f443c22ed601eb351691a8f30d9ec702aa3a6fabc4c9abdedb0401fed",
+     "markirovka.html": "dd6154817dcbdd9b27bc5d8ae46c9a53efcb2f58888ed338f7df39baaccfd59b",
+     "markirovka.js": "9328d94e80e0a2b695722134c7cb6c0e52cd20b55685b51c1736c7c3cee8cc0d"
+   },
