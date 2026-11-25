@@ -1,0 +1,76 @@
+diff --git a/dist/frontend.css b/dist/frontend.css
+index 8f00ff2..9edf574 100644
+--- a/dist/frontend.css
++++ b/dist/frontend.css
+@@ -173,7 +173,7 @@ body[data-density=compact] .route-board .d{display:none}body[data-density=compac
+  .hero{display:block}
+  .hero-about{display:flex;flex-wrap:wrap;align-items:baseline;gap:18px;max-width:none;margin-bottom:12px}
+  .hero-about h1{margin:0;white-space:nowrap}
+- .hero .fields{display:flex;flex-wrap:nowrap;align-items:flex-start;width:100%;max-width:100%;gap:18px;overflow-x:auto;padding-block:4px;scrollbar-width:thin}
++ .hero .fields{display:flex;flex-direction:row;flex-wrap:nowrap;align-items:flex-start;width:100%;max-width:100%;gap:18px;overflow-x:auto;padding-block:4px;scrollbar-width:thin}
+  .hero .fields>div,.hero .fields #book-settings{flex:0 0 auto;max-width:none}
+  .hero .fields .sw{max-width:none}
+  .hero .fields .sw select,.hero .fields #book-settings select{max-width:none}
+diff --git a/dist/index.html b/dist/index.html
+index d5335c2..75b5187 100644
+--- a/dist/index.html
++++ b/dist/index.html
+@@ -202,7 +202,7 @@ dialog::backdrop{background:rgba(20,21,34,.45)}
+ <template id="scope-help"><p><b>Продвижение</b> — как человек узнаёт о предложении и приходит к нему: публикации, реклама, рекомендации и переходы между площадками.</p><p><b>Продажа</b> — что человек видит в месте продажи: страница товара, карточка или предложение в боте. Здесь проверяем рекламный характер, содержание и необходимые сведения.</p><p>Выдача материалов, доставка и оказание услуг относятся к сопровождению онлайн-бизнеса.</p></template>
+ 
+ <footer>
+-<details class="version-note"><summary>Рабочая версия · 25.11.2026 · v14 · меню в одну строку</summary><p>Обновлены общие пояснения и первая цель. Другие девять целей сохранены и ждут последовательной проверки. Статус готовности маршрута не подтверждается одним цветом карточки.</p><p><a href="TASKS.md">Задачи и нерешённые вопросы</a> · <a href="LEGAL_REVIEW_2026-11-24.md">Результаты дополнительной сверки</a></p></details>
++<details class="version-note"><summary>Рабочая версия · 25.11.2026 · v15 · исправлено горизонтальное направление</summary><p>Обновлены общие пояснения и первая цель. Другие девять целей сохранены и ждут последовательной проверки. Статус готовности маршрута не подтверждается одним цветом карточки.</p><p><a href="TASKS.md">Задачи и нерешённые вопросы</a> · <a href="LEGAL_REVIEW_2026-11-24.md">Результаты дополнительной сверки</a></p></details>
+ <div class="foot">
+ <div style="flex:1 1 340px;display:flex;flex-direction:column;gap:10px">
+ <span class="tag" style="align-self:flex-start">Как пользоваться</span>
+diff --git a/dist/risk.html b/dist/risk.html
+index a674fcf..5b48492 100644
+--- a/dist/risk.html
++++ b/dist/risk.html
+@@ -202,7 +202,7 @@ dialog::backdrop{background:rgba(20,21,34,.45)}
+ <template id="scope-help"><p><b>Продвижение</b> — как человек узнаёт о предложении и приходит к нему: публикации, реклама, рекомендации и переходы между площадками.</p><p><b>Продажа</b> — что человек видит в месте продажи: страница товара, карточка или предложение в боте. Здесь проверяем рекламный характер, содержание и необходимые сведения.</p><p>Выдача материалов, доставка и оказание услуг относятся к сопровождению онлайн-бизнеса.</p></template>
+ 
+ <footer>
+-<details class="version-note"><summary>Рабочая версия · 25.11.2026 · v14 · меню в одну строку</summary><p>Обновлены общие пояснения и первая цель. Другие девять целей сохранены и ждут последовательной проверки. Статус готовности маршрута не подтверждается одним цветом карточки.</p><p><a href="TASKS.md">Задачи и нерешённые вопросы</a> · <a href="LEGAL_REVIEW_2026-11-24.md">Результаты дополнительной сверки</a></p></details>
++<details class="version-note"><summary>Рабочая версия · 25.11.2026 · v15 · исправлено горизонтальное направление</summary><p>Обновлены общие пояснения и первая цель. Другие девять целей сохранены и ждут последовательной проверки. Статус готовности маршрута не подтверждается одним цветом карточки.</p><p><a href="TASKS.md">Задачи и нерешённые вопросы</a> · <a href="LEGAL_REVIEW_2026-11-24.md">Результаты дополнительной сверки</a></p></details>
+ <div class="foot">
+ <div style="flex:1 1 340px;display:flex;flex-direction:column;gap:10px">
+ <span class="tag" style="align-self:flex-start">Как пользоваться</span>
+diff --git a/dist/version.json b/dist/version.json
+index 5fadbaa..1c1e2fa 100644
+--- a/dist/version.json
++++ b/dist/version.json
+@@ -1,6 +1,6 @@
+ {
+-  "version": "2026-11-25-working-v14-single-row",
+-  "status": "Рабочая версия: меню настроек в одну строку на ПК",
++  "version": "2026-11-25-working-v15-row-direction",
++  "status": "Рабочая версия: исправлено направление меню на горизонтальное",
+   "base_repository": "9479797/ru-legal-online",
+   "base_commit": "60bf80361bd757522656631eb45ddb19cc1cee88",
+   "old_book_links_preserved": 56,
+@@ -35,12 +35,12 @@
+     "docs/AUDIT_YOUTUBE_TIKTOK_BOOK_2026-11-24.md": "9f50009de772dfb32b0b3f591011d6592feb4d455bd058ab8972aaf54ff887e4",
+     "docs/plan-skhemy.md": "c663b96e6309b7802bc19e5264fb2d4c1240f9bad135209f9294a23ec753a784",
+     "frontend-motion.js": "0c335a2b8709541b5bd92fb2a8f69b2da72ab4ad5a2faed8637c1f8a2561ee32",
+-    "frontend.css": "2c52d15969e447d8acd0617f0bab049d504265635385384b18ee7cfb2e9496bd",
++    "frontend.css": "47dbeb683b575813d25662e158614a5badf90d30357ab6551c2f324c890fb9b9",
+     "goal1-copy.js": "7b880404e80f57782f493f2a43b29604fc5351d81e8ea66aa2f74e21e1285cd2",
+-    "index.html": "9b05bbfc54f1cc3b154c6f365aba634c008f4ba6046b5f434dda5c65c495f5ff",
++    "index.html": "aabefe725c6f9578780d4e83f5f551544d88b0f40d8232cdc8d47f39bc29005b",
+     "markirovka.html": "dd6154817dcbdd9b27bc5d8ae46c9a53efcb2f58888ed338f7df39baaccfd59b",
+     "markirovka.js": "9328d94e80e0a2b695722134c7cb6c0e52cd20b55685b51c1736c7c3cee8cc0d",
+-    "risk.html": "089bb3f78f33c6b1b3e0bba9ed10b80e3c4ec19253d38d7e8cf9d94f56aac64b",
++    "risk.html": "9688430ce9213edec04e56c8f156501db63b8d7b4d1ad4a9385a9dbe53fdfea1",
+     "route-matrix.js": "65acedc3049e8f5bd85b0f8b470cf8424aaef84622157e31f7e917b36beebd82",
+     "settings-layout.js": "1613c4c6772338063b21f62addb8be0916affb907686c035c9d61d8eb3f7285e"
+   },
+@@ -136,5 +136,6 @@
+   "risk_top_headers": true,
+   "intrinsic_select_widths": true,
+   "browser_qa": "Not performed: browser auto-review rejected preview due to usage limit. Source and automated checks completed.",
+-  "desktop_settings_single_row": true
++  "desktop_settings_single_row": true,
++  "desktop_settings_direction": "row"
+ }
