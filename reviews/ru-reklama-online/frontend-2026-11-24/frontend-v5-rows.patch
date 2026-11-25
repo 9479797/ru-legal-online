@@ -1,0 +1,82 @@
+diff --git a/dist/frontend-motion.js b/dist/frontend-motion.js
+index 7f1a698..2da74f4 100644
+--- a/dist/frontend-motion.js
++++ b/dist/frontend-motion.js
+@@ -114,16 +114,10 @@
+       const routes = [];
+       for (let i = 1; i < cards.length; i++) {
+         const a = rect(cards[i - 1]), b = rect(cards[i]);
+-        const start = { x:round((a.left+a.right)/2), y:a.top-18 };
+-        const end = { x:round((b.left+b.right)/2), y:b.top-8 };
+-        const sourceStep=cards[i-1].closest('.step'), targetStep=cards[i].closest('.step');
+-        const sourceTop=rect(sourceStep).top, targetTop=rect(targetStep).top;
+-        const sourceRow=cards[i-1].parentElement;
+-        const targetRow=cards[i].parentElement;
+-        const sy=rect(sourceRow).top-18, ty=rect(targetRow).top-18;
++        const source = {x:a.left-5,y:round((a.top+a.bottom)/2)};
++        const target = {x:b.left-5,y:round((b.top+b.bottom)/2)};
+         const rail=8;
+-        const points=[{x:start.x,y:sy},{x:rail,y:sy},{x:rail,y:ty},{x:end.x,y:ty}];
+-        if (points) routes.push({ key:context + ':' + keys.slice(0,i+1).join('/'), d:roundedPath([{x:start.x,y:a.top-4}, ...points, {x:end.x,y:b.top-4}]) });
++        routes.push({key:context+':'+keys.slice(0,i+1).join('/'),d:roundedPath([source,{x:rail,y:source.y},{x:rail,y:target.y},target])});
+       }
+       const nextSignature = box.width + '|' + box.height + '|' + JSON.stringify(routes);
+       if (signature === nextSignature && host.querySelector('.route-lines')) return;
+diff --git a/dist/frontend.css b/dist/frontend.css
+index 6097f06..b63e5b9 100644
+--- a/dist/frontend.css
++++ b/dist/frontend.css
+@@ -71,3 +71,14 @@ body{font-size:16px}
+ @media(max-width:600px){.path-heading{flex:1 1 100px}.path-change{flex:none}}
+ 
+ .step>.row{padding-top:22px}.step>.sh{margin-bottom:8px}#steps{padding-left:40px}
++
++/* One-column route choices; outcome panels retain their own layout. */
++.step>.row:has(>.opt){display:flex;flex-direction:column;gap:12px;padding-top:0}
++.step>.row>.opt{display:grid;grid-template-columns:minmax(0,1fr) auto;flex:none;width:100%;max-width:none;border-radius:14px;overflow:visible}
++.step>.row>.opt>.hd{grid-column:1/-1;border-radius:12px 12px 0 0;padding:6px 14px}
++.step>.row>.opt>.selection-label{grid-column:1/-1;border-radius:12px 12px 0 0;padding:6px 14px}
++.step>.row>.opt.sel>.hd{border-radius:0}
++.step>.row>.opt>.bd{grid-column:1;gap:6px;padding:14px 18px;min-height:82px}
++.step>.row>.opt>.ft{grid-column:2;display:flex;align-items:center;align-self:center;justify-content:flex-end;max-width:340px;padding:12px 16px;margin:0}
++.step>.row>.opt>.bd .d{max-width:760px}
++@media(max-width:700px){.step>.row>.opt{grid-template-columns:minmax(0,1fr)}.step>.row>.opt>.ft{grid-column:1;justify-content:flex-start;max-width:none;padding:0 18px 14px}.step>.row>.opt>.bd{min-height:0}.step>.row>.opt>.hd,.step>.row>.opt>.selection-label{grid-column:1}}
+diff --git a/dist/index.html b/dist/index.html
+index f54c8ca..2209316 100644
+--- a/dist/index.html
++++ b/dist/index.html
+@@ -200,7 +200,7 @@ dialog::backdrop{background:rgba(20,21,34,.45)}
+ <template id="scope-help"><p><b>Продвижение</b> — как человек узнаёт о предложении и приходит к нему: публикации, реклама, рекомендации и переходы между площадками.</p><p><b>Продажа</b> — что человек видит в месте продажи: страница товара, карточка или предложение в боте. Здесь проверяем рекламный характер, содержание и необходимые сведения.</p><p>Выдача материалов, доставка и оказание услуг относятся к сопровождению онлайн-бизнеса.</p></template>
+ 
+ <footer>
+-<details class="version-note"><summary>Рабочая версия · 25.11.2026 · v8 + фронтенд v4</summary><p>Обновлены общие пояснения и первая цель. Другие девять целей сохранены и ждут последовательной проверки. Статус готовности маршрута не подтверждается одним цветом карточки.</p><p><a href="TASKS.md">Задачи и нерешённые вопросы</a> · <a href="LEGAL_REVIEW_2026-11-24.md">Результаты дополнительной сверки</a></p></details>
++<details class="version-note"><summary>Рабочая версия · 25.11.2026 · v8 + фронтенд v5 · карточки строками</summary><p>Обновлены общие пояснения и первая цель. Другие девять целей сохранены и ждут последовательной проверки. Статус готовности маршрута не подтверждается одним цветом карточки.</p><p><a href="TASKS.md">Задачи и нерешённые вопросы</a> · <a href="LEGAL_REVIEW_2026-11-24.md">Результаты дополнительной сверки</a></p></details>
+ <div class="foot">
+ <div style="flex:1 1 340px;display:flex;flex-direction:column;gap:10px">
+ <span class="tag" style="align-self:flex-start">Как пользоваться</span>
+diff --git a/dist/version.json b/dist/version.json
+index 40ebfdd..c000dc5 100644
+--- a/dist/version.json
++++ b/dist/version.json
+@@ -1,6 +1,6 @@
+ {
+-  "version": "2026-11-25-working-v8-frontend-v4-static",
+-  "status": "Рабочий вариант: статичные связи без прокрутки за стрелкой",
++  "version": "2026-11-25-working-v8-frontend-v5-rows",
++  "status": "Рабочий вариант для сравнения: карточки одной колонкой и статичные связи слева",
+   "base_repository": "9479797/ru-legal-online",
+   "base_commit": "60bf80361bd757522656631eb45ddb19cc1cee88",
+   "old_book_links_preserved": 56,
+@@ -26,9 +26,9 @@
+     "docs/AUDIT_VK_BOOK_2026-11-24.md": "f0e67431df6c92293fb32f596f7d8305352b53d03adb3d91740efedd007d86d0",
+     "docs/AUDIT_YOUTUBE_TIKTOK_BOOK_2026-11-24.md": "9f50009de772dfb32b0b3f591011d6592feb4d455bd058ab8972aaf54ff887e4",
+     "docs/plan-skhemy.md": "c663b96e6309b7802bc19e5264fb2d4c1240f9bad135209f9294a23ec753a784",
+-    "frontend-motion.js": "50a970f36f3c8d77e081a073bdfba3ce0b61156d7108c14740b11cd82a0a7d67",
+-    "frontend.css": "3ad91cdb1654e3960e287569b1e55b4775aaf1aaefa93410cf90e2aeba5f2951",
+-    "index.html": "d986e62f443c22ed601eb351691a8f30d9ec702aa3a6fabc4c9abdedb0401fed",
++    "frontend-motion.js": "0c335a2b8709541b5bd92fb2a8f69b2da72ab4ad5a2faed8637c1f8a2561ee32",
++    "frontend.css": "a858de44d747d198716277c0b3ad2fbb35d6a63802b48d3ceae08dbfec75d775",
++    "index.html": "30fe768696679e7f9b46f59df2e2ac1547471fbad45e1e865cda4b879a475387",
+     "markirovka.html": "dd6154817dcbdd9b27bc5d8ae46c9a53efcb2f58888ed338f7df39baaccfd59b",
+     "markirovka.js": "9328d94e80e0a2b695722134c7cb6c0e52cd20b55685b51c1736c7c3cee8cc0d"
+   },
