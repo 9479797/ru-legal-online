@@ -1,0 +1,612 @@
+diff --git a/dist/book-ui.js b/dist/book-ui.js
+index d5c9da5..fd7ec27 100644
+--- a/dist/book-ui.js
++++ b/dist/book-ui.js
+@@ -43,11 +43,11 @@ window.BookUI = {
+       return box('Результат: книга передана без обязательства обзора', '<p>Публикация и переходы покупателей не гарантированы. Если обзор появится, оцените его отдельно. При договорённости об обязательном размещении выберите бартер.</p>' + list(b.here.can));
+     }
+     function verification(p, b) {
+-      if (b?.id === 'tg-ads' && placeId(p) === 'site') return {title:'Telegram Ads: подтвердите страницу назначения', text:'До запуска подтвердите, поддерживает ли выбранный формат прямую ссылку на сайт. Инструкции платформы описывают назначения неоднозначно. До подтверждения этот маршрут не считается готовым переходом к покупке.'};
+-      if (S.format !== 'print' && placeId(p) === 'vkshop') return { title: 'Цифровой файл в «Товарах» VK: требуется проверка', text: 'Актуальные правила размещения цифрового файла в каталоге VK не подтверждены. До проверки маршрут к оформлению заказа здесь не показывается. Это не вывод о законодательном запрете. Можно выбрать свой сайт; печатная книга рассматривается отдельно.' };
++      if (b?.id === 'tg-ads' && placeId(p) === 'site') return {title:'Telegram Ads: подтвердите страницу назначения', text:'Откройте настройки именно вашего формата Telegram Ads и проверьте, можно ли указать эту страницу сайта. Кнопка должна открывать обещанный материал. Пока поддержка ссылки не подтверждена, схема не показывает этот переход как готовый к запуску.'};
++      if (S.format !== 'print' && placeId(p) === 'vkshop') return { title: 'Цифровой файл в «Товарах» VK: требуется проверка', text: 'Проверьте в действующих правилах раздела «Товары», можно ли разместить именно ваш цифровой файл и выбранный способ его продажи. Это условие пока не подтверждено. Это не вывод о законодательном запрете. Для печатных материалов рассматривается отдельная карточка товара.' };
+       if (S.format !== 'print' && placeId(p) === 'market') return { title: 'Цифровой материал: уточните сервис', text: 'Выберите конкретный книжный сервис и подтвердите поддержку выбранного формата. Наличие электронных книг на площадке не подтверждает приём произвольного файла от любого продавца. До проверки путь к оформлению здесь не подтверждён; это не законодательный запрет цифровых книг.' + (b?.marketReview ? ' Для перехода из VK также проверьте условия ссылки, а для VK Рекламы — поддержку внешней карточки выбранным форматом.' : '') };
+       if (placeId(p) === 'market' && b?.marketReview) return { title: 'Переход на маркетплейс: проверьте условия', text: 'Уточните конкретный маркетплейс и карточку книги. Для VK Рекламы проверьте поддержку внешней ссылки выбранным форматом объявления; для цифрового файла — также правила его размещения на маркетплейсе. После подтверждения условий маршрут ведёт к карточке предложения.' };
+-      if (b?.routeFormatCheck?.includes(placeId(p))) return {title:'Подтвердите ссылку выбранного рекламного формата',text:b.routeConditions[placeId(p)] + ' До подтверждения этого условия готовый переход к оформлению не показывается.'};
++      if (b?.routeFormatCheck?.includes(placeId(p))) return {title:'Подтвердите ссылку выбранного рекламного формата',text:b.routeConditions[placeId(p)] + ' В настройках выбранного объявления проверьте допустимый тип ссылки и откройте её как читатель. Пока это условие не подтверждено, схема не показывает готовый переход к заказу.'};
+       return null;
+     }
+     const verificationBox = q => box(q.title, '<p>' + esc(q.text) + '</p>', 'attention');
+@@ -55,38 +55,51 @@ window.BookUI = {
+     const productName = p => placeId(p) === 'donut' && S.format !== 'print' ? 'Доступ по подписке' : fmt();
+     function sampleItems(p) { return ['Указать объём бесплатного фрагмента и способ получения.', 'Отделить отправку фрагмента от необязательной подписки на рекламные письма.', placeId(p) === 'donut' ? 'Дать переход к условиям подписки: состав материалов, период доступа и регулярность платежей.' : 'Дать понятный переход к полной версии с её ценой и условиями.']; }
+     function saleItems() {
+-      return ['Оценить содержание, оформление и контекст предложения: является ли конкретный материал рекламой.', 'Проверить описание продукта, цену и заявленные условия; сведения в объявлении и в месте продажи должны согласовываться.', 'Для рекламного материала определить применимые требования к содержанию, сведениям о рекламодателе и продавце, маркировке и учёту.', 'Отдельно проверить заявления о результате, скидках, сроках и доступности предложения.', 'Оформление договора, расчёты, чеки и выполнение заказа передать на проверку в проект сопровождения онлайн-бизнеса.'];
++      return ['Оценить содержание, оформление и контекст предложения: является ли конкретный материал рекламой.', 'Проверить описание продукта, цену и заявленные условия; сведения в объявлении и в месте продажи должны согласовываться.', 'Для рекламного материала определить применимые требования к содержанию, сведениям о рекламодателе и продавце, маркировке и учёту.', 'Отдельно проверить заявления о результате, скидках, сроках и доступности предложения.', 'До приёма оплаты отдельно проверить условия покупки и возврата, способ оплаты, необходимые документы и работу с данными покупателя.'];
+     }
+     function paymentPath(b, p) {
+       const sample = S.sample || (b && b.sample);
+       const id = placeId(p);
+-      const path = id === 'donut' ? ['Предложение подписки', 'Состав, цена и период подписки', 'Условия подключения и прекращения'] : [id === 'tgbot' ? 'Предложение в боте' : S.format === 'print' ? 'Карточка материала' : 'Страница материала', 'Цена и условия предложения', id === 'tgbot' ? 'Переход к оформлению заказа в боте' : 'Переход к оформлению заказа'];
++      const path = id === 'donut' ? ['Предложение подписки', 'Состав, цена и период подписки', 'Условия подключения и прекращения'] : [id === 'tgbot' ? 'Читатель открывает описание в боте' : id === 'vkshop' ? 'Читатель открывает карточку в VK' : id === 'market' ? 'Читатель открывает карточку в выбранном сервисе' : 'Читатель открывает страницу на вашем сайте', 'Смотрит состав, формат и цену', id === 'tgbot' ? 'Переход к оформлению заказа в боте' : 'Решает, переходить ли к заказу'];
+       return (sample ? ['Бесплатный фрагмент'] : []).concat(path);
+     }
+     function pathway(items) { return '<ol class="journey-path">' + items.map(t => '<li>' + esc(t) + '</li>').join('') + '</ol>'; }
+-    function navigation() { return '<div class="journey-nav">' + Object.entries(scopes).map(([k, title]) => '<button type="button" class="wbtn" data-book-scope="' + k + '" aria-pressed="' + (S.scope === k) + '">' + title + '</button>').join('') + '</div>'; }
++    function navigation() {
++      return '<div class="journey-nav"><button type="button" class="wbtn" data-book-scope="'+(S.scope==='promotion'?'sale':'promotion')+'">'+(S.scope==='promotion'?'Посмотреть условия в месте продажи':'Вернуться к выбору продвижения')+'</button></div><p class="sub">'+(S.scope==='promotion'?'Откроется раздел «Продажа». Если вы выбрали конкретное место заказа, оно сохранится.':'Откроется выбор площадки и способа продвижения. Ранее выбранная связка сохранится.')+'</p>';
++    }
++    function buyerExample(p) {
++      const print=S.format==='print', id=placeId(p);
++      if(id==='donut')return 'Читатель видит: «Подписчикам доступны памятки и новая таблица каждый месяц». Он знакомится с составом доступа, ценой, периодом оплаты и условиями прекращения подписки.';
++      if(id==='tgbot')return print ? 'Читатель выбирает в боте комплект печатных памяток. Бот показывает состав и цену. До оплаты покупатель должен понимать, что заказывает печатный комплект, а не файл.' : 'Читатель выбирает в боте памятку PDF, смотрит описание и цену. Если цифровая покупка совершается внутри бота, Telegram требует оплату в Stars — внутренних единицах сервиса.';
++      if(id==='market')return print ? 'Читатель открывает карточку комплекта печатных памяток в выбранном сервисе. По фотографиям и описанию он видит состав, формат и цену, затем может начать оформление заказа.' : 'Например, у вас PDF с таблицами. Сначала нужно узнать, принимает ли выбранный сервис именно такой файл от такого продавца. Наличие чужих электронных книг на площадке этого не подтверждает.';
++      if(id==='vkshop')return print ? 'В карточке «Комплект из пяти печатных памяток А5» показаны фотографии, состав и цена. Читатель понимает, что заказывает именно этот комплект.' : 'Например, вы предлагаете PDF, а не печатный экземпляр. Нужно подтвердить правила цифровых товаров в каталоге VK; переименование файла в «печатную памятку» проблему не решает.';
++      return print ? 'На вашем сайте человек видит комплект печатных памяток: фотографии, количество, размер и цену. Кнопка «Заказать» открывает форму заказа этого комплекта.' : 'На вашем сайте человек видит: «Памятка PDF, 12 страниц», оглавление, образец таблицы и цену. Кнопка «Заказать» открывает форму заказа этого файла.';
++    }
++    function exampleBox(p) { return '<div class="guide-example"><h4>Пример: что увидит читатель</h4><p>'+esc(buyerExample(p))+'</p></div>'; }
++    function boundaryNote() { return '<details class="scope-help"><summary>Что ещё нужно проверить перед приёмом оплаты</summary><p>Эта схема объясняет публикации и описание предложения. Она не подключает оплату и не оформляет документы за продавца. До запуска отдельно проверьте условия покупки и возврата, способ оплаты, выдачу нужного покупателю документа и работу с его данными.</p></details>'; }
++
+     function outcome(b, p) {
+       if (nonPurchase(b, p)) return box(placeId(p) === 'none' ? 'Результат без перехода к покупке' : 'Результат: переход к информации', '<p>' + esc(placeId(p) === 'none' ? (/promo/.test(b?.id || '') ? 'Человек ознакомился с условиями участия в розыгрыше. Покупка в этот результат не включена.' : 'Человек получил ответ или полезную информацию. Переход к заказу в этот результат не включён.') : 'Человек открывает «' + p.name + '». Здесь маршрут перехода заканчивается. Сам по себе переход не означает покупку. Для проверки предложения выберите раздел «Продажа» и фактическое место заказа.') + '</p><p>' + esc(b?.routeConditions?.[placeId(p)] || '') + '</p>' + navigation());
+       if (incompatible(p)) return box('Подписка и печатный экземпляр — разные продукты', '<p>Донат открывает доступ к материалам. Для заказа и доставки печатных материалов выберите другое место продажи.</p>' + navigation());
+       const q = verification(p, b);
+-      if (q) return verificationBox(q) + ((S.sample || b?.sample) ? box('Бесплатный фрагмент', list(sampleItems(p))) : '') + navigation();
++      if (q) return verificationBox(q) + exampleBox(p) + ((S.sample || b?.sample) ? box('Бесплатный фрагмент', list(sampleItems(p))) : '') + navigation();
+       const transfer = b && b.transfer;
+       const republish = b && b.republish;
+-      const title = republish ? 'Результат: публикация копии' : transfer ? 'Результат: перенос аудитории' : placeId(p) === 'donut' ? 'Как работает подписка' : 'Куда приводит продвижение';
+-      const content = republish ? '<p>Копия ролика опубликована на площадке «' + esc(p.name) + '». Переход зрителей из исходного канала этим не подтверждён. Для переноса аудитории отдельно проверьте сообщение о другом канале и ссылку на него.</p>' : transfer ? '<p>Человек переходит в «' + esc(p.name) + '». Этот маршрут может завершаться здесь. Если нужно разобрать покупку, отдельно выберите раздел «Продажа» и фактическое место заказа.</p>' : pathway(paymentPath(b, p)) + ((S.sample || b?.sample) ? '<details><summary>Что предусмотреть для бесплатного фрагмента</summary>' + list(sampleItems(p)) + '</details>' : '') + '<p>На этом рекламный маршрут заканчивается. Оформление и выполнение заказа проверяются в проекте сопровождения онлайн-бизнеса.</p>';
++      const title = republish ? 'Результат: публикация копии' : transfer ? 'Результат: перенос аудитории' : placeId(p) === 'donut' ? 'Как работает подписка' : 'Что произойдёт после перехода';
++      const content = republish ? '<p>Копия ролика опубликована на площадке «' + esc(p.name) + '». Переход зрителей из исходного канала этим не подтверждён. Для переноса аудитории отдельно проверьте сообщение о другом канале и ссылку на него.</p>' : transfer ? '<p>Человек переходит в «' + esc(p.name) + '». Этот маршрут может завершаться здесь. Если нужно разобрать покупку, отдельно выберите раздел «Продажа» и фактическое место заказа.</p>' : pathway(paymentPath(b, p)) + ((S.sample || b?.sample) ? '<details><summary>Что предусмотреть для бесплатного фрагмента</summary>' + list(sampleItems(p)) + '</details>' : '') + exampleBox(p) + '<p>Открытие страницы и даже формы заказа ещё не означает оплату. Здесь показано, какое предложение увидит человек после вашей публикации.</p>' + boundaryNote();
+       return box(title, content + (serviceConditions(p) && !transfer && !republish ? '<p>' + esc(serviceConditions(p)) + '</p>' : '') + navigation());
+     }
+     function renderStage() {
+       const section = scopes[S.scope];
+       const cards = channels.map(([id, title, desc]) => '<button type="button" class="sale-choice' + (selected()[0] === id ? ' chosen' : '') + '" data-sale-place="' + id + '" aria-pressed="' + (selected()[0] === id) + '"><b>' + esc(title) + '</b><span>' + esc(desc) + '</span></button>').join('');
+       return box(section + ': ' + productName().toLowerCase(), '<p>Выберите фактическое место заказа. Раздел продвижения и выбранный рекламный маршрут сохраняются.</p><div class="sale-choices">' + cards + '</div>') +
+-        (incompatible() ? box('Подписка и печатный экземпляр — разные продукты', '<p>Донат открывает доступ к материалам. Для продажи и доставки печатных материалов выберите сайт, карточку VK, маркетплейс или отдельно проверяемую модель бота.</p>') : verification() ? verificationBox(verification()) + (S.sample ? box('Бесплатный фрагмент', list(sampleItems())) : '') :
+-        box('Предложение в месте продажи', pathway(paymentPath())) +
++        (incompatible() ? box('Подписка и печатный экземпляр — разные продукты', '<p>Донат открывает доступ к материалам. Для продажи и доставки печатных материалов выберите сайт, карточку VK, маркетплейс или отдельно проверяемую модель бота.</p>') : verification() ? verificationBox(verification()) + exampleBox() + (S.sample ? box('Бесплатный фрагмент', list(sampleItems())) : '') :
++        box('Предложение в месте продажи', pathway(paymentPath()) + exampleBox()) +
+         box('Что проверить в предложении', list(saleItems())) +
+         ((S.sample && S.scope === 'sale') ? box('Необязательный бесплатный фрагмент', list(sampleItems())) : '')) +
+         (serviceConditions() && !incompatible() ? box('Условия сервиса требуют подтверждения', '<p>' + esc(serviceConditions()) + '</p>', 'attention') : '') +
+-        (selected()[0] === 'tgbot' ? box('Модель бота требует отдельной проверки', '<p>Наличие платёжной кнопки не подтверждает соблюдение российских требований. Правила Telegram, расчёты, налоги, чеки и обработку данных проверяют раздельно.</p>', 'attention') : '') +
+-        box('Дальнейшая проверка', '<p>Здесь проверяется рекламная сторона предложения. Документы продажи и выполнение заказа относятся к проекту сопровождения онлайн-бизнеса.</p>' + navigation()) + saveBar();
++        (selected()[0] === 'tgbot' ? box('Где покупатель будет платить?', '<p>' + (S.format==='print' ? 'Вы выбрали печатные материалы. Правило Telegram Stars для цифровых покупок нельзя автоматически переносить на этот формат.' : 'Если вы продаёте файл внутри Telegram-бота, Telegram требует оплату в Stars — внутренних единицах сервиса. Если бот открывает сайт с отдельным предложением, выберите «Свой сайт» и проверьте, где фактически происходит продажа. Одна внешняя ссылка не подтверждает соблюдение правил Telegram.') + '</p>', 'attention') : '') +
++        boundaryNote() + navigation() + saveBar();
+     }
+     function summaryBlocks(b, p, a) {
+       const blocks = [['Раздел и формат', [scopes[S.scope] + ' · ' + fmt()]]];
+@@ -102,20 +115,21 @@ window.BookUI = {
+       if (nonPurchase(b, p)) { blocks.push(['Результат', [placeId(p) === 'none' ? 'Ответ или публикация без перехода к покупке.' : b?.transfer ? 'Перенос аудитории в «' + p.name + '». Покупка в этот итог не включена.' : 'Переход к информации в «' + p.name + '». Покупка в этот итог не включена.', b?.routeConditions?.[placeId(p)] || 'Место заказа проверяется отдельно.']]); return blocks; }
+       if (incompatible(p)) { blocks.push(['Несовместимая модель', ['Донат открывает подписной доступ, а не продаёт и доставляет печатный экземпляр. Выберите место заказа книги.']]); return blocks; }
+       const q = verification(p, b);
+-      if (q) { blocks.push([q.title, [q.text]]); if (S.sample || b?.sample) blocks.push(['Бесплатный фрагмент', sampleItems(p)]); return blocks; }
++      if (q) { blocks.push([q.title, [q.text]], ['Пример: что увидит читатель', [buyerExample(p)]]); if (S.sample || b?.sample) blocks.push(['Бесплатный фрагмент', sampleItems(p)]); return blocks; }
+       if (b?.republish) blocks.push(['Результат', ['Копия ролика опубликована на площадке «' + p.name + '». Переход аудитории этим не подтверждён; покупка в этот итог не включена.']]);
+       else if (b?.transfer) blocks.push(['Результат', ['Перенос аудитории в «' + p.name + '». Покупка в этот итог не включена.']]);
+       else {
+         blocks[0][1] = [scopes[S.scope] + ' · ' + productName(p)];
+         blocks.push([placeId(p) === 'donut' ? 'Путь подписчика' : 'Путь до оформления заказа', paymentPath(b, p)]);
++        blocks.push(['Пример: что увидит читатель', [buyerExample(p)]]);
+         if (serviceConditions(p)) blocks.push(['Условия сервиса требуют подтверждения', [serviceConditions(p)]]);
+         if (S.sample || b?.sample) blocks.push(['Бесплатный фрагмент', sampleItems(p)]);
+       }
+       return blocks;
+     }
+     function summary() {
+-      if (incompatible() || verification()) return { title: scopes[S.scope] + ' · ' + fmt(), path: selected()[1], blocks: summaryBlocks(), legal: 'Рабочая матрица окончаний 25.11.2026 · v9. Это разбор, а не юридическое заключение.' };
+-      return { title: scopes[S.scope] + ' · ' + productName() + ' · ' + curForm().name, path: selected()[1], blocks: summaryBlocks().concat([['Проверка предложения', saleItems()]]), legal: 'Рабочая матрица окончаний 25.11.2026 · v9. Это разбор, а не юридическое заключение. Платежи, договоры и нерешённые условия сервисов проверяются под конкретную модель.' };
++      if (incompatible() || verification()) return { title: scopes[S.scope] + ' · ' + fmt(), path: selected()[1], blocks: summaryBlocks(), legal: 'Рабочая версия 25.11.2026 · v10. Пояснения и примеры. Это разбор, а не юридическое заключение.' };
++      return { title: scopes[S.scope] + ' · ' + productName() + ' · ' + curForm().name, path: selected()[1], blocks: summaryBlocks().concat([['Проверка предложения', saleItems()]]), legal: 'Рабочая версия 25.11.2026 · v10. Пояснения и примеры. Это разбор, а не юридическое заключение. Платежи, договоры и нерешённые условия сервисов проверяются под конкретную модель.' };
+     }
+     return { renderStage, outcome, summaryBlocks, summary, navigation, nonPurchase, incompatible, verification, publicationInfo, publicationIssue, publicationNotice, publicationChoice, giftOutcome };
+   }
+diff --git a/dist/checks/card_help.test.js b/dist/checks/card_help.test.js
+index 5de1158..86f425e 100644
+--- a/dist/checks/card_help.test.js
++++ b/dist/checks/card_help.test.js
+@@ -1,6 +1,6 @@
+ const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
+ const root=__dirname+'/../',c={window:{}};
+-for(const f of ['data.js','card-help.js'])vm.runInNewContext(fs.readFileSync(root+f,'utf8'),c);
++for(const f of ['data.js','card-help.js','goal1-copy.js'])vm.runInNewContext(fs.readFileSync(root+f,'utf8'),c);
+ const d=c.window.SCHEMA,before=JSON.stringify(d),nodes=Object.values(d.start).flatMap(ps=>ps.flatMap(p=>p.children||[]));
+ const esc=s=>String(s).replace(/[&<>"]/g,x=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[x]));
+ c.esc=esc;c.list=xs=>'<ul>'+xs.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul>';
+diff --git a/dist/checks/route_matrix.test.js b/dist/checks/route_matrix.test.js
+index 06614a1..3327929 100644
+--- a/dist/checks/route_matrix.test.js
++++ b/dist/checks/route_matrix.test.js
+@@ -2,7 +2,7 @@ const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/st
+ const root=__dirname+'/../',c={window:{}};
+ const load=f=>vm.runInNewContext(fs.readFileSync(root+f,'utf8'),c);
+ load('data.js');const before=JSON.parse(JSON.stringify(c.window.SCHEMA));
+-load('route-matrix.js');load('book-ui.js');load('card-help.js');
++load('route-matrix.js');load('book-ui.js');load('card-help.js');load('goal1-copy.js');
+ const D=c.window.SCHEMA, page=fs.readFileSync(root+'index.html','utf8');
+ for(const id of Object.keys(before.start).filter(x=>x!=='book'))assert.equal(JSON.stringify(D.start[id]),JSON.stringify(before.start[id]),id);
+ assert.equal(D.routeMatrix.rows.length,64);
+diff --git a/dist/index.html b/dist/index.html
+index ed6b0ec..bc70cb3 100644
+--- a/dist/index.html
++++ b/dist/index.html
+@@ -200,7 +200,7 @@ dialog::backdrop{background:rgba(20,21,34,.45)}
+ <template id="scope-help"><p><b>Продвижение</b> — как человек узнаёт о предложении и приходит к нему: публикации, реклама, рекомендации и переходы между площадками.</p><p><b>Продажа</b> — что человек видит в месте продажи: страница товара, карточка или предложение в боте. Здесь проверяем рекламный характер, содержание и необходимые сведения.</p><p>Выдача материалов, доставка и оказание услуг относятся к сопровождению онлайн-бизнеса.</p></template>
+ 
+ <footer>
+-<details class="version-note"><summary>Рабочая версия · 25.11.2026 · v9 · матрица окончаний первой цели</summary><p>Обновлены общие пояснения и первая цель. Другие девять целей сохранены и ждут последовательной проверки. Статус готовности маршрута не подтверждается одним цветом карточки.</p><p><a href="TASKS.md">Задачи и нерешённые вопросы</a> · <a href="LEGAL_REVIEW_2026-11-24.md">Результаты дополнительной сверки</a></p></details>
++<details class="version-note"><summary>Рабочая версия · 25.11.2026 · v10 · пояснения и примеры первой цели</summary><p>Обновлены общие пояснения и первая цель. Другие девять целей сохранены и ждут последовательной проверки. Статус готовности маршрута не подтверждается одним цветом карточки.</p><p><a href="TASKS.md">Задачи и нерешённые вопросы</a> · <a href="LEGAL_REVIEW_2026-11-24.md">Результаты дополнительной сверки</a></p></details>
+ <div class="foot">
+ <div style="flex:1 1 340px;display:flex;flex-direction:column;gap:10px">
+ <span class="tag" style="align-self:flex-start">Как пользоваться</span>
+@@ -225,6 +225,7 @@ dialog::backdrop{background:rgba(20,21,34,.45)}
+ <script src="route-matrix.js"></script>
+ <script src="book-ui.js"></script>
+ <script src="card-help.js"></script>
++<script src="goal1-copy.js"></script>
+ <script src="frontend-motion.js"></script>
+ <script>
+ {
+@@ -265,6 +266,7 @@ const routePlace = (n, k) => {
+   if (S.goal !== 'book') return p;
+   if (n.republish) return Object.assign(p, { name: k === 'vk' ? (n.id === 'tt-move' ? 'VK Клипы' : 'VK Видео') : k === 'rutube' ? 'Rutube' : p.name, short: 'Здесь публикуется копия ролика.', details: n.details });
+   if (n.transfer) return Object.assign(p, { short: 'Переход в другой канал. Покупка проверяется отдельно.', details: n.details });
++  p.materialFormat = S.format;
+   p.routeResult = k === 'none' ? 'none' : ['vk','tg'].includes(k) && !n.republish ? 'information' : n.republish ? 'copy' : 'offer';
+   const condition = n.routeConditions?.[k];
+   if (condition) { p.details += ' ' + condition; p.short = condition; }
+@@ -304,7 +306,7 @@ function card(n, level, selected) {
+ 
+ function cardDetails(n) {
+   const h = window.CardHelp.get(n), g=n.guide;
+-  const paragraphs=[h.explanation,n.details].filter((x,i,a)=>x&&a.indexOf(x)===i);
++  const paragraphs=(h.editorial ? [h.explanation] : [h.explanation,n.details]).filter((x,i,a)=>x&&a.indexOf(x)===i);
+   let html='<div class="guide-copy"><h4>Что означает этот вариант</h4>'+paragraphs.map(x=>'<p>'+esc(x)+'</p>').join('');
+   if(h.examples?.length) html+='<div class="guide-pair">'+h.examples.map(x=>'<section class="guide-example"><h4>'+esc(x.label)+'</h4><blockquote>'+esc(x.text)+'</blockquote><p><b>Что проверить:</b> '+esc(x.why)+'</p></section>').join('')+'</div>';
+   const yes=n.here?.can||n.can, no=n.here?.cannot||n.cannot||n.why;
+@@ -314,6 +316,7 @@ function cardDetails(n) {
+   if(n.safer)html+='<h4>Другой вариант</h4><p>'+esc(n.safer)+'</p>';
+   if(g?.note)html+='<p class="guide-note">'+esc(g.note)+'</p>';
+   else if(h.examples?.length)html+='<p class="guide-note">Примеры показывают различие действий. Они не заменяют проверку всей публикации, площадки и условий размещения.</p>';
++  if(h.editorial && n.details && n.details!==h.explanation) html+='<details><summary>Правовые условия этого варианта</summary><p>'+esc(n.details)+'</p></details>';
+   if(g?.sources?.length)html+='<p class="guide-sources">Источники исходной карточки · сверка '+esc(g.checked)+': '+g.sources.map(x=>'<a href="'+esc(x.url)+'" target="_blank" rel="noopener noreferrer">'+esc(x.name)+'</a>').join(' · ')+'</p>';
+   return html+'</div>';
+ }
+diff --git a/dist/version.json b/dist/version.json
+index 177127c..903ea3f 100644
+--- a/dist/version.json
++++ b/dist/version.json
+@@ -1,6 +1,6 @@
+ {
+-  "version": "2026-11-25-working-v9-route-matrix",
+-  "status": "Рабочая версия: матрица окончаний первой цели",
++  "version": "2026-11-25-working-v10-editorial-help",
++  "status": "Рабочая версия: пояснения и примеры первой цели",
+   "base_repository": "9479797/ru-legal-online",
+   "base_commit": "60bf80361bd757522656631eb45ddb19cc1cee88",
+   "old_book_links_preserved": 56,
+@@ -12,16 +12,17 @@
+     "README.txt": "25966f7ef050278a4a9e64d090cca5149960258f44dc47a7114866a311ee3da0",
+     "SOURCES.md": "032f42d2586c4ba7c19ffb66691706528475e7acefdc6523e7b5d215e2fbf535",
+     "TASKS.md": "04426ee75d6d5db65bb288e95a3962204ee8e6575d866b10155445f3df1cc873",
+-    "book-ui.js": "a09bed39cdc484b1c38869947f6801086ae1495e11c19e42ad8fe4e7b5a68b91",
++    "book-ui.js": "9e33badb87c0b8c7c508c2c65180368f877d0f0e36164c0a754e936417d9bd4d",
+     "card-help.js": "259add8eb7e56392064eb575625b9a7a83e19744cfabd7d8b54b8cd7994961ac",
+     "changes-v3-v4.patch": "1c1a0799728b8645e4f5f17c0f579c73192766893ba58e621674d2abf95c9bd7",
+     "changes-v4-v5.patch": "6fe69b80e46fc2288556914b419d61ad8c267c6305f47d1bd9a219ca48c6f0e6",
+-    "checks/card_help.test.js": "fc7c5f91f4ef309b829458c8b89a6f09fc2f835b82bbc02334c629ab96eceacc",
++    "checks/card_help.test.js": "bf65ecdccbdd60b8617daf9b50812051e6fa98d6c1968781fb3cd2d9f6d51eb2",
+     "checks/frontend_motion.test.js": "3099d8ac4ecf1a29456dbe7a06c29fc407d7ad0591aa8ddf3e64c91ab9fd566f",
+     "checks/goal1-route-inventory.json": "930b8c80da7389b8beb8785ca08973f81af4627281a36192e6174c330d762b62",
++    "checks/goal1_copy.test.js": "842e6a7b4a9477503ce7299e0135885c7dd745e17d19cfc6b6a90039ed5841f8",
+     "checks/proverka_local.js": "7739917decc3aa1731e39ca97ae7c9d6acd03e3f136041b2657c6a51bbfaf9d5",
+     "checks/proverka_skhemy.js": "a5e269b276122e8149065fa3e683e1fe2e8b4311a896f62251212d44ea6c268f",
+-    "checks/route_matrix.test.js": "741e6024c2d99fb31000d1f9492c37ee6cd32d6902ed897137136d72757e4041",
++    "checks/route_matrix.test.js": "158a0fb121fc859c33a72888326ea55405423a1df75fc3cbcb5d0071319879e3",
+     "data.js": "be3bdc24c97f83493a16c450929343801df29d8f476b8a28a5193a704ca95d62",
+     "docs/AUDIT_DIRECT_BLOGGERS_BOOK_2026-11-24.md": "ee7f73acd8bae55a754302c7e0716053c0b6bc1a274b68aedb175c769319e725",
+     "docs/AUDIT_GOAL1_RESULTS_2026-11-24.md": "b1d0cd23b4bf79265f1abdc61170e9648c62c98d29e16f88d04f9f551379df36",
+@@ -32,7 +33,8 @@
+     "docs/plan-skhemy.md": "c663b96e6309b7802bc19e5264fb2d4c1240f9bad135209f9294a23ec753a784",
+     "frontend-motion.js": "0c335a2b8709541b5bd92fb2a8f69b2da72ab4ad5a2faed8637c1f8a2561ee32",
+     "frontend.css": "69f6a299fff9f9789a5c50f5e36ff7307e3e86145f7bd5821a9a58dff8f09187",
+-    "index.html": "52e41957077e5c3029f1d7345d684fd2178014aeda22dfbafaacd008a479ef64",
++    "goal1-copy.js": "7b880404e80f57782f493f2a43b29604fc5351d81e8ea66aa2f74e21e1285cd2",
++    "index.html": "d212ed0f853a45f5e52424b1db1c27bc25eb6404f09fb0989f2658fa52d9d3fc",
+     "markirovka.html": "dd6154817dcbdd9b27bc5d8ae46c9a53efcb2f58888ed338f7df39baaccfd59b",
+     "markirovka.js": "9328d94e80e0a2b695722134c7cb6c0e52cd20b55685b51c1736c7c3cee8cc0d",
+     "route-matrix.js": "65acedc3049e8f5bd85b0f8b470cf8424aaef84622157e31f7e917b36beebd82"
+@@ -111,5 +113,8 @@
+   "route_matrix_methods": 64,
+   "route_matrix_cells": 576,
+   "route_matrix_potential_endings": 315,
+-  "route_matrix_checked_states": 27432
++  "route_matrix_checked_states": 27432,
++  "editorial_method_coverage": 64,
++  "editorial_platform_coverage": 10,
++  "editorial_destination_coverage": 9
+ }
+diff --git a/dist/checks/goal1_copy.test.js b/dist/checks/goal1_copy.test.js
+new file mode 100644
+index 0000000..001c5b5
+--- /dev/null
++++ b/dist/checks/goal1_copy.test.js
+@@ -0,0 +1,35 @@
++const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
++const root=__dirname+'/../',c={window:{}};
++const load=f=>vm.runInNewContext(fs.readFileSync(root+f,'utf8'),c);
++for(const f of ['data.js','route-matrix.js','card-help.js'])load(f);
++const D=c.window.SCHEMA,previous=JSON.stringify(D);
++const other=Object.entries(D.start).filter(([id])=>id!=='book').flatMap(([,ps])=>ps.flatMap(p=>[p,...p.children||[]]));
++const otherHelp=other.map(n=>JSON.stringify(c.window.CardHelp.get(n)));
++load('goal1-copy.js');
++assert.equal(JSON.stringify(D),previous,'Editorial help must preserve all legal data and routes');
++other.forEach((n,i)=>assert.equal(JSON.stringify(c.window.CardHelp.get(n)),otherHelp[i],'Other goal help changed: '+n.id));
++const C=c.window.Goal1Copy;
++assert.equal(Object.keys(C.methods).length,64);
++assert.equal(Object.keys(C.platforms).length,10);
++assert.equal(Object.keys(C.places).length,9);
++for(const n of D.start.book.flatMap(p=>[p,...p.children||[]])){
++ const h=c.window.CardHelp.get(n);
++ assert(h.editorial&&h.examples.length===2,n.id);
++ assert(!h.examples.some(x=>[...n.here?.can||[],...n.can||[]].includes(x.text)),'Checklist repeated as example: '+n.id);
++ assert(!JSON.stringify(h).includes('Посмотрите условия этого действия'),n.id);
++}
++assert(C.methods['dzen-promo'].explanation.includes('статьи в Дзене'));
++assert(!JSON.stringify(C.methods['dzen-promo']).includes('розыгрыш'));
++const copy=c.window.CardHelp.get({id:'vk',routeResult:'copy'});
++assert(copy.explanation.includes('копию своего ролика'));
++const print=c.window.CardHelp.get({id:'site',routeResult:'offer',materialFormat:'print'});
++assert(print.examples[0].text.includes('пять памяток'));
++const file=c.window.CardHelp.get({id:'site',routeResult:'offer',materialFormat:'file'});
++assert(file.examples[0].text.includes('PDF'));
++const source=fs.readFileSync(root+'book-ui.js','utf8');
++assert(!source.includes('проект сопровождения онлайн-бизнеса'));
++assert(!source.includes('Модель бота требует отдельной проверки'));
++assert(!source.includes("box('Дальнейшая проверка'"));
++assert(source.includes('Пример: что увидит читатель'));
++assert(source.includes('Что ещё нужно проверить перед приёмом оплаты'));
++console.log('Editorial coverage: 64 methods, 10 platforms, 9 endings; Dzen promotion and video-copy examples match the action; other goals and legal data preserved.');
+diff --git a/dist/goal1-copy.js b/dist/goal1-copy.js
+new file mode 100644
+index 0000000..4cf8f1f
+--- /dev/null
++++ b/dist/goal1-copy.js
+@@ -0,0 +1,334 @@
++/* Редакторская карта первой цели: примеры выбираются по id, а не по словам в названии. */
++(function (root) {
++  const D=root.SCHEMA, base=root.CardHelp.get, methods={}, places={};
++  const pair=(explanation,a,aw,b,bw)=>({explanation,examples:[{label:'Пример ситуации',text:a,why:aw},{label:'Что меняется в другом случае',text:b,why:bw}],editorial:true});
++  const add=(ids,...copy)=>ids.split(' ').forEach(id=>{if(methods[id])throw Error('Повтор пояснения: '+id);methods[id]=pair(...copy);});
++  // Эти шесть пояснений уже содержат конкретные реплики и различают действия.
++  for(const id of ['author','bio','source','tglink','word','target']) {
++    const n=D.start.book.flatMap(p=>p.children||[]).find(n=>n.id===id);
++    methods[id]=Object.assign({},base(n),{editorial:true});
++  }
++  add('dm tg-reply vk-reply tt-dm',
++    'Вы отвечаете конкретному человеку, который сам спросил о материале. Можно ограничиться ответом; ссылка на покупку нужна только тогда, когда она помогает ответить на вопрос.',
++    'Читатель: «В памятке есть таблица расходов?» Автор: «Да, есть пустая таблица и заполненный пример».',
++    'Человек получил ответ. Если он спросит, где приобрести памятку, можно отдельно рассмотреть ответ со ссылкой на выбранное предложение.',
++    'После одного вопроса о таблице человеку каждую неделю присылают предложения купить другие материалы.',
++    'Это уже последующие рекламные сообщения. Один входящий вопрос не означает согласия на такую рассылку.');
++  add('tg-expert vk-expert yt-expert rt-expert tt-expert',
++    'Вы публикуете законченный разбор, которым читатель может воспользоваться без покупки. Упоминание платного материала внутри разбора нужно оценить отдельно.',
++    'Автор показывает три категории семейных расходов, заполняет таблицу на примере и объясняет, как повторить расчёт.',
++    'Читатель получил способ решения своей задачи. Проверьте также обложку, подпись и ссылки: они могут менять смысл публикации.',
++    'Вместо расчёта автор перечисляет достоинства платного гайда и говорит: «Хотите узнать способ — покупайте».',
++    'Это уже предложение продукта. Название «полезный разбор» не определяет рекламный характер само по себе.');
++  add('tg-post vk-post',
++    'Вы размещаете пост о своём материале: кому он предназначен, что в него входит и где посмотреть условия приобретения. Отдельно оценивается, является ли именно этот пост рекламой.',
++    '«Памятка по семейному бюджету: 12 страниц, таблица расходов и пример заполнения. Доступен файл PDF. Содержание и цена — по ссылке».',
++    'Ссылка должна открывать то же предложение: тот же материал, формат и условия. Для рекламного поста действуют требования выбранной площадки.',
++    'В посте обещан комплект печатных памяток, а ссылка ведёт только к покупке файла.',
++    'Человек получает другое предложение. Исправьте пост или страницу назначения.');
++  add('tg-posev vk-posev bl-paid',
++    'Вы договариваетесь с другим автором о рекламной публикации. Посев — это размещение такого поста в чужом канале или сообществе.',
++    'Автор канала о семейных финансах за плату публикует согласованный пост о вашей памятке со ссылкой на её описание.',
++    'До размещения нужно знать точную площадку, текст, дату и кто выполняет действия по маркировке и учёту рекламы.',
++    'Исполнитель обещает «продвижение», но не сообщает, в каком канале и какой пост выйдет.',
++    'Пока неизвестна сама публикация, нельзя оценить её площадку, содержание и рекламные обязанности сторон.');
++  add('tg-ads',
++    'Вы покупаете показы объявления через Telegram Ads. Читатель нажимает кнопку объявления и попадает в выбранный канал, бот или на поддерживаемую выбранным форматом страницу.',
++    'Объявление предлагает посмотреть пример таблицы расходов. Кнопка открывает канал, где действительно опубликован этот пример.',
++    'Объявление и место назначения должны соответствовать друг другу. Условия формата и риск рекламы в Telegram проверяются отдельно.',
++    'Кнопка обещает пример таблицы, но открывает пустой бот, который только пересылает человека дальше.',
++    'Сначала исправьте содержимое назначения и проверьте правила рекламного формата. Наличие рекламного кабинета не означает готовность такого перехода.');
++  add('tg-bot',
++    'Бот может показывать материал и принимать заказ внутри Telegram либо давать ссылку на страницу сайта. Это разные варианты: сначала определите, где покупатель видит цену и где платит.',
++    'Читатель выбирает в боте «Памятка PDF», видит состав и цену, затем открывает оплату внутри Telegram.',
++    'Для цифровой покупки внутри бота Telegram требует Stars — внутренние единицы оплаты сервиса. Это правило Telegram; российские обязанности продавца проверяются отдельно.',
++    'Бот только сообщает, что входит в памятку, и открывает сайт автора с отдельной страницей предложения.',
++    'Выберите окончание «Свой сайт». Сама внешняя ссылка не подтверждает соблюдение правил, если цифровая продажа фактически остаётся внутри Telegram.');
++  add('tg-promo vk-promo',
++    'Вы объявляете розыгрыш: что является призом, кто участвует, когда и как выбирают получателя. Розыгрыш сам по себе не означает продажу.',
++    '«Разыграем три комплекта памяток. Участие бесплатное. Заявки до 10 декабря; получателей выберем случайно 11 декабря. Полные условия — в закреплённом посте».',
++    'Это учебный пример условий. Для своей акции нужно согласовать призы, порядок участия, итоги и оценить рекламный характер публикации.',
++    'Для участия нужно сначала купить гайд, но это условие спрятано в конце длинного текста.',
++    'Покупка стала условием участия. Такой случай проверяется отдельно; условия нельзя скрывать.');
++  add('tg-move',
++    'Вы сообщаете подписчикам Telegram, где находится ваше сообщество VK. Результат — человек открыл сообщество, а не оформил покупку.',
++    '«Таблицы из наших разборов теперь также собраны в сообществе VK: [ссылка]».',
++    'Человек переходит и читает материалы. Само сообщение о переходе тоже оценивается по содержанию.',
++    '«Переходите в VK и покупайте памятку со скидкой».',
++    'В сообщении уже есть предложение покупки. Смена площадки назначения не отменяет оценку исходной публикации.');
++  add('vk-tg book-yt-tg book-tt-tg',
++    'Вы даёте ссылку на свой Telegram-канал. Переход помогает найти ваши публикации; покупка материала — отдельное действие.',
++    'В описании видео: «Оглавление памятки и образец таблицы — в моём Telegram-канале: [ссылка]».',
++    'Читатель открывает канал и знакомится с содержанием. Проверьте исходный текст и публикацию по ссылке.',
++    'В описании: «Только в Telegram купите памятку за полцены».',
++    'Ссылка сопровождает предложение покупки. Нельзя считать исходное сообщение нейтральным только из-за переноса продажи в канал.');
++  add('tg-vpn yt-vpn tt-vpn',
++    'Эта карточка посвящена продвижению VPN и других средств доступа к ограниченным ресурсам. Она не описывает обычную ссылку на ваш канал.',
++    'В ролике автор объясняет, где находится его другой канал, и указывает ссылку на него.',
++    'Обычная ссылка на канал сама по себе не равна рекламе VPN. Содержание сообщения и площадки всё равно оцениваются отдельно.',
++    'В ролике предлагают установить конкретный VPN: называют преимущества, цену и дают промокод.',
++    'Здесь продвигается само средство доступа. Для этого действия в схеме показан запрет; маркировка его не отменяет.');
++  add('vk-shop',
++    'В разделе «Товары» сообщества размещается карточка конкретного предложения. По ней должно быть понятно, продаётся файл или печатный комплект.',
++    'Карточка: «Комплект из пяти печатных памяток А5». На фотографиях показаны эти памятки, в описании указаны состав и цена.',
++    'Описание соответствует печатному товару. Отдельно проверьте условия продажи и рекламное оформление карточки.',
++    'Карточку называют «печатный комплект», но покупателю собираются отправить только PDF.',
++    'Формат указан неверно. Кроме исправления описания нужно подтвердить, поддерживает ли каталог именно вашу цифровую модель.');
++  add('vk-mail book-site-email',
++    'Вы отправляете рекламное сообщение по своей базе. Сначала нужно знать, кто согласился на такие сообщения и как человек может от них отказаться.',
++    'Человек отдельно подписался на предложения о новых материалах. Ему приходит письмо: «Вышла памятка о семейном бюджете», с описанием и способом отказаться.',
++    'Сохраните сведения о согласии и проверьте, соответствует ли отправка его условиям. Оценка учёта и маркировки зависит от фактического формата.',
++    'Человек только скачал бесплатный образец, а автор начал отправлять ему все предложения о покупке.',
++    'Запрос образца и согласие на последующую рекламу — разные действия. Не заменяйте одно другим.');
++  add('vk-ads',
++    'Вы создаёте платное объявление в VK Рекламе. После нажатия читатель должен открыть именно тот материал, который описан в объявлении.',
++    'Объявление показывает обложку памятки и сообщает, что это PDF с таблицами. Кнопка открывает страницу с этим PDF, составом и ценой.',
++    'Сверьте объявление, страницу назначения и сведения рекламодателя; проверьте результат автоматической маркировки.',
++    'Объявление обещает бесплатную таблицу, но открывается только платный комплект без бесплатного образца.',
++    'Текст объявления и содержимое страницы расходятся. Автоматизация кабинета это несоответствие не исправляет.');
++  add('vk-adblogger',
++    'Вы заказываете рекламный пост у автора VK через платформу AdBlogger. От прямой договорённости этот вариант отличается использованием посреднического сервиса.',
++    'В AdBlogger вы выбираете автора, согласуете пост о памятке и проверяете его публикацию в указанном сообществе.',
++    'Уточните, какие документы, маркировку и сведения обрабатывает сервис, а что остаётся проверить вам.',
++    'После оплаты автор публикует другой текст: вместо содержания памятки обещает гарантированное решение проблемы.',
++    'Платформа не заменяет проверку фактически вышедшего текста. Согласованный макет и опубликованный пост нужно сопоставить.');
++  add('vk-donut',
++    'VK Донат здесь означает регулярную подписку на материалы сообщества. Читатель оплачивает доступ на условиях подписки, а не покупает печатный экземпляр.',
++    'В предложении написано: «Подписчикам доступны четыре памятки и новая таблица каждый месяц». Рядом указаны цена и период подписки.',
++    'Человек должен понимать состав доступа, регулярность оплаты и условия прекращения подписки. Условия подключения сервиса нужно подтвердить.',
++    'Пост обещает «купить один PDF навсегда», но кнопка подключает регулярную платную подписку.',
++    'Описание покупки не соответствует тому, что подключает человек. Исправьте предложение до публикации.');
++  add('yt-desc',
++    'Вы добавляете в описание видео ссылку на материал. Смысл ссылки оценивается вместе с самим роликом: она может вести к источнику, примеру или предложению покупки.',
++    'В видео автор заполняет таблицу расходов. В описании: «Образец таблицы из разбора: [ссылка]».',
++    'Посмотрите, что действительно открывается по ссылке, и есть ли отдельное рекламное предложение внутри видео или описания.',
++    'В описании написано «образец», но ссылка ведёт на страницу с предложением купить другой продукт.',
++    'Читателю обещали одно назначение, а показали другое. Подпись к ссылке нужно согласовать с её содержимым.');
++  add('yt-blogger',
++    'Автор YouTube-канала размещает в своём видео согласованный рассказ о вашем материале. Это может быть отдельная вставка внутри большого ролика.',
++    'В видео о семейном бюджете ведущий показывает вашу памятку, перечисляет её разделы и даёт ссылку в описании.',
++    'Согласуйте именно вставку, ссылку и рекламные обязанности. Отметка YouTube о платном продвижении не заменяет российские требования.',
++    'Блогер поставил отметку сервиса и считает, что больше ничего проверять не нужно.',
++    'Условия YouTube, маркировка и учёт рекламы в РФ — разные проверки. Риск самой площадки также сохраняется.');
++  add('yt-move tt-move',
++    'Вы загружаете копию своего ролика на другую площадку. Появляется ещё одна публикация, но зрители прежнего канала не переходят туда автоматически.',
++    'Ролик с заполнением таблицы уже есть на YouTube. Автор отдельно загружает тот же ролик в VK Видео.',
++    'Копия появилась в VK. Проверьте содержание и права на повторное использование музыки и изображений.',
++    'Автор загрузил копию и сообщил: «Теперь моя аудитория из YouTube перешла в VK».',
++    'Публикация копии не подтверждает переход зрителей. Сообщение о новом канале и переход по ссылке — другой сценарий.');
++  add('rt-desc',
++    'Вы публикуете видео на Rutube или статью в Дзене и добавляете ссылку на материал. Нужно оценить и саму публикацию, и текст возле ссылки.',
++    'В статье разобран пример семейных расходов. В конце указано: «Таблица из этого примера — на сайте автора».',
++    'Проверьте, доступна ли обещанная таблица, и выделяется ли внутри публикации отдельный рекламный блок.',
++    'В статье почти нет разбора: весь текст хвалит платный гайд и зовёт его заказать.',
++    'Название «статья» не делает предложение автоматически справочной информацией. Оценивается содержание.');
++  add('dzen-promo',
++    'Вы оплачиваете продвижение статьи в Дзене. Человек сначала открывает статью; уже внутри неё может находиться ссылка на материал автора.',
++    'Объявление предлагает статью «Как распределить семейные расходы». Читатель открывает её, видит разбор и ссылку на памятку автора.',
++    'Объявление и статья — два разных объекта проверки. Платный показ статьи не означает, что вся статья автоматически становится рекламой.',
++    'Объявление обещает статью с примером расчёта, но ссылка сразу открывает страницу заказа памятки.',
++    'Обещанный промежуточный шаг отсутствует. Нужно согласовать объявление, фактическое назначение и доступный формат продвижения.');
++  add('rt-blogger tt-blogger',
++    'Вы договариваетесь с автором о рассказе о вашем материале в его публикации. До размещения важно выбрать точную площадку и согласовать сам рассказ.',
++    'Блогер показывает, как выглядит ваша таблица расходов, и объясняет, где читатель может посмотреть состав памятки.',
++    'Проверьте площадку, договорённость, итоговый текст и рекламные обязанности. Для TikTok допустимость размещения остаётся отдельным условием.',
++    'Вместо согласованного примера блогер обещает покупателю результат, которого вы не заявляли.',
++    'Проверьте реальную публикацию, а не только факт договорённости. Нельзя считать любой текст блогера заранее согласованным.');
++  add('tt-bio',
++    'В профиле TikTok вы размещаете описание автора и, если функция доступна аккаунту, ссылку на другие материалы.',
++    '«Пишу о семейном бюджете. Оглавление и образец таблицы — на моём сайте».',
++    'Проверьте содержание профиля и страницу по ссылке. Доступность кликабельной ссылки зависит от аккаунта и условий сервиса.',
++    'Автор рассчитывает на переходы, хотя его аккаунт не позволяет добавить кликабельную ссылку.',
++    'Сначала нужно проверить саму функцию. Схема не обещает, что она доступна каждому пользователю.');
++  add('tt-video',
++    'Вы делаете ролик, который предлагает конкретный платный материал, и показываете, где с ним познакомиться. До рекламного размещения нужно подтвердить допустимость площадки.',
++    'В ролике показаны развороты памятки и сказано: «Внутри пять таблиц для учёта расходов. Состав и условия — на странице материала».',
++    'Это пример предложения продукта. Проверьте рекламу в TikTok и применимые правила раскрытия коммерческого характера публикации.',
++    'Автор считает, что ролик можно публиковать, раз приложение позволяет его загрузить.',
++    'Техническая возможность загрузки не подтверждает допустимость рекламы. Поэтому условие площадки нельзя пропустить.');
++  add('tt-ads',
++    'Речь о платном кабинете TikTok Ads, открытом через иностранный аккаунт. Доступ к кабинету ещё не подтверждает, что нужные показы и такая модель размещения доступны.',
++    'При подготовке объявления автор проверяет страну аккаунта, аудиторию показа, плательщика и страницу по ссылке.',
++    'Пока эти условия не подтверждены, схема не показывает готовый путь запуска.',
++    'Посредник обещает: «Есть иностранный кабинет — значит рекламу в России можно запустить без других проверок».',
++    'Это неподтверждённое обещание. Возможности сервиса и правовые условия нужно проверять по отдельности.');
++  add('bl-gift',
++    'Вы передаёте материал блогеру и не требуете публикацию взамен. Подарок не гарантирует ни обзор, ни ссылку, ни продажи.',
++    '«Отправляю вам комплект памяток в подарок. Писать о нём не обязательно».',
++    'Блогер может ничего не публиковать. Если публикация появится, её содержание и обстоятельства оцениваются отдельно.',
++    '«Отправлю памятки бесплатно, а вы обязуетесь выпустить пост в пятницу».',
++    'Есть обязательство публикации в обмен на материал. Для этого действия нужен разбор бартера.');
++  add('bl-barter',
++    'Вы предоставляете материал в обмен на согласованную публикацию. От подарка этот вариант отличается обязательством блогера что-то разместить.',
++    'Автор даёт блогеру доступ к гайду, а блогер в обмен публикует согласованный обзор со ссылкой.',
++    'Нужно определить содержание публикации, площадку и рекламные обязанности; отсутствие денежной оплаты их не отменяет.',
++    'В переписке требуют обзор, но договорённость называют подарком и не обсуждают рекламные обязанности.',
++    'Название не соответствует фактическому обмену. Рассматривайте обязательство публикации, а не только отсутствие оплаты деньгами.');
++  add('bl-partner',
++    'Блогер получает вознаграждение за покупки по своей ссылке или коду. Размер выплаты зависит от результата, но сама публикация всё равно требует рекламной оценки.',
++    'Блогер даёт ссылку с кодом. По ней купили пять памяток, и автор начисляет согласованную долю от этих продаж.',
++    'Согласуйте публикацию, способ учёта результата и обязанности сторон. Поддержку партнёрской ссылки проверьте у выбранного сервиса.',
++    'Блогер говорит: «Мне платят только после покупки, поэтому мой продающий пост не нуждается в проверке».',
++    'Способ расчёта вознаграждения не заменяет оценку содержания и площадки публикации.');
++  add('bl-mutual',
++    'Вы и другой автор договариваетесь рассказать друг о друге. Проверить нужно обе публикации: их содержание может различаться.',
++    'Автор таблиц расходов рекомендует памятку коллеги, а коллега размещает встречный пост о его гайде.',
++    'Отдельно оцените каждый пост и его площадку. Бесплатный обмен не означает автоматического отсутствия рекламы.',
++    'Встречный продающий пост называют просто дружеским упоминанием, потому что деньги не перечислялись.',
++    'Отсутствие денежного расчёта не определяет смысл публикации. Условия рекламного обмена нужно проверить.');
++  add('bl-doctor dir-med',
++    'Карточка относится к рекламе обычного материала с использованием медицинской профессии или с обещанием лечебного результата. Важно отличать содержание гайда от таких рекламных доводов.',
++    'В описании памятки перечислены темы: какие расходы учитывать и как заполнять таблицу.',
++    'Читателю объясняют состав материала. Это не обещание лечения и не рекомендация от имени врача.',
++    'В рекламе гайда говорят: «Как врач рекомендую: этот гайд избавит вас от боли».',
++    'Появились медицинский образ и лечебное обещание. Для обычного материала нельзя переносить на такой текст выводы о простом описании содержания.');
++  add('bl-banned',
++    'Эта карточка показывает ограничение на рекламное размещение у выбранного блогера: по площадке, статусу автора или невыполненному требованию к странице.',
++    'До оплаты вы уточняете точную страницу блогера и проверяете условия, которые относятся именно к ней.',
++    'Общее слово «блогер» ничего не говорит о допустимости конкретного размещения.',
++    'Блогер предлагает платную интеграцию в Instagram и обещает решить вопрос добавлением пометки «Реклама».',
++    'Маркировка не отменяет запрет площадки. Для других ограничений нужно установить конкретное основание, а не считать все случаи одинаковыми.');
++  add('dir-search',
++    'Пользователь вводит запрос в Яндексе и видит ваше платное объявление рядом с результатами поиска. После нажатия открывается выбранная страница.',
++    'Запрос: «таблица семейных расходов». Объявление предлагает памятку с образцом таблицы и ведёт на её описание.',
++    'Сопоставьте запрос, текст объявления и реальное предложение на странице. Проверьте сведения рекламодателя и маркировку.',
++    'В объявлении обещана бесплатная таблица, а на странице есть только платный гайд без обещанного образца.',
++    'Объявление приводит к другому предложению. Измените текст или страницу назначения.');
++  add('dir-rsya',
++    'РСЯ — рекламная сеть Яндекса. Ваше объявление показывают на сайтах и в приложениях сети; человеку не обязательно вводить поисковый запрос в этот момент.',
++    'Читатель открывает статью на сайте партнёра сети и видит баннер с обложкой вашей памятки. Нажатие ведёт к её описанию.',
++    'Проверьте картинку, текст баннера и страницу назначения как последовательные части предложения.',
++    'На баннере изображён печатный комплект, хотя на странице продаётся только файл.',
++    'Визуальное обещание тоже должно соответствовать реальному формату материала.');
++  add('dir-retarget',
++    'Ретаргетинг — повторный показ объявления выбранной аудитории. Это могут быть посетители сайта либо люди из загруженной базы контактов; источники данных различаются.',
++    'Человек посмотрел страницу памятки, но ушёл. Позже ему показывается объявление об этой памятке на площадке рекламной сети.',
++    'Это пример аудитории посетителей сайта. Нужно проверить сбор данных и настройки аудитории.',
++    'Автор загружает телефоны клиентов из своей таблицы и считает, что прежняя покупка разрешает любое рекламное использование контактов.',
++    'Это другой источник аудитории. Наличие номера в таблице само по себе не подтверждает основание его использования.');
++  add('dir-tg',
++    'Вы заказываете показы через Яндекс Директ, но сам рекламный пост появляется в Telegram-канале. Способ закупки и площадка публикации здесь различаются.',
++    'В Директе подготовлен пост о памятке. Сервис размещает его в Telegram-канале; читатель нажимает ссылку на страницу материала.',
++    'Проверьте условия рекламного формата и риск размещения именно в Telegram. Автоматизация Директа не меняет площадку показа.',
++    'Автор считает, что пост размещён в Яндексе, потому что оплата прошла через Директ.',
++    'Фактическая публикация находится в Telegram. Её нельзя оценивать как объявление только в поиске Яндекса.');
++  add('book-site-page',
++    'На своём сайте вы показываете отдельную страницу материала. По ней человек должен понять состав, формат, цену и то, что откроет кнопка заказа.',
++    'Страница: «Памятка по семейному бюджету, PDF, 12 страниц». Ниже — оглавление, образец таблицы, цена и кнопка заказа.',
++    'Обложка и описание должны соответствовать предлагаемому файлу. Рекламные выделения на странице оцениваются отдельно.',
++    'Страница показывает печатный комплект, но возле кнопки не объясняется, что покупатель получит только PDF.',
++    'Читатель может ошибиться с форматом. Уточните предложение до перехода к заказу.');
++  add('book-site-article',
++    'Статья на вашем сайте объясняет тему и может содержать переход к материалу. Читатель должен получить пользу от самой статьи, если она заявлена как разбор.',
++    'В статье показан расчёт семейных расходов. В конце есть ссылка: «Скачать образец таблицы из разбора».',
++    'Проверьте, что ссылка открывает обещанный образец, а отдельное платное предложение ясно отделено по смыслу.',
++    'Под названием «Как составить бюджет» размещены только похвала гайду и кнопка покупки.',
++    'Фактическое содержание отличается от заявленного разбора. Название статьи само по себе не определяет её рекламный характер.');
++  add('book-site-sample',
++    'Вы даёте бесплатную часть материала, чтобы человек познакомился с содержанием. Это может быть несколько страниц или одна таблица; полный объём нужно обозначить.',
++    'На сайте: «Бесплатно доступны две страницы и одна таблица. Полная памятка содержит 12 страниц».',
++    'Человек понимает, что получит бесплатно и чем отличается полная версия. Покупка после образца необязательна.',
++    'Кнопка обещает «скачать памятку», но выдаёт только обложку и автоматически подписывает человека на рекламные письма.',
++    'Обещанный объём не совпал с полученным; рекламная подписка — отдельное действие. Исправьте оба условия.');
++  add('book-market-card',
++    'Внешний сервис показывает карточку вашего материала в своём каталоге. Важно выбрать конкретную площадку: приём печатных товаров и цифровых файлов может различаться.',
++    'В каталоге размещён комплект печатных памяток: фотографии, состав комплекта и цена относятся к одному товару.',
++    'Проверьте описание карточки и правила конкретного сервиса. Сам вид каталога не отвечает за любую рекламную подачу внутри него.',
++    'Автор видит на сервисе электронные книги и решает, что туда можно загрузить любой его PDF.',
++    'Нужно подтвердить приём именно вашего формата и модели размещения. Чужие электронные книги этого не доказывают.');
++  add('book-market-ads',
++    'Вы используете внутренний инструмент сервиса, чтобы карточку материала увидели чаще. Сначала выясните, что это за инструмент: отдельное объявление или изменение представления в каталоге.',
++    'В сервисе покупают отдельный баннер о комплекте памяток; баннер открывает карточку этого комплекта.',
++    'Объявление и обычная карточка — разные элементы. Для рекламы нужно определить маркировку и учёт по условиям инструмента.',
++    'Продавец считает любой платный инструмент сервиса одинаковой рекламой и не выясняет, как он работает.',
++    'Оплата сама по себе не описывает формат размещения. Нужны его реальные условия и внешний вид.');
++
++  const place=(id,...copy)=>{places[id]=pair(...copy);};
++  place('none','Здесь человек получает ответ или полезные сведения без перехода к заказу.',
++    '«Какие таблицы есть в памятке?» — «Расходы за месяц и план обязательных платежей».',
++    'Вопрос закрыт ответом. Человек не обязан переходить к покупке.',
++    'Вместо ответа автор присылает только «Купите и узнаете».',
++    'Это другое действие: предложение покупки вместо запрошенных сведений.');
++  place('site','Человек открывает страницу на вашем сайте: смотрит состав материала, формат и цену, затем решает, переходить ли к заказу.',
++    'Страница показывает PDF из 12 страниц, оглавление и образец таблицы. Кнопка «Заказать» открывает форму заказа.',
++    'До кнопки понятно, что предлагается. Открытие формы ещё не означает оплату.',
++    'Кнопка «Посмотреть образец» сразу открывает оплату, а образца нет.',
++    'Действие не соответствует подписи кнопки. Исправьте обещание или страницу.');
++  for(const [id,title] of [['vk','сообщество VK'],['tg','Telegram-канал']])place(id,
++    'Ссылка открывает '+title+'. Здесь читатель знакомится с публикациями; место заказа может находиться по другой ссылке.',
++    'Человек открывает закреплённый пост с оглавлением памятки и примером таблицы.',
++    'Результат этого перехода — знакомство с материалом, а не подтверждённая покупка.',
++    'Автор считает, что каждый подписавшийся на канал уже оформил заказ.',
++    'Подписка, просмотр описания и покупка — разные действия.');
++  places.vkshop=methods['vk-shop'];places.market=methods['book-market-card'];places.donut=methods['vk-donut'];places.tgbot=methods['tg-bot'];places.rutube=methods['yt-move'];
++  const platforms={};
++  const platform=(id,...copy)=>{platforms[id]=pair(...copy);};
++  platform('instagram','Здесь вы выбираете, какое действие совершаете в Instagram: представляете автора, даёте полезный разбор, отвечаете человеку или размещаете рекламу. Эти случаи нельзя смешивать.',
++    'В профиле Анны указано, что она пишет о семейном бюджете. В публикации она разбирает заполненную таблицу расходов.',
++    'Дальше выберите конкретное действие: сведения об авторе, источник или другой вариант. Нужно оценить весь текст и оформление.',
++    'В том же профиле размещают объявление «Купите памятку» и оплачивают его продвижение.',
++    'Это рекламный сценарий. В схеме для него сохраняется запрет площадки; обычные сведения об авторе не дают разрешения на такую рекламу.');
++  platform('telegram','В Telegram можно вести канал, отвечать в переписке или использовать бота. На следующем шаге выберите именно то действие, которое планируете.',
++    'Читатель сам пишет: «В памятке есть пример бюджета?» Автор отвечает в личном сообщении.',
++    'Это входящий вопрос. Он отличается от объявления, опубликованного всем подписчикам канала.',
++    'Автор размещает публичный пост с предложением приобрести памятку.',
++    'Это другой способ распространения. Условия публичной рекламы в Telegram проверяются отдельно от личного ответа.');
++  platform('vk','Вы начинаете с VK: публикации сообщества, сообщения, карточки товара или платного объявления. Место, где человек увидел пост, может отличаться от места заказа.',
++    'В сообществе опубликован разбор таблицы расходов со ссылкой на сайт автора.',
++    'Выберите способ публикации, затем назначение ссылки. Переход в сообщество сам по себе не равен покупке.',
++    'Автор выбирает «Товары», хотя собирается опубликовать только статью без карточки товара.',
++    'Это разные действия. Выберите вариант, который соответствует фактическому размещению.');
++  platform('youtube','Вы начинаете с видео или описания на YouTube. Обычный разбор, рекламная вставка у блогера и публикация копии на другом сервисе — разные способы.',
++    'Автор объясняет заполнение таблицы в видео и добавляет ссылку на пример в описании.',
++    'Выберите экспертное видео или ссылку в описании — в зависимости от того, какую часть хотите проверить.',
++    'Автор покупает рекламную вставку в чужом ролике и считает её обычным собственным разбором.',
++    'Для размещения у блогера нужны условия именно этого действия и проверка риска площадки.');
++  platform('rutube','В этой группе собраны видео Rutube и статьи Дзена. Выберите, публикуете ли вы свой разбор, добавляете ссылку или заказываете продвижение.',
++    'В Дзене выходит статья с заполненной таблицей расходов и ссылкой на памятку.',
++    'Статью и предложение по ссылке оценивают вместе с обстоятельствами размещения.',
++    'Автор считает рекламное предложение внутри статьи обычной информацией только потому, что статья названа экспертной.',
++    'Название статьи не заменяет оценку её содержания. Выберите способ размещения, а рекламные вставки оцените отдельно.');
++  platform('tiktok','Вы начинаете с профиля, ролика или личного сообщения TikTok. Наличие функции в приложении не подтверждает готовность рекламного размещения.',
++    'Зритель после полезного ролика спрашивает в личном сообщении, какие темы включены в памятку.',
++    'Можно разобрать входящий вопрос отдельно от публичного рекламного ролика.',
++    'Автор покупает рекламную интеграцию, не подтвердив текущую допустимость размещения и доступность нужных функций.',
++    'Для рекламного сценария в схеме остаётся условие дополнительной проверки площадки.');
++  platform('bloggers','Здесь выбирается договорённость с другим автором: платная публикация, подарок, бартер или процент от продаж. Отдельно укажите, где именно блогер разместит материал.',
++    'Вы договорились об обзоре памятки за плату. Блогер разместит его в Telegram.',
++    'Способ договорённости — платная интеграция, площадка публикации — Telegram. Оба условия влияют на разбор.',
++    'Вы отправили подарок без обязательства обзора, но ожидаете гарантированный выход поста.',
++    'У подарка нет обещанного результата публикации. Для обязательного размещения нужна другая договорённость.');
++  platform('direct','Яндекс Директ — инструмент закупки рекламы. Объявление может показываться в поиске, на площадках рекламной сети или в мессенджере; выберите нужный формат.',
++    'Пользователь ищет таблицу семейных расходов и видит ваше платное объявление в поиске Яндекса.',
++    'Это поисковая реклама. После нажатия человек открывает страницу, указанную в объявлении.',
++    'Пост закуплен через Директ, но опубликован в Telegram-канале.',
++    'Площадка публикации здесь Telegram. Нельзя оценивать этот пост только по правилам поискового объявления.');
++  platform('site','Вы начинаете со своего сайта или своей базы адресов. Страница материала, полезная статья, бесплатный образец и рекламное письмо — разные действия.',
++    'Посетитель читает статью на вашем сайте и открывает образец таблицы расходов.',
++    'Разберите статью и бесплатный фрагмент. Покупка полной версии после этого необязательна.',
++    'Автор отправляет рекламное письмо всем, кто когда-либо оставлял адрес на сайте.',
++    'Для письма нужна отдельная проверка согласия и содержания; владение сайтом её не заменяет.');
++  platform('book-market','Вы начинаете с внешнего сервиса, где размещена карточка материала. Обычная карточка каталога и отдельный инструмент её продвижения проверяются раздельно.',
++    'Читатель находит в каталоге комплект печатных памяток и открывает его карточку.',
++    'Это путь через карточку. Состав, формат и цена должны соответствовать реальному предложению.',
++    'Продавец покупает отдельный баннер внутри сервиса и считает его обычной карточкой каталога.',
++    'Появился другой формат размещения. Выберите внутреннее продвижение и уточните условия инструмента.');
++  const printPlaces={
++    site:pair('Человек открывает на вашем сайте описание печатного комплекта: фотографии, состав, размер и цену. Затем он решает, начинать ли заказ.',
++      'На странице показаны пять памяток А5. Кнопка «Заказать комплект» открывает форму заказа этих памяток.',
++      'Человек видит формат и состав до заказа. Открытие формы ещё не означает оплату.',
++      'На фотографии печатный комплект, но в форме заказа указан только PDF.',
++      'Предложение изменилось по пути. Согласуйте страницу и форму заказа.'),
++    tgbot:pair('Бот показывает предложение печатного комплекта. Этот формат нужно отличать от продажи цифрового файла внутри Telegram.',
++      'Человек выбирает «Пять печатных памяток А5». Бот показывает состав комплекта и цену до перехода к заказу.',
++      'Покупателю должно быть понятно, что он заказывает печатный комплект. Оформление и оплата требуют отдельной подготовки.',
++      'В боте одновременно продаются PDF и печатный комплект, но условия оплаты для них описаны как одинаковые.',
++      'Правило Stars относится к цифровой покупке внутри Telegram. Его нельзя механически переносить на печатный формат.')
++  };
++  const byObject=new WeakMap();
++  for(const a of D.start.book){if(!platforms[a.id])throw Error('Нет пояснения площадки: '+a.id);byObject.set(a,platforms[a.id]);}
++  for(const a of D.start.book)for(const n of a.children||[]){if(!methods[n.id])throw Error('Нет редакторского пояснения: '+n.id);byObject.set(n,methods[n.id]);}
++  for(const [id,n] of Object.entries(D.bookPlaces))if(places[id])byObject.set(n,places[id]);
++  root.CardHelp.get=n=>n.routeResult==='copy'?methods['yt-move']:n.routeResult&&n.materialFormat==='print'&&printPlaces[n.id]?printPlaces[n.id]:byObject.get(n)||(n.routeResult&&places[n.id])||base(n);
++  root.Goal1Copy={methods,places,platforms,printPlaces};
++})(window);
