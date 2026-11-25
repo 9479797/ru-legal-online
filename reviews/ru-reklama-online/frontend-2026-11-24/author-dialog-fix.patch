@@ -1,0 +1,67 @@
+diff --git a/dist/index.html b/dist/index.html
+index 2209316..bc049b4 100644
+--- a/dist/index.html
++++ b/dist/index.html
+@@ -297,6 +297,26 @@ function card(n, level, selected) {
+     '<button class="lnk" type="button" data-fines="' + level + '" data-id="' + esc(n.id) + '">' + scale + 'Ответственность</button></div></div>';
+ }
+ 
++function cardDetails(n) {
++  let html = '<div class="guide-copy"><p>' + esc(n.details || n.short || 'Подробное пояснение пока не заполнено.') + '</p>';
++  if (n.id === 'author' && n.guide) {
++    html += '<h4>Как работает этот вариант</h4><p>' + esc(n.guide.explanation) + '</p>';
++    if (n.here?.can?.length) html += '<h4>Что предусматривает карточка</h4>' + list(n.here.can);
++    if (n.here?.cannot?.length) html += '<h4>Чего избегать</h4>' + list(n.here.cannot);
++    html += n.guide.examples.map(x => '<section class="guide-example"><h4>' + esc(x.label) + '</h4><blockquote>' + esc(x.text) + '</blockquote><p>' + esc(x.why) + '</p></section>').join('');
++  }
++  return html + '</div>';
++}
++
++function cardLiability(n) {
++  const rows = (n.fines || []).map(k => {
++    const f = D.fines[k];
++    return f ? '<div class="kv"><b>' + esc(f.title) + '</b><span>' + esc(fv(f)) + (f.verify ? ' <span class="vf" style="background:var(--soft)">сверить</span>' : '') + '</span><span class="lw">' + esc(f.law) + (f.note ? ' · ' + esc(f.note) : '') + '</span></div>' : '';
++  }).join('');
++  if (rows) return rows;
++  return '<div class="guide-copy"><p><b>Для этой карточки суммы штрафов автоматически не назначаются.</b></p><p>Это информационный сценарий: сначала нужно оценить конкретную публикацию. Пустой список штрафов не означает, что любое упоминание автора или книги разрешено.</p><p>Если содержание или оформление превращает материал в рекламу, потребуется отдельная оценка площадки и нарушения. Ответственность нельзя определить только по названию «' + esc(n.name) + '».</p>' + (n.id === 'author' ? '<p>В «Подробнее» показаны два учебных примера: представление автора и предложение купить книгу. Сравните с ними свой материал.</p>' : '') + '</div>';
++}
++
+ function step(num, title, hint, body) {
+   const selected = S.scope === 'promotion' ? chain()[num - 1] : null;
+   return '<section class="step' + (selected ? ' has-selection' : '') + '" id="step-' + num + '" aria-labelledby="st-' + num + '"><div class="sh"><span class="num" aria-hidden="true">0' + num + '</span><h2 id="st-' + num + '" tabindex="-1">' + esc(title) + '</h2>' + (hint ? '<span class="hint">' + esc(hint) + '</span>' : '') + '</div>' + (num === 1 ? '<p class="restart-hint">Чтобы построить другую связку, выберите любую площадку здесь. Следующие шаги обновятся.</p>' : '') + body + '</section>';
+@@ -601,13 +621,10 @@ document.addEventListener('click', (e) => {
+     if (n) openGuide(n);
+   } else if (t.dataset.more !== undefined) {
+     const n = findAt(+t.dataset.more, t.dataset.id);
+-    if (n) openDlg(head(n.name, 'Подробнее', n.risk) + '<p>' + esc(n.details) + '</p>');
++    if (n) openDlg(head(n.name, 'Подробнее', n.risk) + cardDetails(n));
+   } else if (t.dataset.fines !== undefined) {
+     const n = findAt(+t.dataset.fines, t.dataset.id);
+-    if (n) openDlg(head('Что грозит', n.name + ' · ' + D.formWho[S.form], n.risk) + (n.fines || []).map((k) => {
+-      const f = D.fines[k];
+-      return f ? '<div class="kv"><b>' + esc(f.title) + '</b><span>' + esc(fv(f)) + (f.verify ? ' <span class="vf" style="background:var(--soft)">сверить</span>' : '') + '</span><span class="lw">' + esc(f.law) + (f.note ? ' · ' + esc(f.note) : '') + '</span></div>' : '';
+-    }).join(''));
++    if (n) openDlg(head('Ответственность', n.name + ' · ' + D.formWho[S.form], n.risk) + cardLiability(n));
+   } else if (t.dataset.crumb !== undefined) {
+     if (S.goal === 'book') S.scope = 'promotion';
+     S.path = S.path.slice(0, +t.dataset.crumb);
+diff --git a/dist/version.json b/dist/version.json
+index c000dc5..0e4d1f0 100644
+--- a/dist/version.json
++++ b/dist/version.json
+@@ -1,5 +1,5 @@
+ {
+-  "version": "2026-11-25-working-v8-frontend-v5-rows",
++  "version": "2026-11-25-working-v8-frontend-v5-author-dialogs",
+   "status": "Рабочий вариант для сравнения: карточки одной колонкой и статичные связи слева",
+   "base_repository": "9479797/ru-legal-online",
+   "base_commit": "60bf80361bd757522656631eb45ddb19cc1cee88",
+@@ -28,7 +28,7 @@
+     "docs/plan-skhemy.md": "c663b96e6309b7802bc19e5264fb2d4c1240f9bad135209f9294a23ec753a784",
+     "frontend-motion.js": "0c335a2b8709541b5bd92fb2a8f69b2da72ab4ad5a2faed8637c1f8a2561ee32",
+     "frontend.css": "a858de44d747d198716277c0b3ad2fbb35d6a63802b48d3ceae08dbfec75d775",
+-    "index.html": "30fe768696679e7f9b46f59df2e2ac1547471fbad45e1e865cda4b879a475387",
++    "index.html": "3264aef16a3d78051e610b0f432c18145abf6bb31fe05f8e916f8ade5d968394",
+     "markirovka.html": "dd6154817dcbdd9b27bc5d8ae46c9a53efcb2f58888ed338f7df39baaccfd59b",
+     "markirovka.js": "9328d94e80e0a2b695722134c7cb6c0e52cd20b55685b51c1736c7c3cee8cc0d"
+   },
