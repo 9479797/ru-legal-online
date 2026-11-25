@@ -1,0 +1,2053 @@
+diff --git a/dist/book-ui.js b/dist/book-ui.js
+index 94d57a1..d5c9da5 100644
+--- a/dist/book-ui.js
++++ b/dist/book-ui.js
+@@ -5,15 +5,16 @@ window.BookUI = {
+     const channels = [
+       ['site', 'Свой сайт', 'Страница материала и предложение о покупке.'],
+       ['vkshop', 'Товары VK', 'Карточка товара и условия предложения.'],
+-      ['market', 'Книжный сервис или маркетплейс', 'Карточка книги в выбранном внешнем сервисе.'],
++      ['market', 'Книжный сервис или маркетплейс', 'Карточка материала в выбранном внешнем сервисе.'],
+       ['donut', 'VK Донат', 'Регулярная подписка на материалы и дополнения.'],
+       ['tgbot', 'Telegram-бот', 'Предложение материала в боте и условия площадки.']
+     ];
+-    const fmt = () => S.format === 'print' ? 'Печатная книга' : 'Цифровой файл';
++    const fmt = () => S.format === 'print' ? 'Печатные материалы' : 'Цифровой файл';
+     const selected = () => channels.find(c => c[0] === S.salePlace) || channels[0];
+     const list = a => '<ul>' + a.map(t => '<li>' + esc(t) + '</li>').join('') + '</ul>';
+     const box = (title, content, extra = '') => '<section class="note journey ' + extra + '"><h3>' + esc(title) + '</h3>' + content + '</section>';
+     const placeId = p => p?.id || selected()[0];
++    const nonPurchase = (b, p) => !b?.republish && !b?.routeFormatCheck?.includes(placeId(p)) && (placeId(p) === 'none' || ['vk','tg'].includes(placeId(p)));
+     const incompatible = p => S.format === 'print' && placeId(p) === 'donut';
+     function publicationInfo(a, b) {
+       if (!b || b.uncommitted) return null;
+@@ -36,7 +37,7 @@ window.BookUI = {
+     }
+     function publicationChoice(a) {
+       if (a?.id !== 'bloggers') return '';
+-      return '<div class="note publication-settings"><label for="publisher">Где выйдет публикация?</label><select id="publisher" aria-describedby="publisher-help"><option value="">Не выбрана</option>' + (D.bookPublishers || []).map(p => '<option value="' + esc(p.id) + '"' + (S.publisher === p.id ? ' selected' : '') + '>' + esc(p.name) + '</option>').join('') + '</select><p id="publisher-help">Выберите площадку, на которой блогер расскажет о вашей книге. Место продажи выбирается отдельно. Для взаимного пиара проверьте оба размещения.</p></div>';
++      return '<div class="note publication-settings"><label for="publisher">Где выйдет публикация?</label><select id="publisher" aria-describedby="publisher-help"><option value="">Не выбрана</option>' + (D.bookPublishers || []).map(p => '<option value="' + esc(p.id) + '"' + (S.publisher === p.id ? ' selected' : '') + '>' + esc(p.name) + '</option>').join('') + '</select><p id="publisher-help">Выберите площадку, на которой блогер расскажет о вашем материале. Место продажи выбирается отдельно. Для взаимного пиара проверьте оба размещения.</p></div>';
+     }
+     function giftOutcome(b) {
+       return box('Результат: книга передана без обязательства обзора', '<p>Публикация и переходы покупателей не гарантированы. Если обзор появится, оцените его отдельно. При договорённости об обязательном размещении выберите бартер.</p>' + list(b.here.can));
+@@ -44,8 +45,9 @@ window.BookUI = {
+     function verification(p, b) {
+       if (b?.id === 'tg-ads' && placeId(p) === 'site') return {title:'Telegram Ads: подтвердите страницу назначения', text:'До запуска подтвердите, поддерживает ли выбранный формат прямую ссылку на сайт. Инструкции платформы описывают назначения неоднозначно. До подтверждения этот маршрут не считается готовым переходом к покупке.'};
+       if (S.format !== 'print' && placeId(p) === 'vkshop') return { title: 'Цифровой файл в «Товарах» VK: требуется проверка', text: 'Актуальные правила размещения цифрового файла в каталоге VK не подтверждены. До проверки маршрут к оформлению заказа здесь не показывается. Это не вывод о законодательном запрете. Можно выбрать свой сайт; печатная книга рассматривается отдельно.' };
+-      if (S.format !== 'print' && placeId(p) === 'market') return { title: 'Электронная книга: уточните книжный сервис', text: 'Выберите конкретный книжный сервис и подтвердите поддержку выбранного формата. Наличие электронных книг на площадке не подтверждает приём произвольного файла от любого продавца. До проверки путь к оформлению здесь не подтверждён; это не законодательный запрет цифровых книг.' + (b?.marketReview ? ' Для перехода из VK также проверьте условия ссылки, а для VK Рекламы — поддержку внешней карточки выбранным форматом.' : '') };
++      if (S.format !== 'print' && placeId(p) === 'market') return { title: 'Цифровой материал: уточните сервис', text: 'Выберите конкретный книжный сервис и подтвердите поддержку выбранного формата. Наличие электронных книг на площадке не подтверждает приём произвольного файла от любого продавца. До проверки путь к оформлению здесь не подтверждён; это не законодательный запрет цифровых книг.' + (b?.marketReview ? ' Для перехода из VK также проверьте условия ссылки, а для VK Рекламы — поддержку внешней карточки выбранным форматом.' : '') };
+       if (placeId(p) === 'market' && b?.marketReview) return { title: 'Переход на маркетплейс: проверьте условия', text: 'Уточните конкретный маркетплейс и карточку книги. Для VK Рекламы проверьте поддержку внешней ссылки выбранным форматом объявления; для цифрового файла — также правила его размещения на маркетплейсе. После подтверждения условий маршрут ведёт к карточке предложения.' };
++      if (b?.routeFormatCheck?.includes(placeId(p))) return {title:'Подтвердите ссылку выбранного рекламного формата',text:b.routeConditions[placeId(p)] + ' До подтверждения этого условия готовый переход к оформлению не показывается.'};
+       return null;
+     }
+     const verificationBox = q => box(q.title, '<p>' + esc(q.text) + '</p>', 'attention');
+@@ -58,13 +60,14 @@ window.BookUI = {
+     function paymentPath(b, p) {
+       const sample = S.sample || (b && b.sample);
+       const id = placeId(p);
+-      const path = id === 'donut' ? ['Предложение подписки', 'Состав, цена и период подписки', 'Условия подключения и прекращения'] : [id === 'tgbot' ? 'Предложение в боте' : S.format === 'print' ? 'Карточка книги' : 'Страница материала', 'Цена и условия предложения', id === 'tgbot' ? 'Переход к оформлению заказа в боте' : 'Переход к оформлению заказа'];
++      const path = id === 'donut' ? ['Предложение подписки', 'Состав, цена и период подписки', 'Условия подключения и прекращения'] : [id === 'tgbot' ? 'Предложение в боте' : S.format === 'print' ? 'Карточка материала' : 'Страница материала', 'Цена и условия предложения', id === 'tgbot' ? 'Переход к оформлению заказа в боте' : 'Переход к оформлению заказа'];
+       return (sample ? ['Бесплатный фрагмент'] : []).concat(path);
+     }
+     function pathway(items) { return '<ol class="journey-path">' + items.map(t => '<li>' + esc(t) + '</li>').join('') + '</ol>'; }
+     function navigation() { return '<div class="journey-nav">' + Object.entries(scopes).map(([k, title]) => '<button type="button" class="wbtn" data-book-scope="' + k + '" aria-pressed="' + (S.scope === k) + '">' + title + '</button>').join('') + '</div>'; }
+     function outcome(b, p) {
+-      if (incompatible(p)) return box('Подписка и печатный экземпляр — разные продукты', '<p>Донат открывает доступ к материалам. Для заказа и доставки печатной книги выберите другое место продажи.</p>' + navigation());
++      if (nonPurchase(b, p)) return box(placeId(p) === 'none' ? 'Результат без перехода к покупке' : 'Результат: переход к информации', '<p>' + esc(placeId(p) === 'none' ? (/promo/.test(b?.id || '') ? 'Человек ознакомился с условиями участия в розыгрыше. Покупка в этот результат не включена.' : 'Человек получил ответ или полезную информацию. Переход к заказу в этот результат не включён.') : 'Человек открывает «' + p.name + '». Здесь маршрут перехода заканчивается. Сам по себе переход не означает покупку. Для проверки предложения выберите раздел «Продажа» и фактическое место заказа.') + '</p><p>' + esc(b?.routeConditions?.[placeId(p)] || '') + '</p>' + navigation());
++      if (incompatible(p)) return box('Подписка и печатный экземпляр — разные продукты', '<p>Донат открывает доступ к материалам. Для заказа и доставки печатных материалов выберите другое место продажи.</p>' + navigation());
+       const q = verification(p, b);
+       if (q) return verificationBox(q) + ((S.sample || b?.sample) ? box('Бесплатный фрагмент', list(sampleItems(p))) : '') + navigation();
+       const transfer = b && b.transfer;
+@@ -77,7 +80,7 @@ window.BookUI = {
+       const section = scopes[S.scope];
+       const cards = channels.map(([id, title, desc]) => '<button type="button" class="sale-choice' + (selected()[0] === id ? ' chosen' : '') + '" data-sale-place="' + id + '" aria-pressed="' + (selected()[0] === id) + '"><b>' + esc(title) + '</b><span>' + esc(desc) + '</span></button>').join('');
+       return box(section + ': ' + productName().toLowerCase(), '<p>Выберите фактическое место заказа. Раздел продвижения и выбранный рекламный маршрут сохраняются.</p><div class="sale-choices">' + cards + '</div>') +
+-        (incompatible() ? box('Подписка и печатный экземпляр — разные продукты', '<p>Донат открывает доступ к материалам. Для продажи и доставки печатной книги выберите сайт, карточку VK, маркетплейс или отдельно проверяемую модель бота.</p>') : verification() ? verificationBox(verification()) + (S.sample ? box('Бесплатный фрагмент', list(sampleItems())) : '') :
++        (incompatible() ? box('Подписка и печатный экземпляр — разные продукты', '<p>Донат открывает доступ к материалам. Для продажи и доставки печатных материалов выберите сайт, карточку VK, маркетплейс или отдельно проверяемую модель бота.</p>') : verification() ? verificationBox(verification()) + (S.sample ? box('Бесплатный фрагмент', list(sampleItems())) : '') :
+         box('Предложение в месте продажи', pathway(paymentPath())) +
+         box('Что проверить в предложении', list(saleItems())) +
+         ((S.sample && S.scope === 'sale') ? box('Необязательный бесплатный фрагмент', list(sampleItems())) : '')) +
+@@ -94,7 +97,9 @@ window.BookUI = {
+       if (issue) { blocks.push(['Статус маршрута', [issue.title, issue.blocked ? 'Рекламный путь здесь не продолжается.' : 'Готовность рекламного размещения не подтверждена.']]); return blocks; }
+       if (a && ['telegram', 'youtube'].includes(a.id)) blocks.push(['Риск исходной площадки', [a.details]]);
+       if (a && ['instagram', 'tiktok'].includes(a.id)) blocks.push(['Условия исходной площадки', [a.details]]);
++      if (S.scope === 'promotion' && (!b || (b.dest && !b.dest.includes(p?.id)))) { blocks.push(['Маршрут не завершён', ['Выберите способ и результат на следующих шагах. Переход к заказу ещё не выбран.']]); return blocks; }
+       if (b?.why) { blocks.push(['Результат', [b.review ? 'Требуется проверка. Маршрут покупки не подтверждён.' : 'Предупреждающий тупик. Путь покупки здесь не продолжается.']]); return blocks; }
++      if (nonPurchase(b, p)) { blocks.push(['Результат', [placeId(p) === 'none' ? 'Ответ или публикация без перехода к покупке.' : b?.transfer ? 'Перенос аудитории в «' + p.name + '». Покупка в этот итог не включена.' : 'Переход к информации в «' + p.name + '». Покупка в этот итог не включена.', b?.routeConditions?.[placeId(p)] || 'Место заказа проверяется отдельно.']]); return blocks; }
+       if (incompatible(p)) { blocks.push(['Несовместимая модель', ['Донат открывает подписной доступ, а не продаёт и доставляет печатный экземпляр. Выберите место заказа книги.']]); return blocks; }
+       const q = verification(p, b);
+       if (q) { blocks.push([q.title, [q.text]]); if (S.sample || b?.sample) blocks.push(['Бесплатный фрагмент', sampleItems(p)]); return blocks; }
+@@ -109,9 +114,9 @@ window.BookUI = {
+       return blocks;
+     }
+     function summary() {
+-      if (incompatible() || verification()) return { title: scopes[S.scope] + ' · ' + fmt(), path: selected()[1], blocks: summaryBlocks(), legal: 'Предлагаемая локальная редакция 24.11.2026 · v8. Это разбор, а не юридическое заключение.' };
+-      return { title: scopes[S.scope] + ' · ' + productName() + ' · ' + curForm().name, path: selected()[1], blocks: summaryBlocks().concat([['Проверка предложения', saleItems()]]), legal: 'Предлагаемая локальная редакция 24.11.2026 · v8. Это разбор, а не юридическое заключение. Платежи, договоры и нерешённые условия сервисов проверяются под конкретную модель.' };
++      if (incompatible() || verification()) return { title: scopes[S.scope] + ' · ' + fmt(), path: selected()[1], blocks: summaryBlocks(), legal: 'Рабочая матрица окончаний 25.11.2026 · v9. Это разбор, а не юридическое заключение.' };
++      return { title: scopes[S.scope] + ' · ' + productName() + ' · ' + curForm().name, path: selected()[1], blocks: summaryBlocks().concat([['Проверка предложения', saleItems()]]), legal: 'Рабочая матрица окончаний 25.11.2026 · v9. Это разбор, а не юридическое заключение. Платежи, договоры и нерешённые условия сервисов проверяются под конкретную модель.' };
+     }
+-    return { renderStage, outcome, summaryBlocks, summary, navigation, incompatible, verification, publicationInfo, publicationIssue, publicationNotice, publicationChoice, giftOutcome };
++    return { renderStage, outcome, summaryBlocks, summary, navigation, nonPurchase, incompatible, verification, publicationInfo, publicationIssue, publicationNotice, publicationChoice, giftOutcome };
+   }
+ };
+diff --git a/dist/card-help.js b/dist/card-help.js
+index 2c5c753..c11970c 100644
+--- a/dist/card-help.js
++++ b/dist/card-help.js
+@@ -63,6 +63,8 @@ const special=[
+ [/wom-story/,pair('История клиента может содержать его личные сведения и использоваться в продвижении. Это нужно проверить до публикации.','Автор согласует с клиентом, какой рассказ, изображение и сведения будут показаны.','Сверьте согласованный объём с фактическим постом.','Автор публикует переписку и подробности клиента без предварительного согласования.','Наличие интересной истории не означает разрешения раскрывать её детали.')]
+ ];
+ function get(n){
++ if(n.routeResult==='none')return pair('Ответ или полезная публикация могут закончиться без предложения покупки.','Читатель: «В материале есть список расходов?» Автор: «Да, есть таблица обязательных и необязательных расходов».','Автор дал запрошенные сведения. Ссылка на заказ для такого ответа не обязательна.','После того же вопроса человеку без отдельного согласия начинают присылать предложения каждую неделю.','Один вопрос не означает согласия на последующую рекламную рассылку.');
++ if(n.routeResult==='information')return pair('Эта ссылка ведёт к информации на другой площадке. Сам переход ещё не является покупкой.','Автор: «Оглавление и пример таблицы есть в моём канале». Человек открывает канал и читает публикацию.','Оцените исходное сообщение и публикацию назначения отдельно. Место заказа проверяется в разделе «Продажа».','Автор считает, что после перехода в канал покупатель уже оформил заказ.','Переход, ознакомление с предложением и оформление заказа — разные действия.');
+  if(n.children?.length)return pair('Это выбор площадки: где человек впервые увидит вашу публикацию. На следующем шаге выберите конкретное действие — пост, видео, личный ответ или чужое размещение.','Автор публикует на площадке «'+n.name+'» полезный разбор по своей теме.','Оцените сам материал: одной темы или названия площадки недостаточно.','На той же площадке выходит отдельное предложение купить продукт.','Это другое действие. Выберите соответствующую карточку на следующем шаге и прочитайте её условия.');
+  if(exact[n.id])return exact[n.id];
+  if(/doctor|(?:^|-)med$|health/.test(n.id))return medical;
+diff --git a/dist/checks/proverka_local.js b/dist/checks/proverka_local.js
+index ad6a448..bff8f78 100644
+--- a/dist/checks/proverka_local.js
++++ b/dist/checks/proverka_local.js
+@@ -30,7 +30,7 @@ for(const format of ['file','print']) for(const scope of ['sale']) for(const sal
+   const result=ui.summary();
+   assert(!JSON.stringify(result).includes('undefined'));
+   assert(result.blocks.length);
+-  assert(ui.renderStage().includes(format==='file'&&salePlace==='vkshop'?'Цифровой файл в «Товарах» VK: требуется проверка':format==='file'&&salePlace==='market'?'Электронная книга: уточните книжный сервис':salePlace==='tgbot'?'бот':salePlace==='donut'?'Донат':'Предложение в месте продажи'));
++  assert(ui.renderStage().includes(format==='file'&&salePlace==='vkshop'?'Цифровой файл в «Товарах» VK: требуется проверка':format==='file'&&salePlace==='market'?'Цифровой материал: уточните сервис':salePlace==='tgbot'?'бот':salePlace==='donut'?'Донат':'Предложение в месте продажи'));
+   if(format==='file'&&salePlace==='vkshop') {
+     assert(ui.verification());
+     assert(!result.blocks.some(b=>b[0]==='Путь до оформления заказа'));
+@@ -82,7 +82,7 @@ for(const a of after.start.book) for(const b of a.children||[]) if(b.dest?.inclu
+   context.chain=()=>[a,b,p];
+   S.format='file';
+   let r=context.summaryParts();
+-  assert(r.blocks.some(x=>x[0]==='Электронная книга: уточните книжный сервис'),b.id);
++  assert(r.blocks.some(x=>x[0]==='Цифровой материал: уточните сервис'),b.id);
+   assert(!r.blocks.some(x=>x[0]==='Путь до оформления заказа'),b.id);
+   assert(r.blocks.some(x=>x[0]==='Действия выбранного маршрута'),b.id);
+   if(b.id==='book-site-email') assert(JSON.stringify(r).includes('немедленно прекращать'));
+diff --git a/dist/index.html b/dist/index.html
+index 4e094c2..ed6b0ec 100644
+--- a/dist/index.html
++++ b/dist/index.html
+@@ -200,7 +200,7 @@ dialog::backdrop{background:rgba(20,21,34,.45)}
+ <template id="scope-help"><p><b>Продвижение</b> — как человек узнаёт о предложении и приходит к нему: публикации, реклама, рекомендации и переходы между площадками.</p><p><b>Продажа</b> — что человек видит в месте продажи: страница товара, карточка или предложение в боте. Здесь проверяем рекламный характер, содержание и необходимые сведения.</p><p>Выдача материалов, доставка и оказание услуг относятся к сопровождению онлайн-бизнеса.</p></template>
+ 
+ <footer>
+-<details class="version-note"><summary>Рабочая версия · 25.11.2026 · v8 + фронтенд v6 · единые пояснения</summary><p>Обновлены общие пояснения и первая цель. Другие девять целей сохранены и ждут последовательной проверки. Статус готовности маршрута не подтверждается одним цветом карточки.</p><p><a href="TASKS.md">Задачи и нерешённые вопросы</a> · <a href="LEGAL_REVIEW_2026-11-24.md">Результаты дополнительной сверки</a></p></details>
++<details class="version-note"><summary>Рабочая версия · 25.11.2026 · v9 · матрица окончаний первой цели</summary><p>Обновлены общие пояснения и первая цель. Другие девять целей сохранены и ждут последовательной проверки. Статус готовности маршрута не подтверждается одним цветом карточки.</p><p><a href="TASKS.md">Задачи и нерешённые вопросы</a> · <a href="LEGAL_REVIEW_2026-11-24.md">Результаты дополнительной сверки</a></p></details>
+ <div class="foot">
+ <div style="flex:1 1 340px;display:flex;flex-direction:column;gap:10px">
+ <span class="tag" style="align-self:flex-start">Как пользоваться</span>
+@@ -222,6 +222,7 @@ dialog::backdrop{background:rgba(20,21,34,.45)}
+ <dialog id="dlg" aria-labelledby="dlg-t"></dialog>
+ 
+ <script src="data.js"></script>
++<script src="route-matrix.js"></script>
+ <script src="book-ui.js"></script>
+ <script src="card-help.js"></script>
+ <script src="frontend-motion.js"></script>
+@@ -264,9 +265,12 @@ const routePlace = (n, k) => {
+   if (S.goal !== 'book') return p;
+   if (n.republish) return Object.assign(p, { name: k === 'vk' ? (n.id === 'tt-move' ? 'VK Клипы' : 'VK Видео') : k === 'rutube' ? 'Rutube' : p.name, short: 'Здесь публикуется копия ролика.', details: n.details });
+   if (n.transfer) return Object.assign(p, { short: 'Переход в другой канал. Покупка проверяется отдельно.', details: n.details });
++  p.routeResult = k === 'none' ? 'none' : ['vk','tg'].includes(k) && !n.republish ? 'information' : n.republish ? 'copy' : 'offer';
++  const condition = n.routeConditions?.[k];
++  if (condition) { p.details += ' ' + condition; p.short = condition; }
+   const q = bookUI.verification(p, n);
+   if (q) return Object.assign(p, { risk: 'y', short: q.title, details: q.text });
+-  if (n.id === 'tg-bot' && k === 'site') return Object.assign(p, { short: 'Бот даёт ссылку на предложение книги на сайте.' });
++  if (n.id === 'tg-bot' && k === 'site') return Object.assign(p, { short: 'Бот даёт ссылку на предложение материала на сайте.' });
+   return p;
+ };
+ const resolve = (n) => (n.place ? place(n.place, n.id) : n);
+@@ -320,7 +324,7 @@ function cardLiability(n) {
+     return f ? '<div class="kv"><b>' + esc(f.title) + '</b><span>' + esc(fv(f)) + (f.verify ? ' <span class="vf" style="background:var(--soft)">сверить</span>' : '') + '</span><span class="lw">' + esc(f.law) + (f.note ? ' · ' + esc(f.note) : '') + '</span></div>' : '';
+   }).join('');
+   if (rows) return rows;
+-  return '<div class="guide-copy"><p><b>Для этой карточки суммы штрафов автоматически не назначаются.</b></p><p>Это информационный сценарий: сначала нужно оценить конкретную публикацию. Пустой список штрафов не означает, что любое упоминание автора или книги разрешено.</p><p>Если содержание или оформление превращает материал в рекламу, потребуется отдельная оценка площадки и нарушения. Ответственность нельзя определить только по названию «' + esc(n.name) + '».</p>' + (n.id === 'author' ? '<p>В «Подробнее» показаны два учебных примера: представление автора и предложение купить книгу. Сравните с ними свой материал.</p>' : '') + '</div>';
++  return '<div class="guide-copy"><p><b>Для этой карточки суммы штрафов автоматически не назначаются.</b></p><p>Это информационный сценарий: сначала нужно оценить конкретную публикацию. Пустой список штрафов не означает, что любое упоминание автора или материала разрешено.</p><p>Если содержание или оформление превращает материал в рекламу, потребуется отдельная оценка площадки и нарушения. Ответственность нельзя определить только по названию «' + esc(n.name) + '».</p>' + (n.id === 'author' ? '<p>В «Подробнее» показаны два учебных примера: представление автора и предложение купить книгу. Сравните с ними свой материал.</p>' : '') + '</div>';
+ }
+ 
+ function step(num, title, hint, body) {
+@@ -359,6 +363,7 @@ function finalPanel(link, p, from) {
+   if (publication && !publication.needsCheck) from = publication.name;
+   const publicationWarning = S.goal === 'book' ? bookUI.publicationNotice(platform, link) : '';
+   const warning = publicationWarning || (platform && ['instagram','telegram','youtube','tiktok'].includes(platform.id) ? '<div class="note attention"><b>Условия исходной площадки: ' + esc(platform.name) + '</b><p>' + esc(platform.details) + '</p></div>' : '');
++  if (S.goal === 'book' && bookUI.nonPurchase(link, p)) return warning + '<section class="note"><h3>Что проверить в выбранном действии</h3>' + list(link.here.can) + '<h4>Чего избегать</h4>' + list(link.here.cannot) + '</section>' + bookUI.outcome(link, p);
+   if (S.goal === 'book' && bookUI.incompatible(p)) return warning + bookUI.outcome(link, p);
+   if (S.goal === 'book' && bookUI.verification(p, link)) {
+     const actions = link ? '<section class="note"><h3>Что проверить в выбранном способе</h3>' + list(link.here.can) + '<h4>Что нельзя делать</h4>' + list(link.here.cannot) + '</section>' : '';
+@@ -425,7 +430,7 @@ function render() {
+   if (!c.length) crumbs = ['<li><button type="button" class="crumb empty" data-step-nav="1">Выберите площадку на шаге 1</button></li>'];
+   if (S.goal === 'book' && S.scope !== 'promotion') {
+     const orderName = S.salePlace === 'tgbot' ? 'Telegram-бот' : (D.bookPlaces[S.salePlace]?.name || S.salePlace);
+-    crumbs = ['<li><span class="crumb" aria-current="step"><span><small>Продажа · ' + (S.format === 'print' ? 'печатная книга' : S.salePlace === 'donut' ? 'подписка' : 'цифровой файл') + '</small><b>' + esc(orderName) + '</b></span></span></li>'];
++    crumbs = ['<li><span class="crumb" aria-current="step"><span><small>Продажа · ' + (S.format === 'print' ? 'печатные материалы' : S.salePlace === 'donut' ? 'подписка' : 'цифровой файл') + '</small><b>' + esc(orderName) + '</b></span></span></li>'];
+   }
+   $('#crumbs').innerHTML = crumbs.join('');
+   $('.path-change').hidden = S.scope !== 'promotion' || !c.length;
+@@ -446,7 +451,7 @@ function render() {
+       } else if (publicationIssue) {
+         html += step(3, publicationIssue.title, '', bookUI.publicationNotice(a, b) + saveBar());
+       } else if (b && b.dest) {
+-        const destinationHint = S.goal === 'book' ? (b.republish ? 'где публикуете копию' : b.transfer ? 'куда переводите аудиторию' : b.id === 'tg-bot' ? 'где оформляется заказ' : goal.destHint || 'где продаёте') : goal.destHint || 'где продаёте';
++        const destinationHint = S.goal === 'book' ? (b.republish ? 'где публикуете копию' : b.transfer ? 'куда переводите аудиторию' : b.id === 'tg-bot' ? 'где размещено предложение' : 'какой результат нужен: информация, переход или предложение') : goal.destHint || 'где продаёте';
+         html += step(3, 'Куда ведёт «' + b.name + '»', destinationHint, '<div class="row">' + b.dest.map((k) => card(routePlace(b, k), 2, S.path[2])).join('') + '</div>');
+         if (d) html += step(4, 'Итог: ' + (S.goal === 'book' ? bookUI.publicationInfo(a, b)?.name || a.name : a.name) + ' → ' + d.name, '', finalPanel(b, d, a.name) + saveBar());
+       } else if (b) {
+@@ -458,7 +463,7 @@ function render() {
+   }
+   $('#steps').innerHTML = html;
+   requestAnimationFrame(syncRouteLayout);
+-  $('#legal').textContent = 'Это разбор, а не юридическое заключение. Общие уточнения и первая цель: 24.11.2026. Другие цели и исходные суммы: ' + D.checked + ', их проверка продолжается. Неопределённые условия не являются подтверждённым разрешением или запретом.';
++  $('#legal').textContent = 'Это разбор, а не юридическое заключение. Матрица окончаний первой цели: 25.11.2026; прежняя правовая сверка: 24.11.2026. Другие цели и исходные суммы: ' + D.checked + ', их проверка продолжается. Неопределённые условия не являются подтверждённым разрешением или запретом.';
+ }
+ 
+ /* Итог для печати, PDF или текстового файла */
+@@ -475,21 +480,21 @@ function summaryParts() {
+   const out = { title: goal.name + ' · ' + curForm().name, path: [a, b, d].filter(Boolean).map((n, i) => n.name + (i === 0 && publication ? ' (' + publication.name + ')' : '')).join(' → '), blocks: [] };
+   if (curForm().note) out.blocks.push(['Ваш статус', [curForm().note]]);
+   const publicationIssue = S.goal === 'book' ? bookUI.publicationIssue(a, b) : null;
+-  if (S.goal === 'book' && (b?.uncommitted || publicationIssue)) {
++  if (S.goal === 'book' && (b?.uncommitted || publicationIssue || (b?.dest && !d))) {
+     out.blocks.push(['Действия выбранного маршрута', b.here?.can || []], ['Ограничения', b.here?.cannot || []]);
+   } else if (b && b.why) {
+     out.blocks.push([b.review ? 'Что нужно проверить' : 'Почему нельзя', b.why], ['Как сделать безопаснее', [b.safer]], ['Ответственность', F(b.fines || [])]);
+-  } else if (S.goal === 'book' && b && d && (b.transfer || b.republish || bookUI.incompatible(d) || bookUI.verification(d, b))) {
+-    if (!bookUI.incompatible(d)) out.blocks.push(['Действия выбранного маршрута', b.here.can], ['Ограничения', b.here.cannot], ['Ответственность при наличии рекламы и соответствующего нарушения', F(b.fines || [])]);
++  } else if (S.goal === 'book' && b && d && (b.transfer || b.republish || bookUI.nonPurchase(b, d) || bookUI.incompatible(d) || bookUI.verification(d, b))) {
++    out.blocks.push(['Действия выбранного маршрута', b.here.can], ['Ограничения', b.here.cannot], ['Ответственность при наличии рекламы и соответствующего нарушения', F(b.fines || [])]);
+   } else {
+     const link = d ? b : null, p = d || a;
+     out.blocks.push(['Можно', (link ? link.here.can : []).concat(p.can || [])], ['Нельзя', (link ? link.here.cannot : []).concat(p.cannot || [])],
+       [S.goal === 'book' ? 'Ответственность при наличии рекламы и соответствующего нарушения' : 'Ответственность', F((link ? link.fines : []).concat(p.fines || []))],
+       ['Подготовить до старта', (p.check || []).filter((c) => !c.forms || c.forms.some((x) => curForm().tags.includes(x))).map((c) => c.text)]);
+   }
+-  if (S.goal === 'book') out.blocks = out.blocks.concat(bookUI.summaryBlocks(b, d || a, a));
++  if (S.goal === 'book') out.blocks = out.blocks.concat(bookUI.summaryBlocks(b, d, a));
+   out.blocks = out.blocks.filter((x) => x[1].length);
+-  out.legal = 'Предлагаемая локальная редакция 24.11.2026. Это разбор, а не юридическое заключение. Нерешённые условия и суммы требуют проверки под конкретный случай.';
++  out.legal = 'Рабочая матрица окончаний 25.11.2026 · v9. Это разбор, а не юридическое заключение. Нерешённые условия и суммы требуют проверки под конкретный случай.';
+   return out;
+ }
+ 
+diff --git a/dist/version.json b/dist/version.json
+index bf60298..177127c 100644
+--- a/dist/version.json
++++ b/dist/version.json
+@@ -1,6 +1,6 @@
+ {
+-  "version": "2026-11-25-working-v8-frontend-v6-material-labels",
+-  "status": "Рабочая версия: единая кнопка Подробнее и парные учебные примеры",
++  "version": "2026-11-25-working-v9-route-matrix",
++  "status": "Рабочая версия: матрица окончаний первой цели",
+   "base_repository": "9479797/ru-legal-online",
+   "base_commit": "60bf80361bd757522656631eb45ddb19cc1cee88",
+   "old_book_links_preserved": 56,
+@@ -12,14 +12,16 @@
+     "README.txt": "25966f7ef050278a4a9e64d090cca5149960258f44dc47a7114866a311ee3da0",
+     "SOURCES.md": "032f42d2586c4ba7c19ffb66691706528475e7acefdc6523e7b5d215e2fbf535",
+     "TASKS.md": "04426ee75d6d5db65bb288e95a3962204ee8e6575d866b10155445f3df1cc873",
+-    "book-ui.js": "2c64e47ad43f55e5ea0d9fe325324d79ea427a4a8c343a41599abc6869ae49db",
+-    "card-help.js": "c42b8f85afa0f95f6e6e7a719e667a2f02d990f80203f4dc5ea1bf819b30181a",
++    "book-ui.js": "a09bed39cdc484b1c38869947f6801086ae1495e11c19e42ad8fe4e7b5a68b91",
++    "card-help.js": "259add8eb7e56392064eb575625b9a7a83e19744cfabd7d8b54b8cd7994961ac",
+     "changes-v3-v4.patch": "1c1a0799728b8645e4f5f17c0f579c73192766893ba58e621674d2abf95c9bd7",
+     "changes-v4-v5.patch": "6fe69b80e46fc2288556914b419d61ad8c267c6305f47d1bd9a219ca48c6f0e6",
+     "checks/card_help.test.js": "fc7c5f91f4ef309b829458c8b89a6f09fc2f835b82bbc02334c629ab96eceacc",
+     "checks/frontend_motion.test.js": "3099d8ac4ecf1a29456dbe7a06c29fc407d7ad0591aa8ddf3e64c91ab9fd566f",
+-    "checks/proverka_local.js": "317dc5842c64502b8197c54d49adfb0956239b44315fb2a1ebca581230de0924",
++    "checks/goal1-route-inventory.json": "930b8c80da7389b8beb8785ca08973f81af4627281a36192e6174c330d762b62",
++    "checks/proverka_local.js": "7739917decc3aa1731e39ca97ae7c9d6acd03e3f136041b2657c6a51bbfaf9d5",
+     "checks/proverka_skhemy.js": "a5e269b276122e8149065fa3e683e1fe2e8b4311a896f62251212d44ea6c268f",
++    "checks/route_matrix.test.js": "741e6024c2d99fb31000d1f9492c37ee6cd32d6902ed897137136d72757e4041",
+     "data.js": "be3bdc24c97f83493a16c450929343801df29d8f476b8a28a5193a704ca95d62",
+     "docs/AUDIT_DIRECT_BLOGGERS_BOOK_2026-11-24.md": "ee7f73acd8bae55a754302c7e0716053c0b6bc1a274b68aedb175c769319e725",
+     "docs/AUDIT_GOAL1_RESULTS_2026-11-24.md": "b1d0cd23b4bf79265f1abdc61170e9648c62c98d29e16f88d04f9f551379df36",
+@@ -30,9 +32,10 @@
+     "docs/plan-skhemy.md": "c663b96e6309b7802bc19e5264fb2d4c1240f9bad135209f9294a23ec753a784",
+     "frontend-motion.js": "0c335a2b8709541b5bd92fb2a8f69b2da72ab4ad5a2faed8637c1f8a2561ee32",
+     "frontend.css": "69f6a299fff9f9789a5c50f5e36ff7307e3e86145f7bd5821a9a58dff8f09187",
+-    "index.html": "9862f52323f0c963927f8cf9054605313bf75a6451ee0745949eaac470cb34ca",
++    "index.html": "52e41957077e5c3029f1d7345d684fd2178014aeda22dfbafaacd008a479ef64",
+     "markirovka.html": "dd6154817dcbdd9b27bc5d8ae46c9a53efcb2f58888ed338f7df39baaccfd59b",
+-    "markirovka.js": "9328d94e80e0a2b695722134c7cb6c0e52cd20b55685b51c1736c7c3cee8cc0d"
++    "markirovka.js": "9328d94e80e0a2b695722134c7cb6c0e52cd20b55685b51c1736c7c3cee8cc0d",
++    "route-matrix.js": "65acedc3049e8f5bd85b0f8b470cf8424aaef84622157e31f7e917b36beebd82"
+   },
+   "canonical_main_modified": false,
+   "backup_location": "reviews/ru-reklama-online/site-audit-2026-11-23/ in pravka/reklama-audit-checkpoint-2026-11",
+@@ -81,10 +84,10 @@
+   "approved_tg_reply": "tg-reply",
+   "implemented_instagram_guides": 7,
+   "example_pairs": 7,
+-  "analysis_complete": true,
++  "analysis_complete": false,
+   "goal1_approved": false,
+   "vk_deep_audit_deferred": true,
+-  "risk_view_implemented": false,
++  "risk_view_implemented": true,
+   "implemented_video_fixes": [
+     "YT-PERIOD01",
+     "VIDEO-LINK01",
+@@ -103,5 +106,10 @@
+   "publication_platform_options": 9,
+   "open_telegram_ads_destination": true,
+   "frontend_base": "2026-11-24-working-v8",
+-  "frontend_previous": "2026-11-24-working-v8-frontend-v1"
++  "frontend_previous": "2026-11-24-working-v8-frontend-v1",
++  "route_matrix_complete": true,
++  "route_matrix_methods": 64,
++  "route_matrix_cells": 576,
++  "route_matrix_potential_endings": 315,
++  "route_matrix_checked_states": 27432
+ }
+diff --git a/dist/checks/goal1-route-inventory.json b/dist/checks/goal1-route-inventory.json
+new file mode 100644
+index 0000000..be23340
+--- /dev/null
++++ b/dist/checks/goal1-route-inventory.json
+@@ -0,0 +1,1612 @@
++{
++  "date": "25.11.2026",
++  "scope": "Полнота сценариев первой цели; условные переходы не являются правовым разрешением.",
++  "baseCommit": "bfe10ee7327e55f967ebbdf4ccdaf4a07f88d2a3",
++  "counts": {
++    "conditional": 315,
++    "not-applicable": 171,
++    "terminal": 90
++  },
++  "methods": 64,
++  "cells": 576,
++  "states": {
++    "conditional": "Сценарий учитывается с условиями; не является подтверждением законности или готовности размещения",
++    "terminal": "Предупреждение, отдельная проверка или подарок без гарантии публикации",
++    "not-applicable": "Другой тип действия; причина хранится в routeMatrix и route-matrix.js"
++  },
++  "sources": [
++    {
++      "url": "https://www.consultant.ru/document/cons_doc_LAW_539057/",
++      "checked": "25.11.2026",
++      "use": "Оценка конкретной информации по содержанию и обстоятельствам"
++    },
++    {
++      "url": "https://ads.telegram.org/guidelines",
++      "checked": "25.11.2026",
++      "use": "Каналы, боты и работоспособность страниц назначения; формат требует проверки"
++    },
++    {
++      "url": "https://core.telegram.org/bots/payments-stars",
++      "checked": "25.11.2026",
++      "use": "Правила сервиса для цифровых продаж внутри бота"
++    },
++    {
++      "url": "https://www.yandex.ru/support/direct/ru/messengers-ads/features",
++      "checked": "25.11.2026",
++      "use": "Условия размещения в мессенджерах; доступность сервиса не означает юридического разрешения"
++    }
++  ],
++  "limits": [
++    "Не выполнена новая полная сверка размеров штрафов и всех налоговых обязанностей.",
++    "Сохраняются условия VK, цифровых маркетплейсов, Доната, рекламных форматов и текущей допустимости TikTok.",
++    "315 — число структурных продолжений до применения условий формата и площадки публикации, а не количество юридически одобренных цепочек."
++  ],
++  "rows": [
++    {
++      "platform": "instagram",
++      "method": "author",
++      "name": "Через имя автора",
++      "previous": [
++        "site",
++        "vk",
++        "tg"
++      ],
++      "targets": {
++        "none": "conditional",
++        "site": "conditional",
++        "vk": "conditional",
++        "vkshop": "conditional",
++        "tg": "conditional",
++        "market": "conditional",
++        "donut": "conditional",
++        "tgbot": "conditional",
++        "rutube": "not-applicable"
++      },
++      "added": [
++        "none",
++        "vkshop",
++        "market",
++        "donut",
++        "tgbot"
++      ]
++    },
++    {
++      "platform": "instagram",
++      "method": "bio",
++      "name": "Шапка профиля",
++      "previous": [
++        "site",
++        "vk",
++        "tg"
++      ],
++      "targets": {
++        "none": "conditional",
++        "site": "conditional",
++        "vk": "conditional",
++        "vkshop": "conditional",
++        "tg": "conditional",
++        "market": "conditional",
++        "donut": "conditional",
++        "tgbot": "conditional",
++        "rutube": "not-applicable"
++      },
++      "added": [
++        "none",
++        "vkshop",
++        "market",
++        "donut",
++        "tgbot"
++      ]
++    },
++    {
++      "platform": "instagram",
++      "method": "source",
++      "name": "Памятка как источник",
++      "previous": [
++        "site",
++        "vk",
++        "tg"
++      ],
++      "targets": {
++        "none": "conditional",
++        "site": "conditional",
++        "vk": "conditional",
++        "vkshop": "conditional",
++        "tg": "conditional",
++        "market": "conditional",
++        "donut": "conditional",
++        "tgbot": "conditional",
++        "rutube": "not-applicable"
++      },
++      "added": [
++        "none",
++        "vkshop",
++        "market",
++        "donut",
++        "tgbot"
++      ]
++    },
++    {
++      "platform": "instagram",
++      "method": "dm",
++      "name": "Ответ в директ по запросу",
++      "previous": [
++        "site",
++        "vk"
++      ],
++      "targets": {
++        "none": "conditional",
++        "site": "conditional",
++        "vk": "conditional",
++        "vkshop": "conditional",
++        "tg": "conditional",
++        "market": "conditional",
++        "donut": "conditional",
++        "tgbot": "conditional",
++        "rutube": "not-applicable"
++      },
++      "added": [
++        "none",
++        "vkshop",
++        "tg",
++        "market",
++        "donut",
++        "tgbot"
++      ]
++    },
++    {
++      "platform": "instagram",
++      "method": "tglink",
++      "name": "Ссылка на Telegram",
++      "previous": [
++        "tg"
++      ],
++      "targets": {
++        "none": "not-applicable",
++        "site": "not-applicable",
++        "vk": "not-applicable",
++        "vkshop": "not-applicable",
++        "tg": "conditional",
++        "market": "not-applicable",
++        "donut": "not-applicable",
++        "tgbot": "not-applicable",
++        "rutube": "not-applicable"
++      },
++      "added": []
++    },
++    {
++      "platform": "instagram",
++      "method": "word",
++      "name": "«Напиши слово в директ»",
++      "previous": [],
++      "targets": {
++        "none": "terminal",
++        "site": "terminal",
++        "vk": "terminal",
++        "vkshop": "terminal",
++        "tg": "terminal",
++        "market": "terminal",
++        "donut": "terminal",
++        "tgbot": "terminal",
++        "rutube": "terminal"
++      },
++      "added": []
++    },
++    {
++      "platform": "instagram",
++      "method": "target",
++      "name": "Таргет и платные функции",
++      "previous": [],
++      "targets": {
++        "none": "terminal",
++        "site": "terminal",
++        "vk": "terminal",
++        "vkshop": "terminal",
++        "tg": "terminal",
++        "market": "terminal",
++        "donut": "terminal",
++        "tgbot": "terminal",
++        "rutube": "terminal"
++      },
++      "added": []
++    },
++    {
++      "platform": "telegram",
++      "method": "tg-expert",
++      "name": "Экспертная публикация в канале",
++      "previous": [
++        "site",
++        "vk"
++      ],
++      "targets": {
++        "none": "conditional",
++        "site": "conditional",
++        "vk": "conditional",
++        "vkshop": "conditional",
++        "tg": "conditional",
++        "market": "conditional",
++        "donut": "conditional",
++        "tgbot": "conditional",
++        "rutube": "not-applicable"
++      },
++      "added": [
++        "none",
++        "vkshop",
++        "tg",
++        "market",
++        "donut",
++        "tgbot"
++      ]
++    },
++    {
++      "platform": "telegram",
++      "method": "tg-reply",
++      "name": "Ответ на входящий вопрос о материале",
++      "previous": [
++        "site",
++        "vkshop"
++      ],
++      "targets": {
++        "none": "conditional",
++        "site": "conditional",
++        "vk": "conditional",
++        "vkshop": "conditional",
++        "tg": "conditional",
++        "market": "conditional",
++        "donut": "conditional",
++        "tgbot": "conditional",
++        "rutube": "not-applicable"
++      },
++      "added": [
++        "none",
++        "vk",
++        "tg",
++        "market",
++        "donut",
++        "tgbot"
++      ]
++    },
++    {
++      "platform": "telegram",
++      "method": "tg-post",
++      "name": "Пост или закреп со ссылкой",
++      "previous": [
++        "site"
++      ],
++      "targets": {
++        "none": "not-applicable",
++        "site": "conditional",
++        "vk": "conditional",
++        "vkshop": "conditional",
++        "tg": "conditional",
++        "market": "conditional",
++        "donut": "conditional",
++        "tgbot": "conditional",
++        "rutube": "not-applicable"
++      },
++      "added": [
++        "vk",
++        "vkshop",
++        "tg",
++        "market",
++        "donut",
++        "tgbot"
++      ]
++    },
++    {
++      "platform": "telegram",
++      "method": "tg-posev",
++      "name": "Посев в чужом канале",
++      "previous": [
++        "site"
++      ],
++      "targets": {
++        "none": "not-applicable",
++        "site": "conditional",
++        "vk": "conditional",
++        "vkshop": "conditional",
++        "tg": "conditional",
++        "market": "conditional",
++        "donut": "conditional",
++        "tgbot": "conditional",
++        "rutube": "not-applicable"
++      },
++      "added": [
++        "vk",
++        "vkshop",
++        "tg",
++        "market",
++        "donut",
++        "tgbot"
++      ]
++    },
++    {
++      "platform": "telegram",
++      "method": "tg-ads",
++      "name": "Telegram Ads",
++      "previous": [
++        "site"
++      ],
++      "targets": {
++        "none": "not-applicable",
++        "site": "conditional",
++        "vk": "not-applicable",
++        "vkshop": "not-applicable",
++        "tg": "conditional",
++        "market": "not-applicable",
++        "donut": "not-applicable",
++        "tgbot": "conditional",
++        "rutube": "not-applicable"
++      },
++      "added": [
++        "tg",
++        "tgbot"
++      ]
++    },
++    {
++      "platform": "telegram",
++      "method": "tg-bot",
++      "name": "Бот-магазин или переход из бота на сайт",
++      "previous": [
++        "tgbot",
++        "site"
++      ],
++      "targets": {
++        "none": "not-applicable",
++        "site": "conditional",
++        "vk": "not-applicable",
++        "vkshop": "not-applicable",
++        "tg": "not-applicable",
++        "market": "not-applicable",
++        "donut": "not-applicable",
++        "tgbot": "conditional",
++        "rutube": "not-applicable"
++      },
++      "added": []
++    },
++    {
++      "platform": "telegram",
++      "method": "tg-promo",
++      "name": "Розыгрыш памятки",
++      "previous": [
++        "site"
++      ],
++      "targets": {
++        "none": "conditional",
++        "site": "conditional",
++        "vk": "not-applicable",
++        "vkshop": "conditional",
++        "tg": "not-applicable",
++        "market": "conditional",
++        "donut": "not-applicable",
++        "tgbot": "not-applicable",
++        "rutube": "not-applicable"
++      },
++      "added": [
++        "none",
++        "vkshop",
++        "market"
++      ]
++    },
++    {
++      "platform": "telegram",
++      "method": "tg-move",
++      "name": "Перевести аудиторию в VK",
++      "previous": [
++        "vk"
++      ],
++      "targets": {
++        "none": "not-applicable",
++        "site": "not-applicable",
++        "vk": "conditional",
++        "vkshop": "not-applicable",
++        "tg": "not-applicable",
++        "market": "not-applicable",
++        "donut": "not-applicable",
++        "tgbot": "not-applicable",
++        "rutube": "not-applicable"
++      },
++      "added": []
++    },
++    {
++      "platform": "telegram",
++      "method": "tg-vpn",
++      "name": "Реклама VPN и средств доступа к ограниченным ресурсам",
++      "previous": [],
++      "targets": {
++        "none": "terminal",
++        "site": "terminal",
++        "vk": "terminal",
++        "vkshop": "terminal",
++        "tg": "terminal",
++        "market": "terminal",
++        "donut": "terminal",
++        "tgbot": "terminal",
++        "rutube": "terminal"
++      },
++      "added": []
++    },
++    {
++      "platform": "vk",
++      "method": "vk-expert",
++      "name": "Экспертное сообщество",
++      "previous": [
++        "site",
++        "vkshop"
++      ],
++      "targets": {
++        "none": "conditional",
++        "site": "conditional",
++        "vk": "conditional",
++        "vkshop": "conditional",
++        "tg": "conditional",
++        "market": "conditional",
++        "donut": "conditional",
++        "tgbot": "conditional",
++        "rutube": "not-applicable"
++      },
++      "added": [
++        "none",
++        "vk",
++        "tg",
++        "market",
++        "donut",
++        "tgbot"
++      ]
++    },
++    {
++      "platform": "vk",
++      "method": "vk-post",
++      "name": "Пост со ссылкой на памятку",
++      "previous": [
++        "site",
++        "vkshop",
++        "market"
++      ],
++      "targets": {
++        "none": "not-applicable",
++        "site": "conditional",
++        "vk": "conditional",
++        "vkshop": "conditional",
++        "tg": "conditional",
++        "market": "conditional",
++        "donut": "conditional",
++        "tgbot": "conditional",
++        "rutube": "not-applicable"
++      },
++      "added": [
++        "vk",
++        "tg",
++        "donut",
++        "tgbot"
++      ]
++    },
++    {
++      "platform": "vk",
++      "method": "vk-shop",
++      "name": "Раздел «Товары»",
++      "previous": [
++        "vkshop"
++      ],
++      "targets": {
++        "none": "not-applicable",
++        "site": "not-applicable",
++        "vk": "not-applicable",
++        "vkshop": "conditional",
++        "tg": "not-applicable",
++        "market": "not-applicable",
++        "donut": "not-applicable",
++        "tgbot": "not-applicable",
++        "rutube": "not-applicable"
++      },
++      "added": []
++    },
++    {
++      "platform": "vk",
++      "method": "vk-mail",
++      "name": "Рассылка сообщений сообщества",
++      "previous": [
++        "site",
++        "vkshop"
++      ],
++      "targets": {
++        "none": "not-applicable",
++        "site": "conditional",
++        "vk": "conditional",
++        "vkshop": "conditional",
++        "tg": "conditional",
++        "market": "conditional",
++        "donut": "conditional",
++        "tgbot": "conditional",
++        "rutube": "not-applicable"
++      },
++      "added": [
++        "vk",
++        "tg",
++        "market",
++        "donut",
++        "tgbot"
++      ]
++    },
++    {
++      "platform": "vk",
++      "method": "vk-ads",
++      "name": "VK Реклама",
++      "previous": [
++        "site",
++        "vkshop",
++        "market"
++      ],
++      "targets": {
++        "none": "not-applicable",
++        "site": "conditional",
++        "vk": "conditional",
++        "vkshop": "conditional",
++        "tg": "conditional",
++        "market": "conditional",
++        "donut": "conditional",
++        "tgbot": "conditional",
++        "rutube": "not-applicable"
++      },
++      "added": [
++        "vk",
++        "tg",
++        "donut",
++        "tgbot"
++      ]
++    },
++    {
++      "platform": "vk",
++      "method": "vk-adblogger",
++      "name": "Посев через VK AdBlogger",
++      "previous": [
++        "site",
++        "vkshop"
++      ],
++      "targets": {
++        "none": "not-applicable",
++        "site": "conditional",
++        "vk": "conditional",
++        "vkshop": "conditional",
++        "tg": "conditional",
++        "market": "conditional",
++        "donut": "conditional",
++        "tgbot": "conditional",
++        "rutube": "not-applicable"
++      },
++      "added": [
++        "vk",
++        "tg",
++        "market",
++        "donut",
++        "tgbot"
++      ]
++    },
++    {
++      "platform": "vk",
++      "method": "vk-posev",
++      "name": "Посев напрямую у сообщества",
++      "previous": [
++        "site",
++        "vkshop"
++      ],
++      "targets": {
++        "none": "not-applicable",
++        "site": "conditional",
++        "vk": "conditional",
++        "vkshop": "conditional",
++        "tg": "conditional",
++        "market": "conditional",
++        "donut": "conditional",
++        "tgbot": "conditional",
++        "rutube": "not-applicable"
++      },
++      "added": [
++        "vk",
++        "tg",
++        "market",
++        "donut",
++        "tgbot"
++      ]
++    },
++    {
++      "platform": "vk",
++      "method": "vk-donut",
++      "name": "VK Донат",
++      "previous": [
++        "donut"
++      ],
++      "targets": {
++        "none": "not-applicable",
++        "site": "not-applicable",
++        "vk": "not-applicable",
++        "vkshop": "not-applicable",
++        "tg": "not-applicable",
++        "market": "not-applicable",
++        "donut": "conditional",
++        "tgbot": "not-applicable",
++        "rutube": "not-applicable"
++      },
++      "added": []
++    },
++    {
++      "platform": "vk",
++      "method": "vk-promo",
++      "name": "Розыгрыш памятки",
++      "previous": [
++        "site",
++        "vkshop"
++      ],
++      "targets": {
++        "none": "conditional",
++        "site": "conditional",
++        "vk": "not-applicable",
++        "vkshop": "conditional",
++        "tg": "not-applicable",
++        "market": "conditional",
++        "donut": "not-applicable",
++        "tgbot": "not-applicable",
++        "rutube": "not-applicable"
++      },
++      "added": [
++        "none",
++        "market"
++      ]
++    },
++    {
++      "platform": "vk",
++      "method": "vk-tg",
++      "name": "Ссылка на Telegram",
++      "previous": [
++        "tg"
++      ],
++      "targets": {
++        "none": "not-applicable",
++        "site": "not-applicable",
++        "vk": "not-applicable",
++        "vkshop": "not-applicable",
++        "tg": "conditional",
++        "market": "not-applicable",
++        "donut": "not-applicable",
++        "tgbot": "not-applicable",
++        "rutube": "not-applicable"
++      },
++      "added": []
++    },
++    {
++      "platform": "vk",
++      "method": "vk-reply",
++      "name": "Ответ на входящий вопрос в сообщениях",
++      "previous": [
++        "site",
++        "vkshop"
++      ],
++      "targets": {
++        "none": "conditional",
++        "site": "conditional",
++        "vk": "conditional",
++        "vkshop": "conditional",
++        "tg": "conditional",
++        "market": "conditional",
++        "donut": "conditional",
++        "tgbot": "conditional",
++        "rutube": "not-applicable"
++      },
++      "added": [
++        "none",
++        "vk",
++        "tg",
++        "market",
++        "donut",
++        "tgbot"
++      ]
++    },
++    {
++      "platform": "youtube",
++      "method": "yt-expert",
++      "name": "Экспертные видео",
++      "previous": [
++        "site",
++        "vk"
++      ],
++      "targets": {
++        "none": "conditional",
++        "site": "conditional",
++        "vk": "conditional",
++        "vkshop": "conditional",
++        "tg": "conditional",
++        "market": "conditional",
++        "donut": "conditional",
++        "tgbot": "conditional",
++        "rutube": "not-applicable"
++      },
++      "added": [
++        "none",
++        "vkshop",
++        "tg",
++        "market",
++        "donut",
++        "tgbot"
++      ]
++    },
++    {
++      "platform": "youtube",
++      "method": "yt-desc",
++      "name": "Ссылка на памятку в описании видео",
++      "previous": [
++        "site",
++        "vk"
++      ],
++      "targets": {
++        "none": "not-applicable",
++        "site": "conditional",
++        "vk": "conditional",
++        "vkshop": "conditional",
++        "tg": "conditional",
++        "market": "conditional",
++        "donut": "conditional",
++        "tgbot": "conditional",
++        "rutube": "not-applicable"
++      },
++      "added": [
++        "vkshop",
++        "tg",
++        "market",
++        "donut",
++        "tgbot"
++      ]
++    },
++    {
++      "platform": "youtube",
++      "method": "yt-blogger",
++      "name": "Интеграция у блогера на YouTube",
++      "previous": [
++        "site",
++        "vk"
++      ],
++      "targets": {
++        "none": "not-applicable",
++        "site": "conditional",
++        "vk": "conditional",
++        "vkshop": "conditional",
++        "tg": "conditional",
++        "market": "conditional",
++        "donut": "conditional",
++        "tgbot": "conditional",
++        "rutube": "not-applicable"
++      },
++      "added": [
++        "vkshop",
++        "tg",
++        "market",
++        "donut",
++        "tgbot"
++      ]
++    },
++    {
++      "platform": "youtube",
++      "method": "yt-move",
++      "name": "Разместить копии видео в VK Видео и на Rutube",
++      "previous": [
++        "vk",
++        "rutube"
++      ],
++      "targets": {
++        "none": "not-applicable",
++        "site": "not-applicable",
++        "vk": "conditional",
++        "vkshop": "not-applicable",
++        "tg": "not-applicable",
++        "market": "not-applicable",
++        "donut": "not-applicable",
++        "tgbot": "not-applicable",
++        "rutube": "conditional"
++      },
++      "added": []
++    },
++    {
++      "platform": "youtube",
++      "method": "book-yt-tg",
++      "name": "Ссылка на свой Telegram-канал",
++      "previous": [
++        "tg"
++      ],
++      "targets": {
++        "none": "not-applicable",
++        "site": "not-applicable",
++        "vk": "not-applicable",
++        "vkshop": "not-applicable",
++        "tg": "conditional",
++        "market": "not-applicable",
++        "donut": "not-applicable",
++        "tgbot": "not-applicable",
++        "rutube": "not-applicable"
++      },
++      "added": []
++    },
++    {
++      "platform": "youtube",
++      "method": "yt-vpn",
++      "name": "Реклама VPN и средств доступа к ограниченным ресурсам",
++      "previous": [],
++      "targets": {
++        "none": "terminal",
++        "site": "terminal",
++        "vk": "terminal",
++        "vkshop": "terminal",
++        "tg": "terminal",
++        "market": "terminal",
++        "donut": "terminal",
++        "tgbot": "terminal",
++        "rutube": "terminal"
++      },
++      "added": []
++    },
++    {
++      "platform": "rutube",
++      "method": "rt-expert",
++      "name": "Экспертные видео и статьи",
++      "previous": [
++        "site",
++        "vk"
++      ],
++      "targets": {
++        "none": "conditional",
++        "site": "conditional",
++        "vk": "conditional",
++        "vkshop": "conditional",
++        "tg": "conditional",
++        "market": "conditional",
++        "donut": "conditional",
++        "tgbot": "conditional",
++        "rutube": "not-applicable"
++      },
++      "added": [
++        "none",
++        "vkshop",
++        "tg",
++        "market",
++        "donut",
++        "tgbot"
++      ]
++    },
++    {
++      "platform": "rutube",
++      "method": "rt-desc",
++      "name": "Видео или статья со ссылкой на памятку",
++      "previous": [
++        "site",
++        "vkshop"
++      ],
++      "targets": {
++        "none": "not-applicable",
++        "site": "conditional",
++        "vk": "conditional",
++        "vkshop": "conditional",
++        "tg": "conditional",
++        "market": "conditional",
++        "donut": "conditional",
++        "tgbot": "conditional",
++        "rutube": "not-applicable"
++      },
++      "added": [
++        "vk",
++        "tg",
++        "market",
++        "donut",
++        "tgbot"
++      ]
++    },
++    {
++      "platform": "rutube",
++      "method": "dzen-promo",
++      "name": "Продвижение статьи в Дзене",
++      "previous": [
++        "site",
++        "vkshop"
++      ],
++      "targets": {
++        "none": "not-applicable",
++        "site": "conditional",
++        "vk": "conditional",
++        "vkshop": "conditional",
++        "tg": "conditional",
++        "market": "conditional",
++        "donut": "conditional",
++        "tgbot": "conditional",
++        "rutube": "not-applicable"
++      },
++      "added": [
++        "vk",
++        "tg",
++        "market",
++        "donut",
++        "tgbot"
++      ]
++    },
++    {
++      "platform": "rutube",
++      "method": "rt-blogger",
++      "name": "Интеграция у блогера на Rutube или в Дзене",
++      "previous": [
++        "site",
++        "vk"
++      ],
++      "targets": {
++        "none": "not-applicable",
++        "site": "conditional",
++        "vk": "conditional",
++        "vkshop": "conditional",
++        "tg": "conditional",
++        "market": "conditional",
++        "donut": "conditional",
++        "tgbot": "conditional",
++        "rutube": "not-applicable"
++      },
++      "added": [
++        "vkshop",
++        "tg",
++        "market",
++        "donut",
++        "tgbot"
++      ]
++    },
++    {
++      "platform": "tiktok",
++      "method": "tt-expert",
++      "name": "Экспертные ролики",
++      "previous": [
++        "site",
++        "vk"
++      ],
++      "targets": {
++        "none": "conditional",
++        "site": "conditional",
++        "vk": "conditional",
++        "vkshop": "conditional",
++        "tg": "conditional",
++        "market": "conditional",
++        "donut": "conditional",
++        "tgbot": "conditional",
++        "rutube": "not-applicable"
++      },
++      "added": [
++        "none",
++        "vkshop",
++        "tg",
++        "market",
++        "donut",
++        "tgbot"
++      ]
++    },
++    {
++      "platform": "tiktok",
++      "method": "tt-bio",
++      "name": "Ссылка в профиле",
++      "previous": [
++        "site",
++        "vk"
++      ],
++      "targets": {
++        "none": "conditional",
++        "site": "conditional",
++        "vk": "conditional",
++        "vkshop": "conditional",
++        "tg": "conditional",
++        "market": "conditional",
++        "donut": "conditional",
++        "tgbot": "conditional",
++        "rutube": "not-applicable"
++      },
++      "added": [
++        "none",
++        "vkshop",
++        "tg",
++        "market",
++        "donut",
++        "tgbot"
++      ]
++    },
++    {
++      "platform": "tiktok",
++      "method": "tt-dm",
++      "name": "Ответ в личные сообщения",
++      "previous": [
++        "site",
++        "vk"
++      ],
++      "targets": {
++        "none": "conditional",
++        "site": "conditional",
++        "vk": "conditional",
++        "vkshop": "conditional",
++        "tg": "conditional",
++        "market": "conditional",
++        "donut": "conditional",
++        "tgbot": "conditional",
++        "rutube": "not-applicable"
++      },
++      "added": [
++        "none",
++        "vkshop",
++        "tg",
++        "market",
++        "donut",
++        "tgbot"
++      ]
++    },
++    {
++      "platform": "tiktok",
++      "method": "tt-video",
++      "name": "Ролик о памятке со ссылкой",
++      "previous": [
++        "site",
++        "vk"
++      ],
++      "targets": {
++        "none": "not-applicable",
++        "site": "conditional",
++        "vk": "conditional",
++        "vkshop": "conditional",
++        "tg": "conditional",
++        "market": "conditional",
++        "donut": "conditional",
++        "tgbot": "conditional",
++        "rutube": "not-applicable"
++      },
++      "added": [
++        "vkshop",
++        "tg",
++        "market",
++        "donut",
++        "tgbot"
++      ]
++    },
++    {
++      "platform": "tiktok",
++      "method": "tt-blogger",
++      "name": "Интеграция у блогера",
++      "previous": [
++        "site",
++        "vk"
++      ],
++      "targets": {
++        "none": "not-applicable",
++        "site": "conditional",
++        "vk": "conditional",
++        "vkshop": "conditional",
++        "tg": "conditional",
++        "market": "conditional",
++        "donut": "conditional",
++        "tgbot": "conditional",
++        "rutube": "not-applicable"
++      },
++      "added": [
++        "vkshop",
++        "tg",
++        "market",
++        "donut",
++        "tgbot"
++      ]
++    },
++    {
++      "platform": "tiktok",
++      "method": "tt-move",
++      "name": "Разместить копии роликов в VK и на Rutube",
++      "previous": [
++        "vk",
++        "rutube"
++      ],
++      "targets": {
++        "none": "not-applicable",
++        "site": "not-applicable",
++        "vk": "conditional",
++        "vkshop": "not-applicable",
++        "tg": "not-applicable",
++        "market": "not-applicable",
++        "donut": "not-applicable",
++        "tgbot": "not-applicable",
++        "rutube": "conditional"
++      },
++      "added": []
++    },
++    {
++      "platform": "tiktok",
++      "method": "book-tt-tg",
++      "name": "Ссылка на Telegram-канал в профиле",
++      "previous": [
++        "tg"
++      ],
++      "targets": {
++        "none": "not-applicable",
++        "site": "not-applicable",
++        "vk": "not-applicable",
++        "vkshop": "not-applicable",
++        "tg": "conditional",
++        "market": "not-applicable",
++        "donut": "not-applicable",
++        "tgbot": "not-applicable",
++        "rutube": "not-applicable"
++      },
++      "added": []
++    },
++    {
++      "platform": "tiktok",
++      "method": "tt-ads",
++      "name": "TikTok Ads через иностранный аккаунт",
++      "previous": [],
++      "targets": {
++        "none": "terminal",
++        "site": "terminal",
++        "vk": "terminal",
++        "vkshop": "terminal",
++        "tg": "terminal",
++        "market": "terminal",
++        "donut": "terminal",
++        "tgbot": "terminal",
++        "rutube": "terminal"
++      },
++      "added": []
++    },
++    {
++      "platform": "tiktok",
++      "method": "tt-vpn",
++      "name": "Реклама VPN и средств доступа к ограниченным ресурсам",
++      "previous": [],
++      "targets": {
++        "none": "terminal",
++        "site": "terminal",
++        "vk": "terminal",
++        "vkshop": "terminal",
++        "tg": "terminal",
++        "market": "terminal",
++        "donut": "terminal",
++        "tgbot": "terminal",
++        "rutube": "terminal"
++      },
++      "added": []
++    },
++    {
++      "platform": "bloggers",
++      "method": "bl-paid",
++      "name": "Платная интеграция по договору",
++      "previous": [
++        "site",
++        "vk",
++        "vkshop",
++        "market"
++      ],
++      "targets": {
++        "none": "not-applicable",
++        "site": "conditional",
++        "vk": "conditional",
++        "vkshop": "conditional",
++        "tg": "conditional",
++        "market": "conditional",
++        "donut": "conditional",
++        "tgbot": "conditional",
++        "rutube": "not-applicable"
++      },
++      "added": [
++        "tg",
++        "donut",
++        "tgbot"
++      ]
++    },
++    {
++      "platform": "bloggers",
++      "method": "bl-gift",
++      "name": "Подарить памятку без условий",
++      "previous": [
++        "site",
++        "vk"
++      ],
++      "targets": {
++        "none": "terminal",
++        "site": "terminal",
++        "vk": "terminal",
++        "vkshop": "terminal",
++        "tg": "terminal",
++        "market": "terminal",
++        "donut": "terminal",
++        "tgbot": "terminal",
++        "rutube": "terminal"
++      },
++      "added": []
++    },
++    {
++      "platform": "bloggers",
++      "method": "bl-barter",
++      "name": "Бартер: памятка за публикацию",
++      "previous": [
++        "site",
++        "vk",
++        "vkshop",
++        "market"
++      ],
++      "targets": {
++        "none": "not-applicable",
++        "site": "conditional",
++        "vk": "conditional",
++        "vkshop": "conditional",
++        "tg": "conditional",
++        "market": "conditional",
++        "donut": "conditional",
++        "tgbot": "conditional",
++        "rutube": "not-applicable"
++      },
++      "added": [
++        "tg",
++        "donut",
++        "tgbot"
++      ]
++    },
++    {
++      "platform": "bloggers",
++      "method": "bl-partner",
++      "name": "Партнёрская ссылка с процентом",
++      "previous": [
++        "site",
++        "vkshop",
++        "market"
++      ],
++      "targets": {
++        "none": "not-applicable",
++        "site": "conditional",
++        "vk": "conditional",
++        "vkshop": "conditional",
++        "tg": "conditional",
++        "market": "conditional",
++        "donut": "conditional",
++        "tgbot": "conditional",
++        "rutube": "not-applicable"
++      },
++      "added": [
++        "vk",
++        "tg",
++        "donut",
++        "tgbot"
++      ]
++    },
++    {
++      "platform": "bloggers",
++      "method": "bl-mutual",
++      "name": "Взаимный пиар с другим автором",
++      "previous": [
++        "site",
++        "vk"
++      ],
++      "targets": {
++        "none": "not-applicable",
++        "site": "conditional",
++        "vk": "conditional",
++        "vkshop": "conditional",
++        "tg": "conditional",
++        "market": "conditional",
++        "donut": "conditional",
++        "tgbot": "conditional",
++        "rutube": "not-applicable"
++      },
++      "added": [
++        "vkshop",
++        "tg",
++        "market",
++        "donut",
++        "tgbot"
++      ]
++    },
++    {
++      "platform": "bloggers",
++      "method": "bl-doctor",
++      "name": "Врач-блогер рекламирует памятку как врач",
++      "previous": [],
++      "targets": {
++        "none": "terminal",
++        "site": "terminal",
++        "vk": "terminal",
++        "vkshop": "terminal",
++        "tg": "terminal",
++        "market": "terminal",
++        "donut": "terminal",
++        "tgbot": "terminal",
++        "rutube": "terminal"
++      },
++      "added": []
++    },
++    {
++      "platform": "bloggers",
++      "method": "bl-banned",
++      "name": "Блогер в Instagram, без реестра или иноагент",
++      "previous": [],
++      "targets": {
++        "none": "terminal",
++        "site": "terminal",
++        "vk": "terminal",
++        "vkshop": "terminal",
++        "tg": "terminal",
++        "market": "terminal",
++        "donut": "terminal",
++        "tgbot": "terminal",
++        "rutube": "terminal"
++      },
++      "added": []
++    },
++    {
++      "platform": "direct",
++      "method": "dir-search",
++      "name": "Реклама в поиске",
++      "previous": [
++        "site",
++        "market"
++      ],
++      "targets": {
++        "none": "not-applicable",
++        "site": "conditional",
++        "vk": "conditional",
++        "vkshop": "conditional",
++        "tg": "conditional",
++        "market": "conditional",
++        "donut": "conditional",
++        "tgbot": "conditional",
++        "rutube": "not-applicable"
++      },
++      "added": [
++        "vk",
++        "vkshop",
++        "tg",
++        "donut",
++        "tgbot"
++      ]
++    },
++    {
++      "platform": "direct",
++      "method": "dir-rsya",
++      "name": "Баннеры в Рекламной сети Яндекса",
++      "previous": [
++        "site",
++        "vk",
++        "market"
++      ],
++      "targets": {
++        "none": "not-applicable",
++        "site": "conditional",
++        "vk": "conditional",
++        "vkshop": "conditional",
++        "tg": "conditional",
++        "market": "conditional",
++        "donut": "conditional",
++        "tgbot": "conditional",
++        "rutube": "not-applicable"
++      },
++      "added": [
++        "vkshop",
++        "tg",
++        "donut",
++        "tgbot"
++      ]
++    },
++    {
++      "platform": "direct",
++      "method": "dir-retarget",
++      "name": "Ретаргетинг: контакты или посетители сайта",
++      "previous": [
++        "site",
++        "market"
++      ],
++      "targets": {
++        "none": "not-applicable",
++        "site": "conditional",
++        "vk": "conditional",
++        "vkshop": "conditional",
++        "tg": "conditional",
++        "market": "conditional",
++        "donut": "conditional",
++        "tgbot": "conditional",
++        "rutube": "not-applicable"
++      },
++      "added": [
++        "vk",
++        "vkshop",
++        "tg",
++        "donut",
++        "tgbot"
++      ]
++    },
++    {
++      "platform": "direct",
++      "method": "dir-tg",
++      "name": "Посты в Telegram-каналах через Директ",
++      "previous": [
++        "site"
++      ],
++      "targets": {
++        "none": "not-applicable",
++        "site": "conditional",
++        "vk": "conditional",
++        "vkshop": "conditional",
++        "tg": "conditional",
++        "market": "conditional",
++        "donut": "conditional",
++        "tgbot": "conditional",
++        "rutube": "not-applicable"
++      },
++      "added": [
++        "vk",
++        "vkshop",
++        "tg",
++        "market",
++        "donut",
++        "tgbot"
++      ]
++    },
++    {
++      "platform": "direct",
++      "method": "dir-med",
++      "name": "Объявление с медицинским обещанием",
++      "previous": [],
++      "targets": {
++        "none": "terminal",
++        "site": "terminal",
++        "vk": "terminal",
++        "vkshop": "terminal",
++        "tg": "terminal",
++        "market": "terminal",
++        "donut": "terminal",
++        "tgbot": "terminal",
++        "rutube": "terminal"
++      },
++      "added": []
++    },
++    {
++      "platform": "site",
++      "method": "book-site-page",
++      "name": "Страница материала",
++      "previous": [
++        "site",
++        "market"
++      ],
++      "targets": {
++        "none": "conditional",
++        "site": "conditional",
++        "vk": "conditional",
++        "vkshop": "conditional",
++        "tg": "conditional",
++        "market": "conditional",
++        "donut": "conditional",
++        "tgbot": "conditional",
++        "rutube": "not-applicable"
++      },
++      "added": [
++        "none",
++        "vk",
++        "vkshop",
++        "tg",
++        "donut",
++        "tgbot"
++      ]
++    },
++    {
++      "platform": "site",
++      "method": "book-site-article",
++      "name": "Статья в блоге",
++      "previous": [
++        "site",
++        "market"
++      ],
++      "targets": {
++        "none": "conditional",
++        "site": "conditional",
++        "vk": "conditional",
++        "vkshop": "conditional",
++        "tg": "conditional",
++        "market": "conditional",
++        "donut": "conditional",
++        "tgbot": "conditional",
++        "rutube": "not-applicable"
++      },
++      "added": [
++        "none",
++        "vk",
++        "vkshop",
++        "tg",
++        "donut",
++        "tgbot"
++      ]
++    },
++    {
++      "platform": "site",
++      "method": "book-site-email",
++      "name": "Письмо по своей базе",
++      "previous": [
++        "site",
++        "market"
++      ],
++      "targets": {
++        "none": "not-applicable",
++        "site": "conditional",
++        "vk": "conditional",
++        "vkshop": "conditional",
++        "tg": "conditional",
++        "market": "conditional",
++        "donut": "conditional",
++        "tgbot": "conditional",
++        "rutube": "not-applicable"
++      },
++      "added": [
++        "vk",
++        "vkshop",
++        "tg",
++        "donut",
++        "tgbot"
++      ]
++    },
++    {
++      "platform": "site",
++      "method": "book-site-sample",
++      "name": "Бесплатный фрагмент",
++      "previous": [
++        "site",
++        "market"
++      ],
++      "targets": {
++        "none": "conditional",
++        "site": "conditional",
++        "vk": "conditional",
++        "vkshop": "conditional",
++        "tg": "conditional",
++        "market": "conditional",
++        "donut": "conditional",
++        "tgbot": "conditional",
++        "rutube": "not-applicable"
++      },
++      "added": [
++        "none",
++        "vk",
++        "vkshop",
++        "tg",
++        "donut",
++        "tgbot"
++      ]
++    },
++    {
++      "platform": "book-market",
++      "method": "book-market-card",
++      "name": "Обычная карточка",
++      "previous": [
++        "market"
++      ],
++      "targets": {
++        "none": "not-applicable",
++        "site": "not-applicable",
++        "vk": "not-applicable",
++        "vkshop": "not-applicable",
++        "tg": "not-applicable",
++        "market": "conditional",
++        "donut": "not-applicable",
++        "tgbot": "not-applicable",
++        "rutube": "not-applicable"
++      },
++      "added": []
++    },
++    {
++      "platform": "book-market",
++      "method": "book-market-ads",
++      "name": "Внутреннее продвижение",
++      "previous": [
++        "market"
++      ],
++      "targets": {
++        "none": "not-applicable",
++        "site": "not-applicable",
++        "vk": "not-applicable",
++        "vkshop": "not-applicable",
++        "tg": "not-applicable",
++        "market": "conditional",
++        "donut": "not-applicable",
++        "tgbot": "not-applicable",
++        "rutube": "not-applicable"
++      },
++      "added": []
++    }
++  ]
++}
+diff --git a/dist/checks/route_matrix.test.js b/dist/checks/route_matrix.test.js
+new file mode 100644
+index 0000000..06614a1
+--- /dev/null
++++ b/dist/checks/route_matrix.test.js
+@@ -0,0 +1,54 @@
++const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
++const root=__dirname+'/../',c={window:{}};
++const load=f=>vm.runInNewContext(fs.readFileSync(root+f,'utf8'),c);
++load('data.js');const before=JSON.parse(JSON.stringify(c.window.SCHEMA));
++load('route-matrix.js');load('book-ui.js');load('card-help.js');
++const D=c.window.SCHEMA, page=fs.readFileSync(root+'index.html','utf8');
++for(const id of Object.keys(before.start).filter(x=>x!=='book'))assert.equal(JSON.stringify(D.start[id]),JSON.stringify(before.start[id]),id);
++assert.equal(D.routeMatrix.rows.length,64);
++assert.equal(JSON.stringify(D.places),JSON.stringify(before.places),'Shared destinations for other goals changed');
++const S={goal:'book',format:'file',scope:'promotion',salePlace:'site',form:D.forms[0].id,sample:false,publisher:'vk',path:[]};
++const esc=s=>String(s).replace(/[&<>"]/g,x=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[x]));
++Object.assign(c,{D,S,esc,saveBar:()=>'',list:xs=>'<ul>'+xs.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul>'});
++c.bookUI=c.window.BookUI.create({D,S,esc,curForm:()=>D.forms.find(f=>f.id===S.form),saveBar:()=>''});
++vm.runInNewContext(page.slice(page.indexOf('const place ='),page.indexOf('\nfunction card(')),c);
++vm.runInNewContext(page.slice(page.indexOf('function cardDetails('),page.indexOf('\nfunction cardLiability')),c);
++vm.runInNewContext(page.slice(page.indexOf('function curForm()'),page.indexOf('\nfunction redPanel(')),c);
++vm.runInNewContext(page.slice(page.indexOf('function summaryParts()'),page.indexOf('/* Скачивание файла:')),c);
++const chain=()=>vm.runInNewContext('chain()',c);
++let cases=0,routeCount=0,terminal=0;
++for(const a of D.start.book)for(const b of a.children||[]){
++ const old=before.start.book.find(x=>x.id===a.id).children.find(x=>x.id===b.id);
++ assert.equal(b.risk,old.risk);assert.equal(JSON.stringify(b.fines),JSON.stringify(old.fines));
++ assert(c.window.CardHelp.get(b).examples.length===2,b.id);
++ const row=D.routeMatrix.rows.find(x=>x.method===b.id);
++ assert.equal(row.destinations.length,9);assert(new Set(row.destinations.map(x=>x.id)).size===9);
++ if(b.why||b.uncommitted)terminal++;else routeCount+=b.dest.length;
++ for(const format of ['file','print'])for(const form of D.forms)for(const sample of [false,true])for(const publisher of a.id==='bloggers'?['',...D.bookPublishers.map(x=>x.id)]:['vk'])for(const k of D.routeMatrix.targets){
++   Object.assign(S,{format,form:form.id,sample,path:[a.id,b.id,k],publisher});
++   const nodes=chain(),issue=c.bookUI.publicationIssue(a,b);
++   const applies=!b.why&&!b.uncommitted&&!issue&&b.dest.includes(k);
++   assert.equal(nodes.length,applies?3:2,[a.id,b.id,k].join('/'));
++   const result=c.summaryParts();
++   assert(!/undefined|NaN/.test(JSON.stringify(result)),b.id+'/'+k);
++   if(applies){
++     const p=nodes[2];c.testNodes=nodes;
++     const html=vm.runInNewContext('finalPanel(testNodes[1],testNodes[2],testNodes[0].name)',c);
++     assert(!/undefined|NaN/.test(html),b.id+'/'+k);
++     assert(!/undefined|NaN/.test(vm.runInNewContext('cardDetails(testNodes[2])',c)),b.id+'/'+k);
++     const noOrder=c.bookUI.nonPurchase(b,p)||b.transfer||b.republish||c.bookUI.incompatible(p)||c.bookUI.verification(p,b);
++     if(noOrder)assert(!result.blocks.some(x=>x[0]==='Путь до оформления заказа'),b.id+'/'+k);
++     assert(result.blocks.some(x=>x[0]==='Действия выбранного маршрута'||x[0]==='Можно'),b.id+'/'+k);
++   }else assert(!result.blocks.some(x=>x[0]==='Путь до оформления заказа'),b.id+'/'+k);
++   cases++;
++ }
++}
++const find=id=>D.start.book.flatMap(p=>p.children||[]).find(b=>b.id===id);
++for(const id of ['dm','tg-reply','vk-reply','tt-dm'])for(const k of ['none','site','vkshop','market','tgbot'])assert(find(id).dest.includes(k),id+'/'+k);
++for(const id of ['yt-move','tt-move'])assert.deepEqual(Array.from(find(id).dest),['vk','rutube']);
++assert.deepEqual(Array.from(find('vk-shop').dest),['vkshop']);
++assert.deepEqual(Array.from(find('book-market-card').dest),['market']);
++assert.equal(D.routeMatrix.rows.reduce((n,r)=>n+r.destinations.length,0),576);
++assert(page.indexOf('src="route-matrix.js"')>page.indexOf('src="data.js"'));
++assert(page.indexOf('src="route-matrix.js"')<page.indexOf('src="book-ui.js"'));
++console.log(JSON.stringify({methods:64,cells:576,potentialEndings:routeCount,terminalMethods:terminal,checkedStateCombinations:cases}));
+diff --git a/dist/route-matrix.js b/dist/route-matrix.js
+new file mode 100644
+index 0000000..5a5df46
+--- /dev/null
++++ b/dist/route-matrix.js
+@@ -0,0 +1,65 @@
++/* Полнота окончаний первой цели. Это карта сценариев, не разрешение размещения. */
++(function () {
++  const D = window.SCHEMA;
++  const targets = ['none','site','vk','vkshop','tg','market','donut','tgbot','rutube'];
++  const offers = ['site','vk','vkshop','tg','market','donut','tgbot'];
++  const informational = new Set(['author','bio','source','dm','tg-expert','tg-reply','vk-expert','vk-reply','yt-expert','rt-expert','tt-expert','tt-bio','tt-dm','book-site-page','book-site-article','book-site-sample']);
++  const external = new Set(['tg-post','tg-posev','vk-post','vk-mail','vk-ads','vk-adblogger','vk-posev','yt-desc','yt-blogger','rt-desc','dzen-promo','rt-blogger','tt-video','tt-blogger','bl-paid','bl-barter','bl-partner','bl-mutual','dir-search','dir-rsya','dir-retarget','dir-tg','book-site-email']);
++  const fixed = {
++    'tglink':['tg'], 'tg-move':['vk'], 'vk-tg':['tg'], 'book-yt-tg':['tg'], 'book-tt-tg':['tg'],
++    'yt-move':['vk','rutube'], 'tt-move':['vk','rutube'],
++    'vk-shop':['vkshop'], 'vk-donut':['donut'], 'book-market-card':['market'], 'book-market-ads':['market'],
++    'tg-bot':['tgbot','site'], 'tg-ads':['tg','tgbot','site'],
++    'tg-promo':['none','site','vkshop','market'], 'vk-promo':['none','site','vkshop','market']
++  };
++  const conditions = {
++    none:'Без перехода к покупке: ответ, полезная публикация или условия розыгрыша имеют самостоятельный результат.',
++    site:'Описание и условия на сайте должны соответствовать публикации. Оцените рекламный характер конкретного материала.',
++    vk:'Это переход в сообщество, а не подтверждённая покупка. Место заказа выбирается отдельно.',
++    tg:'Это переход в канал, а не подтверждённая покупка. Риск рекламы в Telegram сохраняется.',
++    vkshop:'Проверьте конкретную карточку и формат. Для цифрового файла правила каталога пока не подтверждены.',
++    market:'Выберите конкретный сервис, карточку и поддерживаемый формат материала. Для файла маршрут остаётся условным.',
++    donut:'Это подписной доступ к материалам. Печатный экземпляр через эту модель не предлагается; условия сервиса требуют проверки.',
++    tgbot:'Проверьте правила Telegram и содержание предложения. Для цифровых продаж внутри бота применяются правила Stars; оформление заказа проверяется отдельно.',
++    rutube:'Публикация копии ролика. Переход аудитории и покупка этим не подтверждаются.'
++  };
++  D.bookPlaces.none = {
++    name:'Без перехода к покупке',risk:'g',short:'Ответить на вопрос или дать полезную информацию без ссылки на заказ.',
++    details:'Не каждый вопрос или полезная публикация должен вести к покупке. Например: читатель спрашивает, какие темы разобраны, а автор отвечает списком тем. Рекламный характер и условия исходного сообщения всё равно оцениваются отдельно.',
++    can:['Завершить ответ или публикацию без предложения покупки'],cannot:['Считать любой личный ответ разрешением на последующую рекламную рассылку'],check:[],fines:[]
++  };
++  for (const [id,title] of [['vk','Свое сообщество в VK'],['tg','Свой канал в Telegram']]) {
++    const p=D.bookPlaces[id];p.name=title;p.short='Переход к информации в '+(id==='vk'?'сообществе':'канале')+'. Место заказа проверяется отдельно.';
++  }
++  D.bookPlaces.tgbot.name='Предложение материала в Telegram-боте';
++  const rows=[];
++  for(const a of D.start.book) for(const b of a.children||[]) {
++    const previous=(b.dest||[]).slice();
++    const rename=t=>t.replace(/Печатная книга/g,'Печатные материалы').replace(/печатная книга/g,'печатные материалы').replace(/печатной книги/g,'печатных материалов').replace(/печатную книгу/g,'печатные материалы').replace(/о книге/g,'о материале').replace(/книги/g,'материала').replace(/книгу/g,'материал');
++    a.short=rename(a.short);
++    b.name=rename(b.name); b.short=rename(b.short);
++    if(a.nextTitle) a.nextTitle=rename(a.nextTitle);
++    if(b.id==='tg-expert') b.name='Экспертная публикация в канале';
++    if(b.id==='tg-reply') b.short='Ответьте по существу вопроса; ссылка на предложение нужна не всегда.';
++    if(b.id==='bl-mutual') b.details='Оцените каждую встречную публикацию по содержанию, оформлению и фактической договорённости. Обмен рекламными размещениями без денежной оплаты не освобождает от рекламных обязанностей. Если конкретный материал признан рекламой, проверьте допустимость площадки, применимость включения страницы в перечень РКН, маркировку и учёт. Обычное экспертное сотрудничество нельзя автоматически приравнивать к рекламе.';
++    if(b.id==='bl-mutual') b.here.can=['Согласовать содержание и даты встречных публикаций','Для каждой рекламной публикации определить маркировку и учёт'];
++    if(b.id==='bl-partner') b.here.cannot=b.here.cannot.map(x=>x==='Выплаты физлицу без статуса без удержания налога'?'Выплачивать вознаграждение без проверки обязанностей плательщика и статуса получателя':x);
++    if(b.id==='bl-partner') b.here.can=b.here.can.map(x=>x==='Отдельный erid под каждого партнёра'?'Определить erid и учёт для фактического креатива и цепочки размещения':x);
++    if(b.id==='tg-reply') b.here.can[1]='При необходимости дать ссылку на выбранное предложение после проверки его условий';
++    if(b.id==='dir-search') b.here.can=b.here.can.map(x=>x==='Ведёт на страницу памятки на сайте'?'Выбрать подходящую страницу предложения и проверить поддержку ссылки':x);
++    if(b.id==='book-site-sample') b.here.can=b.here.can.map(x=>x==='Дать понятный переход к предложению полной версии'?'При необходимости дать понятный переход к предложению полной версии':x);
++    const terminal=!!(b.why||b.uncommitted);
++    if(!terminal && !fixed[b.id] && !informational.has(b.id) && !external.has(b.id)) throw new Error('Не разобран способ первой цели: '+b.id);
++    if(!terminal) b.dest=fixed[b.id] ? fixed[b.id].slice() : (informational.has(b.id)?['none',...offers]:offers.slice());
++    const allowed=terminal?[]:b.dest;
++    if (['tt-video','tt-blogger'].includes(b.id)) b.publicationPlatform='tiktok';
++    b.routeFormatCheck = /^(dir-|vk-ads|vk-adblogger|dzen-promo)/.test(b.id) ? allowed.filter(k=>!previous.includes(k) && k !== 'none') : [];
++    b.routeConditions={};
++    for(const k of allowed) b.routeConditions[k]=conditions[k]+(b.republish?' Копия должна пройти отдельную оценку содержания на новой площадке.':'')+(/^(dir-|vk-ads|vk-adblogger|dzen-promo|tg-ads)/.test(b.id)?' Подтвердите поддержку такой ссылки выбранным рекламным форматом.':'');
++    rows.push({platform:a.id,method:b.id,name:b.name,previous,destinations:targets.map(k=>({id:k,state:allowed.includes(k)?'conditional':terminal?'terminal':'not-applicable',reason:allowed.includes(k)?b.routeConditions[k]:terminal?(b.uncommitted?'Подарок не гарантирует публикацию или переход.':b.review?'Модель требует отдельной проверки; готовое продолжение не подтверждено.':'Предупреждающий маршрут сохраняет запрет; окончание не делает его допустимым.'):'Узкий сценарий: '+(b.republish?'размещение копии':b.transfer?'переход в указанный канал':'действие внутри выбранного сервиса')+'. Для другого действия выберите соответствующий способ.'}))});
++  }
++  D.routeMatrix={date:'25.11.2026',targets,rows,scope:'Полнота сценариев первой цели; условные переходы не являются правовым разрешением.'};
++  D.review.date='25.11.2026';
++  D.review.status='Рабочая версия · v9';
++  D.review.scope='Сверена матрица окончаний 64 способов первой цели. Добавлены отсутствующие переходы и результат без покупки; переход в канал отделён от заказа. Условия сервисов и спорные правовые вопросы остаются открытыми.';
++})();
