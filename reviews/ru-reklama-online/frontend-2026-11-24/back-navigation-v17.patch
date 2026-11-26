@@ -1,0 +1,197 @@
+diff --git a/dist/checks/stage_navigation.test.js b/dist/checks/stage_navigation.test.js
+index 65bb34c..4fcadbd 100644
+--- a/dist/checks/stage_navigation.test.js
++++ b/dist/checks/stage_navigation.test.js
+@@ -1,14 +1,13 @@
+ const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
+-const html=fs.readFileSync(__dirname+'/../index.html','utf8');
+-const calls=[];
+-const heading={setAttribute(){},focus(){calls.push('focus')}};
+-const selected={getBoundingClientRect:()=>({top:520}),offsetHeight:80};
+-const choices={querySelector:()=>selected,getBoundingClientRect:()=>({top:200}),scrollTop:100,clientHeight:240,scrollTo:o=>calls.push(o.top)};
+-const stage={querySelector:q=>q==='.board-choices'?choices:heading,classList:{add:()=>calls.push('highlight')}};
+-const c={S:{scope:'promotion'},window:{matchMedia:()=>({matches:true})},document:{getElementById:()=>stage,querySelectorAll:()=>[]},motion:{scrollToElement:()=>calls.push('page')},reduce:true};
++const html=fs.readFileSync(__dirname+'/../index.html','utf8'),calls=[];
++const list={scrollTop:210,scrollLeft:0,closest:()=>({id:'step-1'})};
++const stage={querySelector:()=>list};
++const c={S:{scope:'promotion',path:['instagram','author','site'],form:'ip',goal:'book',format:'file',sample:true},window:{scrollX:0,scrollY:350,scrollTo:o=>calls.push(['position',o.top])},document:{getElementById:()=>stage,querySelectorAll:()=>[list],querySelector:()=>({focus:o=>calls.push(['focus',o.preventScroll])})},motion:{scrollToElement:()=>calls.push('advance'),cancelScroll:()=>calls.push('cancel')},render:()=>{calls.push('render');list.scrollTop=0;}};
+ vm.runInNewContext(html.slice(html.indexOf('function scrollToStep('),html.indexOf("document.addEventListener('click'")),c);
+-c.scrollToStep(2);assert.deepEqual(calls,[],'Automatic desktop selection must stay still');
+-c.scrollToStep(2,true);assert.deepEqual(calls,['page',340,'highlight','focus'],'Explicit breadcrumb must navigate, reveal selected card, and focus stage');
+-calls.length=0;c.window.matchMedia=()=>({matches:false});c.scrollToStep(2);assert.deepEqual(calls,['page'],'Mobile automatic navigation remains available');
+-calls.length=0;c.document.getElementById=()=>null;c.scrollToStep(2,true);assert.deepEqual(calls,[],'Missing stages are harmless');
+-console.log('Stage navigation: explicit desktop transitions reveal selection; automatic desktop and mobile behavior preserved.');
++c.scrollToStep(2);assert.deepEqual(calls,['advance'],'Choosing a card advances on desktop as well');
++calls.length=0;c.returnToChoice(2);assert.equal(c.S.path.join('/'),'instagram/author');assert.equal(list.scrollTop,210);assert.deepEqual(calls,['cancel','render',['position',350],['focus',true]],'Back restores viewport and list position without scrolling to a stage');
++assert.equal(c.S.form,'ip');assert.equal(c.S.goal,'book');assert.equal(c.S.format,'file');assert.equal(c.S.sample,true);
++c.returnToChoice(1);assert.equal(c.S.path.join('/'),'instagram','Platform remains selected, later selections are removed');
++c.S.path=['telegram','tg-reply','site'];c.returnToChoice(3);assert.equal(c.S.path.join('/'),'telegram/tg-reply/site');
++calls.length=0;c.document.getElementById=()=>null;c.scrollToStep(9);assert.deepEqual(calls,[]);
++console.log('Navigation: card choices advance; breadcrumb rolls back only later choices, preserves settings and viewport, and cancels pending animation.');
+diff --git a/dist/index.html b/dist/index.html
+index 4777a99..81b0784 100644
+--- a/dist/index.html
++++ b/dist/index.html
+@@ -199,7 +199,7 @@ dialog::backdrop{background:rgba(20,21,34,.45)}
+ <template id="scope-help"><p><b>Продвижение</b> — как человек узнаёт о предложении и приходит к нему: публикации, реклама, рекомендации и переходы между площадками.</p><p><b>Продажа</b> — что человек видит в месте продажи: страница товара, карточка или предложение в боте. Здесь проверяем рекламный характер, содержание и необходимые сведения.</p><p>Выдача материалов, доставка и оказание услуг относятся к сопровождению онлайн-бизнеса.</p></template>
+ 
+ <template id="sample-help"><p>Это часть материала, с которой человек может ознакомиться до покупки: например, две страницы памятки или одна таблица из гайда.</p><p>Включите флажок, если предлагаете такой фрагмент в выбранной связке. Если сразу предлагаете полную версию, оставьте его выключенным. В маршрутах, где фрагмент уже выбран как способ знакомства, флажок включается автоматически.</p><p>Получение фрагмента и согласие на рекламную рассылку — отдельные действия.</p></template>
+-<template id="navigation-help"><p>Схема помогает проверить, как вы рассказываете о своём продукте, куда ведёте читателя и какие рекламные требования нужно учесть. Она подходит для материалов, курсов, консультаций и других онлайн-проектов.</p><p>Выберите статус, цель и нужный раздел: «Продвижение» или «Продажу». Для текстовых материалов укажите формат и, при необходимости, бесплатный фрагмент.</p><ol><li><b>Площадка.</b> Выберите, где человек впервые видит материал.</li><li><b>Как вы рассказываете о материале.</b> Выберите конкретный способ: например, ответ на входящий вопрос или публикацию со ссылкой.</li><li><b>Чем заканчивается связка.</b> Выберите место, куда приходит читатель. Кнопка «Посмотреть итог» открывает разбор собранного маршрута.</li></ol><p>На ПК три этапа расположены рядом. Чтобы вернуться к этапу, нажмите его кнопку в полосе «Ваша связка». Чтобы собрать другой маршрут, выберите площадку в первой колонке: следующие шаги обновятся, а настройки сохранятся.</p><p>«Обычные варианты» и «Рискованные и запрещённые» открываются в отдельных вкладках браузера. В каждой сохраняется свой выбранный маршрут.</p><p>Цветная полоса показывает оценку риска, а фиолетовая рамка с галочкой — выбранную карточку. Кнопка «?» у карточки открывает пояснение с примерами, «Ответственность» — отдельный разбор ответственности.</p><p>Условия конкретной публикации нужно проверить даже для обычных вариантов. Примеры о здоровье требуют отдельной проверки объекта рекламы: книга, услуга, лекарство или БАД. Оформление и выполнение заказа относятся к сопровождению онлайн-бизнеса.</p></template>
++<template id="navigation-help"><p>Схема помогает проверить, как вы рассказываете о своём продукте, куда ведёте читателя и какие рекламные требования нужно учесть. Она подходит для материалов, курсов, консультаций и других онлайн-проектов.</p><p>Выберите статус, цель и нужный раздел: «Продвижение» или «Продажу». Для текстовых материалов укажите формат и, при необходимости, бесплатный фрагмент.</p><ol><li><b>Площадка.</b> Выберите, где человек впервые видит материал.</li><li><b>Как вы рассказываете о материале.</b> Выберите конкретный способ: например, ответ на входящий вопрос или публикацию со ссылкой.</li><li><b>Чем заканчивается связка.</b> Выберите место, куда приходит читатель. Кнопка «Посмотреть итог» открывает разбор собранного маршрута.</li></ol><p>На ПК три этапа расположены рядом. Чтобы вернуться к своему выбору на этапе и отменить последующие шаги, нажмите его кнопку в полосе «Ваша связка». Чтобы собрать другой маршрут, выберите площадку в первой колонке: следующие шаги обновятся, а настройки сохранятся.</p><p>«Обычные варианты» и «Рискованные и запрещённые» открываются в отдельных вкладках браузера. В каждой сохраняется свой выбранный маршрут.</p><p>Цветная полоса показывает оценку риска, а фиолетовая рамка с галочкой — выбранную карточку. Кнопка «?» у карточки открывает пояснение с примерами, «Ответственность» — отдельный разбор ответственности.</p><p>Условия конкретной публикации нужно проверить даже для обычных вариантов. Примеры о здоровье требуют отдельной проверки объекта рекламы: книга, услуга, лекарство или БАД. Оформление и выполнение заказа относятся к сопровождению онлайн-бизнеса.</p></template>
+ 
+ <footer>
+ <details class="version-note"><summary>Рабочая версия · 26.11.2026 · v16 · навигация по этапам и единая справка</summary><p>Обновлены общие пояснения и первая цель. Другие девять целей сохранены и ждут последовательной проверки. Статус готовности маршрута не подтверждается одним цветом карточки.</p><p><a href="TASKS.md">Задачи и нерешённые вопросы</a> · <a href="LEGAL_REVIEW_2026-11-24.md">Результаты дополнительной сверки</a></p></details>
+@@ -598,24 +598,24 @@ function changeScope(next) {
+   S.scope=next;render();
+ }
+ 
+-function scrollToStep(num, explicit = false) {
+-  if (!explicit && S.scope === 'promotion' && window.matchMedia('(min-width: 1050px)').matches) return;
++function scrollToStep(num) {
+   if (num === 4 && S.scope === 'promotion') num = 3;
+-  const el = num === 0 ? document.getElementById('steps') : document.getElementById('step-' + num);
+-  if (!el) return;
+-  motion.scrollToElement(el);
+-  if (explicit) {
+-    const choices = el.querySelector('.board-choices');
+-    const selected = choices?.querySelector('.opt.sel');
+-    if (selected) {
+-      const delta = selected.getBoundingClientRect().top - choices.getBoundingClientRect().top;
+-      choices.scrollTo({top:choices.scrollTop + delta - (choices.clientHeight - selected.offsetHeight)/2, behavior:reduce?'auto':'smooth'});
+-    }
+-    document.querySelectorAll('.stage-target').forEach(stage=>stage.classList.remove('stage-target'));
+-    el.classList.add('stage-target');
+-    const heading = el.querySelector('h2,h3');
+-    if(heading){heading.setAttribute('tabindex','-1');heading.focus({preventScroll:true});}
++  const el = document.getElementById('step-' + num);
++  if (el) motion.scrollToElement(el);
++}
++
++function returnToChoice(num) {
++  motion.cancelScroll();
++  const position = {left:window.scrollX, top:window.scrollY};
++  const lists = [...document.querySelectorAll('.board-choices')].map(el=>({id:el.closest('.step').id, top:el.scrollTop, left:el.scrollLeft}));
++  if (num > 0) S.path = S.path.slice(0, num);
++  render();
++  for (const saved of lists) {
++    const list = document.getElementById(saved.id)?.querySelector('.board-choices');
++    if(list){list.scrollTop=saved.top;list.scrollLeft=saved.left;}
+   }
++  window.scrollTo({...position, behavior:'instant'});
++  document.querySelector('[data-step-nav="' + num + '"]')?.focus({preventScroll:true});
+ }
+ 
+ document.addEventListener('click', (e) => {
+@@ -632,7 +632,7 @@ document.addEventListener('click', (e) => {
+     return;
+   }
+   const nav = e.target.closest('[data-step-nav]');
+-  if (nav) { scrollToStep(+nav.dataset.stepNav, true); document.getElementById('st-' + nav.dataset.stepNav)?.focus({preventScroll:true}); return; }
++  if (nav) { returnToChoice(+nav.dataset.stepNav); return; }
+   if (e.target.closest('[data-risk-options]')) { openRiskOptions(); return; }
+   const riskPick = e.target.closest('[data-risk-pick]');
+   if (riskPick) {
+diff --git a/dist/risk.html b/dist/risk.html
+index 630e8d7..e08039b 100644
+--- a/dist/risk.html
++++ b/dist/risk.html
+@@ -199,7 +199,7 @@ dialog::backdrop{background:rgba(20,21,34,.45)}
+ <template id="scope-help"><p><b>Продвижение</b> — как человек узнаёт о предложении и приходит к нему: публикации, реклама, рекомендации и переходы между площадками.</p><p><b>Продажа</b> — что человек видит в месте продажи: страница товара, карточка или предложение в боте. Здесь проверяем рекламный характер, содержание и необходимые сведения.</p><p>Выдача материалов, доставка и оказание услуг относятся к сопровождению онлайн-бизнеса.</p></template>
+ 
+ <template id="sample-help"><p>Это часть материала, с которой человек может ознакомиться до покупки: например, две страницы памятки или одна таблица из гайда.</p><p>Включите флажок, если предлагаете такой фрагмент в выбранной связке. Если сразу предлагаете полную версию, оставьте его выключенным. В маршрутах, где фрагмент уже выбран как способ знакомства, флажок включается автоматически.</p><p>Получение фрагмента и согласие на рекламную рассылку — отдельные действия.</p></template>
+-<template id="navigation-help"><p>Схема помогает проверить, как вы рассказываете о своём продукте, куда ведёте читателя и какие рекламные требования нужно учесть. Она подходит для материалов, курсов, консультаций и других онлайн-проектов.</p><p>Выберите статус, цель и нужный раздел: «Продвижение» или «Продажу». Для текстовых материалов укажите формат и, при необходимости, бесплатный фрагмент.</p><ol><li><b>Площадка.</b> Выберите, где человек впервые видит материал.</li><li><b>Как вы рассказываете о материале.</b> Выберите конкретный способ: например, ответ на входящий вопрос или публикацию со ссылкой.</li><li><b>Чем заканчивается связка.</b> Выберите место, куда приходит читатель. Кнопка «Посмотреть итог» открывает разбор собранного маршрута.</li></ol><p>На ПК три этапа расположены рядом. Чтобы вернуться к этапу, нажмите его кнопку в полосе «Ваша связка». Чтобы собрать другой маршрут, выберите площадку в первой колонке: следующие шаги обновятся, а настройки сохранятся.</p><p>«Обычные варианты» и «Рискованные и запрещённые» открываются в отдельных вкладках браузера. В каждой сохраняется свой выбранный маршрут.</p><p>Цветная полоса показывает оценку риска, а фиолетовая рамка с галочкой — выбранную карточку. Кнопка «?» у карточки открывает пояснение с примерами, «Ответственность» — отдельный разбор ответственности.</p><p>Условия конкретной публикации нужно проверить даже для обычных вариантов. Примеры о здоровье требуют отдельной проверки объекта рекламы: книга, услуга, лекарство или БАД. Оформление и выполнение заказа относятся к сопровождению онлайн-бизнеса.</p></template>
++<template id="navigation-help"><p>Схема помогает проверить, как вы рассказываете о своём продукте, куда ведёте читателя и какие рекламные требования нужно учесть. Она подходит для материалов, курсов, консультаций и других онлайн-проектов.</p><p>Выберите статус, цель и нужный раздел: «Продвижение» или «Продажу». Для текстовых материалов укажите формат и, при необходимости, бесплатный фрагмент.</p><ol><li><b>Площадка.</b> Выберите, где человек впервые видит материал.</li><li><b>Как вы рассказываете о материале.</b> Выберите конкретный способ: например, ответ на входящий вопрос или публикацию со ссылкой.</li><li><b>Чем заканчивается связка.</b> Выберите место, куда приходит читатель. Кнопка «Посмотреть итог» открывает разбор собранного маршрута.</li></ol><p>На ПК три этапа расположены рядом. Чтобы вернуться к своему выбору на этапе и отменить последующие шаги, нажмите его кнопку в полосе «Ваша связка». Чтобы собрать другой маршрут, выберите площадку в первой колонке: следующие шаги обновятся, а настройки сохранятся.</p><p>«Обычные варианты» и «Рискованные и запрещённые» открываются в отдельных вкладках браузера. В каждой сохраняется свой выбранный маршрут.</p><p>Цветная полоса показывает оценку риска, а фиолетовая рамка с галочкой — выбранную карточку. Кнопка «?» у карточки открывает пояснение с примерами, «Ответственность» — отдельный разбор ответственности.</p><p>Условия конкретной публикации нужно проверить даже для обычных вариантов. Примеры о здоровье требуют отдельной проверки объекта рекламы: книга, услуга, лекарство или БАД. Оформление и выполнение заказа относятся к сопровождению онлайн-бизнеса.</p></template>
+ 
+ <footer>
+ <details class="version-note"><summary>Рабочая версия · 26.11.2026 · v16 · навигация по этапам и единая справка</summary><p>Обновлены общие пояснения и первая цель. Другие девять целей сохранены и ждут последовательной проверки. Статус готовности маршрута не подтверждается одним цветом карточки.</p><p><a href="TASKS.md">Задачи и нерешённые вопросы</a> · <a href="LEGAL_REVIEW_2026-11-24.md">Результаты дополнительной сверки</a></p></details>
+@@ -598,24 +598,24 @@ function changeScope(next) {
+   S.scope=next;render();
+ }
+ 
+-function scrollToStep(num, explicit = false) {
+-  if (!explicit && S.scope === 'promotion' && window.matchMedia('(min-width: 1050px)').matches) return;
++function scrollToStep(num) {
+   if (num === 4 && S.scope === 'promotion') num = 3;
+-  const el = num === 0 ? document.getElementById('steps') : document.getElementById('step-' + num);
+-  if (!el) return;
+-  motion.scrollToElement(el);
+-  if (explicit) {
+-    const choices = el.querySelector('.board-choices');
+-    const selected = choices?.querySelector('.opt.sel');
+-    if (selected) {
+-      const delta = selected.getBoundingClientRect().top - choices.getBoundingClientRect().top;
+-      choices.scrollTo({top:choices.scrollTop + delta - (choices.clientHeight - selected.offsetHeight)/2, behavior:reduce?'auto':'smooth'});
+-    }
+-    document.querySelectorAll('.stage-target').forEach(stage=>stage.classList.remove('stage-target'));
+-    el.classList.add('stage-target');
+-    const heading = el.querySelector('h2,h3');
+-    if(heading){heading.setAttribute('tabindex','-1');heading.focus({preventScroll:true});}
++  const el = document.getElementById('step-' + num);
++  if (el) motion.scrollToElement(el);
++}
++
++function returnToChoice(num) {
++  motion.cancelScroll();
++  const position = {left:window.scrollX, top:window.scrollY};
++  const lists = [...document.querySelectorAll('.board-choices')].map(el=>({id:el.closest('.step').id, top:el.scrollTop, left:el.scrollLeft}));
++  if (num > 0) S.path = S.path.slice(0, num);
++  render();
++  for (const saved of lists) {
++    const list = document.getElementById(saved.id)?.querySelector('.board-choices');
++    if(list){list.scrollTop=saved.top;list.scrollLeft=saved.left;}
+   }
++  window.scrollTo({...position, behavior:'instant'});
++  document.querySelector('[data-step-nav="' + num + '"]')?.focus({preventScroll:true});
+ }
+ 
+ document.addEventListener('click', (e) => {
+@@ -632,7 +632,7 @@ document.addEventListener('click', (e) => {
+     return;
+   }
+   const nav = e.target.closest('[data-step-nav]');
+-  if (nav) { scrollToStep(+nav.dataset.stepNav, true); document.getElementById('st-' + nav.dataset.stepNav)?.focus({preventScroll:true}); return; }
++  if (nav) { returnToChoice(+nav.dataset.stepNav); return; }
+   if (e.target.closest('[data-risk-options]')) { openRiskOptions(); return; }
+   const riskPick = e.target.closest('[data-risk-pick]');
+   if (riskPick) {
+diff --git a/dist/version.json b/dist/version.json
+index 16dabb8..6be6beb 100644
+--- a/dist/version.json
++++ b/dist/version.json
+@@ -1,6 +1,6 @@
+ {
+-  "version": "2026-11-26-working-v16-navigation-help",
+-  "status": "Рабочая версия: переходы по этапам, вкладки и единая справка",
++  "version": "2026-11-26-working-v17-back-navigation",
++  "status": "Рабочая версия: откат связки по кнопке этапа без прокрутки",
+   "base_repository": "9479797/ru-legal-online",
+   "base_commit": "60bf80361bd757522656631eb45ddb19cc1cee88",
+   "old_book_links_preserved": 56,
+@@ -37,13 +37,13 @@
+     "frontend-motion.js": "0c335a2b8709541b5bd92fb2a8f69b2da72ab4ad5a2faed8637c1f8a2561ee32",
+     "frontend.css": "8ab72bf25b378274dc25206032f898df55721e961d77da42b906e53ffa98e673",
+     "goal1-copy.js": "7b880404e80f57782f493f2a43b29604fc5351d81e8ea66aa2f74e21e1285cd2",
+-    "index.html": "e43cafb5bcbe90bc39558faf335113e8038b9903fc3aadf8c68b8143a462e871",
++    "index.html": "06f863102b4d174a20f0892fa5882b8dc843622ec882b81ecd4082356794bd65",
+     "markirovka.html": "dd6154817dcbdd9b27bc5d8ae46c9a53efcb2f58888ed338f7df39baaccfd59b",
+     "markirovka.js": "9328d94e80e0a2b695722134c7cb6c0e52cd20b55685b51c1736c7c3cee8cc0d",
+-    "risk.html": "201bfbba7e5f45aa6fa5d98402ee747bda57a84825e6021e63ae9badb55f1db3",
++    "risk.html": "c40dadb4d78b24718af812276486431ddfd317b4684e33a77891a7169c3a28da",
+     "route-matrix.js": "65acedc3049e8f5bd85b0f8b470cf8424aaef84622157e31f7e917b36beebd82",
+     "settings-layout.js": "1613c4c6772338063b21f62addb8be0916affb907686c035c9d61d8eb3f7285e",
+-    "checks/stage_navigation.test.js": "d296394eff6a5c050ba618c3c77b74f04daf429109670cb6b1eb9b039757a546"
++    "checks/stage_navigation.test.js": "a6ec2049d2bca5477ee9a0b3b7fc66828e4029d2bc6f486f0c61b535f10fede9"
+   },
+   "canonical_main_modified": false,
+   "backup_location": "reviews/ru-reklama-online/site-audit-2026-11-23/ in pravka/reklama-audit-checkpoint-2026-11",
+@@ -139,7 +139,8 @@
+   "browser_qa": "Not performed: browser auto-review rejected preview due to usage limit. Source and automated checks completed.",
+   "desktop_settings_single_row": true,
+   "desktop_settings_direction": "row",
+-  "stage_navigation": true,
++  "stage_navigation": "rollback-without-scroll",
+   "route_links_new_tabs": true,
+-  "sample_inline_help": true
++  "sample_inline_help": true,
++  "card_selection_scroll": true
+ }
