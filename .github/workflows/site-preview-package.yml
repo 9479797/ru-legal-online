@@ -1,0 +1,32 @@
+name: Site preview package
+on:
+  push:
+    branches:
+      - 'site/tiktok-funnels-2026-11-28'
+  pull_request:
+    branches:
+      - main
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify website data
+        run: node scripts/proverka_skhemy.js
+      - name: Package offline website
+        run: |
+          test -f site/index.html
+          test -f site/risk.html
+          test -f site/youtube-funnels.js
+          test -f site/data.js
+          cd site
+          zip -q -r ../reklama-site-v20.4-2026-11-28.zip . -x '*.DS_Store'
+      - name: Upload site package
+        uses: actions/upload-artifact@v4
+        with:
+          name: reklama-site-v20.4
+          path: reklama-site-v20.4-2026-11-28.zip
+          if-no-files-found: error
+          retention-days: 30
