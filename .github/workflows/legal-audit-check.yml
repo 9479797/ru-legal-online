@@ -47,6 +47,7 @@ jobs:
           node site/checks/goal1_copy.test.js
           node site/checks/desktop_board.test.js
           node site/checks/route_mode.test.js
+          node site/checks/stage_navigation.test.js
       - name: Compile Python test scripts
         run: python3 -m py_compile scripts/proverka.py scripts/proverka_brauzer.py scripts/sravnit_tekst.py scripts/proverka_kontrolnyh_summ.py scripts/test_proverka_kontrolnyh_summ.py
       - name: Verify registered normative text checksums
