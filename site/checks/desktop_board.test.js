@@ -1,6 +1,6 @@
 const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
 const root=__dirname+'/../',c={window:{}};
-for(const f of ['data.js','instagram-legal.js','youtube-funnels.js','telegram-funnels.js','route-matrix.js','desktop-board.js'])vm.runInNewContext(fs.readFileSync(root+f,'utf8'),c);
+for(const f of ['data.js','instagram-legal.js','youtube-funnels.js','telegram-funnels.js','p0-legal-review.js','route-matrix.js','desktop-board.js'])vm.runInNewContext(fs.readFileSync(root+f,'utf8'),c);
 const D=c.window.SCHEMA,B=c.window.DesktopBoard;
 const pairs=ps=>ps.flatMap(p=>p.children?p.children.map(n=>p.id+'/'+n.id):[p.id]);
 let total=0;
