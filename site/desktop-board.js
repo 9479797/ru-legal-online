@@ -53,7 +53,7 @@
      if(title){title.setAttribute('aria-label',title.textContent);title.textContent=titles[i];}
      const choices=stage.querySelector(':scope > .row:has(> .opt)');
      if(choices){choices.classList.add('board-choices');choices.setAttribute('aria-label','Варианты: '+titles[i]);}
-     if(i===2&&!choices&&!stage.classList.contains('board-empty')){
+     if(i===2&&!choices&&!stage.classList.contains('board-empty')&&!stage.querySelector('.ig-codeword-flow')){
        const original=document.createElement('div');original.id='board-terminal';original.hidden=true;
        [...stage.children].filter(x=>!x.classList.contains('sh')).forEach(x=>original.append(x));
        const titleText=title?.getAttribute('aria-label')||'Разбор выбранного действия';
