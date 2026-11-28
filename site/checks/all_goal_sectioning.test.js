@@ -57,12 +57,11 @@ assert.equal(total,400,'Нарушена полнота маршрутов по�
 assert.equal(D.routeMatrix.rows.length,86,'Первая цель вернулась к старой версии');
 assert.equal(ig,8,'Информация о собственных товарах покрыта не во всех целях');
 assert(vkHigh>0,'Нет проверки рискованных креативов VK');
-for(const page of ['index.html','risk.html']){
-  const content=fs.readFileSync(dir+page,'utf8');
-  assert(content.includes("desktop-board.js"),page+' нет фильтра');
-  assert(content.includes('document.body.dataset.routeMode, S.goal'),page+' нет цели при распределении');
-  assert(content.includes('Площадка разрешена · риск отдельного объявления'),page+' нет оговорки о доступной площадке');
-  for(const [,s] of content.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/g))
-    new vm.Script(s,{filename:page});
-}
+const page='index.html',content=fs.readFileSync(dir+page,'utf8');
+assert(content.includes('desktop-board.js'),'Нет фильтра карточек');
+assert(content.includes("map(resolve), 'all', S.goal"),'Карточки не объединены');
+assert(!content.includes('id="route-mode"'),'Старый переключатель не удалён');
+for(const [,source] of content.matchAll(/<script(?:\\s[^>]*)?>([\\s\\S]*?)<\\/script>/g))
+  new vm.Script(source,{filename:page});
+assert(fs.readFileSync(dir+'risk.html','utf8').includes("window.location.replace('index.html')"),'Старый адрес рисков должен открывать общую схему');
 console.log('All goals: '+goals.length+', routes: '+total+', own Instagram: '+ig+', VK high-risk actions: '+vkHigh+', restricted resource groups: '+restricted+'. Partition OK.');
