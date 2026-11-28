@@ -56,6 +56,15 @@ for(const [goal,roots] of Object.entries(D.start)){
  combined+=all(roots).length;
 }
 assert.equal(combined,379,'All routes retained');
+load('book-ui.js');
+const state={goal:'book',scope:'promotion',format:'file',sample:false,salePlace:'site',publisher:'tiktok',path:[]};
+const ui=ctx.window.BookUI.create({D,S:state,esc:String,curForm:()=>D.forms[0],saveBar:()=>''});
+const ownTikTok=D.start.book.find(n=>n.id==='tiktok');
+const ownVideo=ownTikTok.children.find(n=>n.id==='tt-video');
+assert(!ui.publicationIssue(ownTikTok,ownVideo),'Ordinary/conditional TikTok route wrongly blocked');
+assert(ui.publicationNotice(ownTikTok,ownVideo).includes('TikTok'),'TikTok caution must remain visible');
+const blogger=D.start.book.find(n=>n.id==='bloggers');
+assert(ui.publicationIssue(blogger,blogger.children.find(n=>n.id==='bl-paid')),'Paid blogger TikTok placement must still be gated');
 const html=fs.readFileSync(root+'index.html','utf8');
 assert(html.indexOf('src="consult-legal.js"')<html.indexOf('src="tiktok-legal.js"'));
 assert(html.indexOf('src="tiktok-legal.js"')<html.indexOf('src="route-matrix.js"'));
