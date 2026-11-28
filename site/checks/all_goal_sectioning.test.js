@@ -1,68 +1,51 @@
-/* Аудит вкладок всех десяти целей: различаем площадку и конкретную публикацию.
-   Юридические статусы: справочная информация / рекламные ограничения / запрет. */
+/* Единая схема: все варианты 10 целей, красные → жёлтые → обычные.
+   Цвет площадки определяется её собственным статусом, а не отдельной карточкой. */
 const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
-const dir=__dirname+'/../',ctx={window:{}};
-for(const p of ['data.js','instagram-legal.js','consult-legal.js','route-matrix.js','desktop-board.js'])
-  vm.runInNewContext(fs.readFileSync(dir+p,'utf8'),ctx,{filename:p});
-const D=ctx.window.SCHEMA,B=ctx.window.DesktopBoard;
-const goals=Object.entries(D.start);
-assert.equal(goals.length,10,'Проверяйте все десять целей');
-let total=0,ig=0,vkHigh=0,restricted=0;
+const dir=__dirname+'/../',c={window:{}};
+for(const n of ['data.js','instagram-legal.js','consult-legal.js','route-matrix.js','desktop-board.js'])
+ vm.runInNewContext(fs.readFileSync(dir+n,'utf8'),c,{filename:n});
+const D=c.window.SCHEMA,B=c.window.DesktopBoard;
+const goals=Object.entries(D.start),ids=ps=>ps.flatMap(p=>p.children?p.children.map(n=>p.id+'/'+n.id):[p.id]);
+assert.equal(goals.length,10,'Должны быть все десять целей');
+let total=0,ig=0;
 for(const [goal,raw] of goals){
-  const ordinary=B.platforms(raw,'ordinary',goal),risky=B.platforms(raw,'risk',goal);
-  const names=xs=>xs.flatMap(p=>p.children?p.children.map(n=>p.id+'/'+n.id):[p.id]);
-  const a=names(raw),o=names(ordinary),r=names(risky);
-  assert.equal(new Set(a).size,a.length,goal+' повтор ID в исходнике');
-  assert.equal(new Set(o).size,o.length,goal+' повтор обычной карточки');
-  assert.equal(new Set(r).size,r.length,goal+' повтор рискованной карточки');
-  assert(!o.some(x=>r.includes(x)),goal+' карточка попала в две вкладки');
-  assert.equal(JSON.stringify([...o,...r].sort()),JSON.stringify(a.slice().sort()),goal+' потерян маршрут');
-  total+=a.length;
-  for(const p of risky){
-    if(p.id==='vk'){
-      assert(p.scenarioOnly,goal+' VK нельзя называть запрещённой площадкой');
-      assert(p.short.includes('разрешена'),goal+' нет пояснения VK');
-      assert.equal(p.risk,'g',goal+' нельзя повышать риск VK целиком');
-      for(const n of p.children)assert(n.risk==='r'||n.review,goal+' в риск VK перенесено законное действие');
-      vkHigh+=p.children.length;
-    }
-    if(['direct','rutube'].includes(p.id) && p.risk==='g')assert(p.scenarioOnly,goal+' разрешённая площадка показана как запрещённая');
-  }
-  const insta=raw.find(n=>n.id==='instagram');
-  if(insta){
-    const ia=ordinary.find(n=>n.id==='instagram'),ir=risky.find(n=>n.id==='instagram');
-    const all=insta.children||[];
-    assert.equal((ia?.children.length||0)+(ir?.children.length||0),all.length,goal+' потерял Instagram');
-    for(const n of ia?.children||[])assert(n.risk!=='r',goal+' запретная реклама в обычной вкладке Instagram');
-    for(const n of ir?.children||[])assert(n.risk==='r'||n.review,goal+' информация ошибочно запрещена в Instagram');
-    if(goal!=='adsell') {
-      ig++;
-      const own=ia.children.find(n=>n.instagramInfo);
-      assert(own && own.guide.examples.length===2,goal+' нет описания своего продукта');
-      assert(!own.fines.length,goal+' на справочной информации назначен штраф за рекламу');
-    }
-  }
-  for(const pid of ['youtube','tg','telegram','tiktok']){
-    const p=raw.find(n=>n.id===pid);if(!p)continue;
-    const one=ordinary.find(n=>n.id===pid),two=risky.find(n=>n.id===pid);
-    for(const n of p.children||[]){
-      if(n.risk==='g'&&goal!=='adsell')assert(one?.children?.some(x=>x.id===n.id),goal+' информационное действие '+n.id+' попало под запрет ресурса');
-      if(n.risk==='y')assert(two?.children?.some(x=>x.id===n.id),goal+' упущена проверка риска рекламного размещения '+n.id);
-      if(goal==='adsell')assert(two?.children?.some(x=>x.id===n.id),goal+' реклама на ограниченном ресурсе попала в обычные варианты');
-    }
-    restricted++;
-  }
+ const original=JSON.stringify(raw);
+ const unified=B.platforms(raw);
+ assert.equal(JSON.stringify(ids(unified).slice().sort()),JSON.stringify(ids(raw).slice().sort()),'Потеря варианта: '+goal);
+ assert.equal(ids(unified).length,ids(raw).length,'Дубликат: '+goal);
+ assert.equal(new Set(ids(unified)).size,ids(unified).length,'Повтор ID: '+goal);
+ assert.equal(JSON.stringify(raw),original,'Изменение исходных данных при сортировке: '+goal);
+ const rank=n=>B.riskRank(n);
+ const sorted=xs=>xs.every((v,i)=>!i||rank(xs[i-1])<=rank(v));
+ assert(sorted(unified),'Порядок площадок нарушен: '+goal);
+ for(const p of unified)if(p.children)assert(sorted(p.children),'Порядок способов: '+goal+'/'+p.id);
+ for(const p of raw){
+   const dest=p.children||[];
+   for(const n of dest){
+     if(n.risk==='r')assert(unified.find(x=>x.id===p.id).children.some(x=>x.id===n.id),'Потерян запрет: '+n.id);
+     if(n.risk==='y')assert(unified.find(x=>x.id===p.id).children.some(x=>x.id===n.id),'Потерян условный вариант: '+n.id);
+   }
+ }
+ const vk=unified.find(x=>x.id==='vk');
+ if(vk)assert.equal(vk.risk,'g','VK ошибочно объявлен запрещённой площадкой: '+goal);
+ const insta=unified.find(x=>x.id==='instagram');
+ if(insta&&goal!=='adsell'){
+   ig++;
+   assert(insta.children.some(n=>n.instagramInfo),'Нет информации о собственном продукте: '+goal);
+   assert(insta.children.some(n=>n.risk==='r'),'Нет запрещённой рекламы: '+goal);
+ }
+ total+=ids(raw).length;
 }
-assert.equal(total,379,'Нарушена полнота маршрутов после восстановления');
-assert.equal(D.routeMatrix.rows.length,65,'Первая цель вернулась к старой версии');
-assert.equal(ig,8,'Информация о собственных товарах покрыта не во всех целях');
-assert(vkHigh>0,'Нет проверки рискованных креативов VK');
-for(const page of ['index.html','risk.html']){
-  const content=fs.readFileSync(dir+page,'utf8');
-  assert(content.includes("desktop-board.js"),page+' нет фильтра');
-  assert(content.includes('document.body.dataset.routeMode, S.goal'),page+' нет цели при распределении');
-  assert(content.includes('Площадка разрешена · риск отдельного объявления'),page+' нет оговорки о доступной площадке');
-  for(const [,s] of content.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/g))
-    new vm.Script(s,{filename:page});
-}
-console.log('All goals: '+goals.length+', routes: '+total+', own Instagram: '+ig+', VK high-risk actions: '+vkHigh+', restricted resource groups: '+restricted+'. Partition OK.');
+assert.equal(total,379,'Должны сохраниться 379 вариантов');
+assert.equal(D.routeMatrix.rows.length,65,'Должны сохраниться 65 методов материалов');
+assert.equal(ig,8,'Информация Instagram должна быть в восьми целях');
+const html=fs.readFileSync(dir+'index.html','utf8');
+assert(!html.includes('id="route-mode"'),'Переключатель разделов не убран');
+assert(html.includes('data-route-mode="all"'),'Не включена единая схема');
+assert(html.includes('DesktopBoard.sortNodes(n.dest.map'),'Третий шаг не сортируется');
+assert(html.includes('childrenOf(a).map'),'Второй шаг не сортируется');
+assert(!html.includes('Красные карточки показаны сверху как более рискованные'),'Не добавлять запрещённую подпись');
+for(const [,script] of html.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/g))new vm.Script(script);
+const legacy=fs.readFileSync(dir+'risk.html','utf8');
+assert(legacy.includes("location.replace('index.html')"),'Старая ссылка должна вести в общую схему');
+console.log('Единая схема: '+goals.length+' целей, '+total+' вариантов, 65 книжных методов, порядок r/y/g на всех карточках; VK сохраняет собственный статус.');
