@@ -23,7 +23,7 @@ for(const [goal,starts] of Object.entries(D.start)) {
   assert.equal(p.risk,'y','Риск всей площадки: '+goal);
   const info=p.children.find(x=>x.id==='ig-info'||/-ig-info$/.test(x.id));
   assert(info&&info.risk==='y'&&info.dest.length,'Нет маршрута собственных сведений: '+goal);
-  assert(info.details.includes('Цена')||info.details.includes('цена'),'Нет цены в пояснении: '+goal);
+  assert(info.short.includes('цена'),'Нет цены в пояснении: '+goal);
   assert(!info.fines.length,'Автоматический штраф за информирование: '+goal);
   ordinary++;
   const red=p.children.filter(x=>x.risk==='r');
