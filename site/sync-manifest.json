@@ -52,21 +52,22 @@
     "version.json": "583a301f52e7b3598bdf52d2d34d3e2ab361282a811a2fc15c074942ac55362c"
   },
   "source_ref": "site/tiktok-funnels-2026-11-28",
-  "source_commit_before_manifest": "880ea4f12b6dede45cdc7d50c2accb3f4836608e",
+  "source_commit_before_manifest": "b388c3e300c2fd78293f9908ac5b414aebdd74d7",
   "previous_published_url_unverified": "https://reklama-frontend.gulfopt.chatgpt.site",
   "publish_status": "Рабочая v20.5 на согласовании, в main не объединена; внешний сайт не обновлялся",
   "drive_site_folder": "https://drive.google.com/drive/folders/10BkTBIjl9sIcI2GvyHU4arxgByXkQ8gp",
-  "drive_archive_file": null,
-  "drive_preview_file": null,
+  "drive_archive_file": "https://drive.google.com/file/d/17v5kbw0-wabKrJr38Sqz2ntb1JiNg0O0/view?usp=drivesdk",
+  "drive_preview_file": "https://drive.google.com/file/d/1fdl7JPRpj-f_Sr1DiBryk5ch7yBehrig/view?usp=drivesdk",
   "file_hash_algorithm": "SHA-256",
   "file_count": 47,
   "qa_status": {
-    "technical_regressions": "GitHub Actions test suite passed on code, verify latest workflow after this commit",
-    "browser": "GitHub Actions browser smoke checked for v20.5, verify latest workflow after this commit",
-    "file_checksums": "48 ZIP files, 47 SHA-256 checksums. Source-check mismatch corrected against byte-for-byte ZIP."
+    "technical_regressions": "GitHub Actions legal audit technical checks: completed/success (run 46160789574)",
+    "browser": "GitHub Actions browser and UI smoke tests: completed/success (run 46160789574)",
+    "file_checksums": "47 of 47 source SHA-256 matched; archive packaging verified"
   },
   "note": "Рабочая синхронизация проекта; внешняя публикация и merge в main не выполнялись",
   "drive_previous_archive": "https://drive.google.com/file/d/1UQi2RzGC1ISd83QX5-H-kBc8iIZnl_5T/view?usp=drivesdk",
   "drive_previous_preview": "https://drive.google.com/file/d/1aAxes9u2DLY3Dtl-BNjEqfVsHGFG1wT1/view?usp=drivesdk",
-  "drive_backup_status": "Ожидает загрузки рабочей v20.5; ссылки v20.4 оставлены как исторические"
+  "drive_backup_status": "Рабочие копии v20.5 загружены на Google Диск и идентификаторы файлов проверены",
+  "drive_markirovka_preview": "https://drive.google.com/file/d/1EJepG1pNllOfIpQWD7x9gD3T6a292GQq/view?usp=drivesdk"
 }
