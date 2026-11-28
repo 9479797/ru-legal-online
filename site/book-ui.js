@@ -24,7 +24,15 @@ window.BookUI = {
       if (!option || id === 'other') return {name:option?.name || 'Не выбрана', risk:'y', needsCheck:true, title:'Уточните площадку публикации', text:'Способ договорённости с блогером не определяет место размещения. Выберите площадку, прежде чем оценивать рекламный путь.'};
       if (id === 'site') return {name:option.name, risk:'g', text:'Это сайт блогера, а не собственный сайт продавца. Отдельно проверьте публикацию, рекламные обязанности и страницу предложения.'};
       const source = D.start.book.find(n => n.id === (id === 'dzen' ? 'rutube' : id));
-      return {name:option.name, risk:source.risk, text:source.details, blocked:id === 'instagram', needsCheck:id === 'tiktok', title:id === 'instagram' ? 'Рекламное размещение в Instagram запрещено' : 'Подтвердите текущую допустимость рекламы в TikTok'};
+      if (id === 'instagram') {
+        const plannedAd = ['bl-paid','bl-barter','bl-partner'].includes(b.id);
+        return {name:option.name,risk:'r',text:plannedAd
+          ? 'В этом маршруте заказано рекламное размещение у блогера. Реклама в Instagram запрещена, включая бартер и партнёрское продвижение.'
+          : 'Содержание публикации другого автора нужно проверить отдельно. Само упоминание товара не устанавливает рекламный характер, но рекламное размещение в Instagram запрещено.',
+          blocked:plannedAd,needsCheck:!plannedAd,
+          title:plannedAd ? 'Рекламное размещение в Instagram запрещено' : 'Проверьте публикацию блогера в Instagram'};
+      }
+      return {name:option.name, risk:source.risk, text:source.details, blocked:false, needsCheck:id === 'tiktok', title:id === 'tiktok' ? 'Подтвердите текущую допустимость рекламы в TikTok' : ''};
     }
     function publicationIssue(a, b) {
       if (b?.why || b?.uncommitted) return null;
