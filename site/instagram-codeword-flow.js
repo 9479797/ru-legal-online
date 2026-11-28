@@ -18,7 +18,7 @@
     }
   };
   function active(S,mode){
-    return !!S && mode==='risk' && S.scope==='promotion' && S.goal==='book'
+    return !!S && (mode==='all'||mode==='risk') && S.scope==='promotion' && S.goal==='book'
       && S.format==='file' && S.sample===true
       && S.path?.[0]==='instagram' && S.path?.[1]==='word';
   }
