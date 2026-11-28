@@ -2,7 +2,7 @@ const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/st
 const root=__dirname+'/../',c={window:{}};
 const load=f=>vm.runInNewContext(fs.readFileSync(root+f,'utf8'),c);
 load('data.js');load('instagram-legal.js');load('youtube-funnels.js');load('telegram-funnels.js');const before=JSON.parse(JSON.stringify(c.window.SCHEMA));
-load('route-matrix.js');load('book-ui.js');load('card-help.js');load('goal1-copy.js');
+load('route-matrix.js');load('book-ui.js');load('card-help.js');load('goal1-copy.js');load('desktop-board.js');
 const D=c.window.SCHEMA, page=fs.readFileSync(root+'index.html','utf8');
 for(const id of Object.keys(before.start).filter(x=>x!=='book'))assert.equal(JSON.stringify(D.start[id]),JSON.stringify(before.start[id]),id);
 assert.equal(D.routeMatrix.rows.length,86);
