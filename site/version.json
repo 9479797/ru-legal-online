@@ -1,6 +1,6 @@
 {
-  "version": "2026-11-28-working-v19-menu-icons",
-  "status": "Рабочая версия: меню вариантов в настройках, значки по центру",
+  "version": "2026-11-28-working-v20-same-tab",
+  "status": "Рабочая версия: разделы в одной вкладке с независимым сохранением маршрутов",
   "base_repository": "9479797/ru-legal-online",
   "base_commit": "60bf80361bd757522656631eb45ddb19cc1cee88",
   "old_book_links_preserved": 56,
@@ -37,13 +37,14 @@
     "frontend-motion.js": "0c335a2b8709541b5bd92fb2a8f69b2da72ab4ad5a2faed8637c1f8a2561ee32",
     "frontend.css": "f4b0cfbbe875403c33ffb758870353b7f4575d8bf821b4f3463fe3ad32875a61",
     "goal1-copy.js": "7b880404e80f57782f493f2a43b29604fc5351d81e8ea66aa2f74e21e1285cd2",
-    "index.html": "a6cc1b66665e23319e38143df07529aadd226c40368f41d5668ef1c01fc6a89d",
+    "index.html": "e40bc803c3101b1568ef842f0ba986b3187d50ff0475cc27eb2a20684dbd73a9",
     "markirovka.html": "dd6154817dcbdd9b27bc5d8ae46c9a53efcb2f58888ed338f7df39baaccfd59b",
     "markirovka.js": "9328d94e80e0a2b695722134c7cb6c0e52cd20b55685b51c1736c7c3cee8cc0d",
-    "risk.html": "867d950117f19c5161ff4cfe34c1ea01f8043ee52e1bc334af370a305f6204be",
+    "risk.html": "5fd147f88ea566cba70178ed777a5b64987b1ed36678a1f3d184cfee1b960f1c",
     "route-matrix.js": "65acedc3049e8f5bd85b0f8b470cf8424aaef84622157e31f7e917b36beebd82",
     "settings-layout.js": "1613c4c6772338063b21f62addb8be0916affb907686c035c9d61d8eb3f7285e",
-    "checks/stage_navigation.test.js": "a6ec2049d2bca5477ee9a0b3b7fc66828e4029d2bc6f486f0c61b535f10fede9"
+    "checks/stage_navigation.test.js": "a6ec2049d2bca5477ee9a0b3b7fc66828e4029d2bc6f486f0c61b535f10fede9",
+    "checks/route_mode.test.js": "51649fbeb103c5856f51cb4ddac975daf3ca08c320156eb768d3c155858b2565"
   },
   "canonical_main_modified": false,
   "backup_location": "reviews/ru-reklama-online/site-audit-2026-11-23/ in pravka/reklama-audit-checkpoint-2026-11",
@@ -140,7 +141,7 @@
   "desktop_settings_single_row": true,
   "desktop_settings_direction": "row",
   "stage_navigation": "rollback-without-scroll",
-  "route_links_new_tabs": true,
+  "route_links_new_tabs": false,
   "sample_inline_help": true,
   "card_selection_scroll": true
 }
