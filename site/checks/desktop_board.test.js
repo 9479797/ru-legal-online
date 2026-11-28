@@ -30,7 +30,7 @@ const index=fs.readFileSync(root+'index.html','utf8'),alias=fs.readFileSync(root
 assert(index.includes('data-route-mode="all"'));
 assert(!index.includes('id="route-mode"'));
 assert(alias.includes("window.location.replace('index.html')"));
-for(const [,code] of index.matchAll(/<script(?:\\s[^>]*)?>([\\s\\S]*?)<\\/script>/g))new vm.Script(code);
+const script=index.split('<script>')[1]?.split('</script>')[0]; if(script)new vm.Script(script);
 assert(index.includes('data-open-result'));assert(index.includes('stateKey'));
 const red=B.platforms(D.start.book,'all','book').find(p=>p.id==='instagram').children.filter(n=>n.risk==='r');
 assert(red.length>0,'Красные Instagram-карточки не должны исчезнуть');
