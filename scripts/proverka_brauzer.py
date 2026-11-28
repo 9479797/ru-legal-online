@@ -43,6 +43,27 @@ with sync_playwright() as p:
     pg.goto((SITE / "markirovka.html").as_uri()); pg.wait_for_timeout(200)
     for form in pg.eval_on_selector_all("#form option", "e=>e.map(x=>x.value)"):
         pg.select_option("#form", form)
+    # One pilot flow: risk tab → Instagram → codeword → free PDF → Telegram/site.
+    pg.goto((SITE / "risk.html").as_uri())
+    pg.evaluate("localStorage.removeItem('skhema-state-risk')")
+    pg.reload()
+    pg.select_option("#goal", "book")
+    pg.select_option("#format", "file")
+    pg.check("#sample")
+    pg.locator('[data-pick="0"][data-id="instagram"]').click()
+    pg.locator('[data-pick="1"][data-id="word"]').click()
+    assert pg.locator(".ig-codeword-flow").is_visible(), "Risk chain must be visible in column 3"
+    assert pg.locator(".ig-flow-node").count() == 4, "Four distinct stages required"
+    assert pg.locator('[data-ig-flow-dest="site"]').get_attribute("aria-pressed") == "true"
+    pg.locator('[data-ig-flow-dest="tg"]').click()
+    assert pg.locator('[data-ig-flow-dest="tg"]').get_attribute("aria-pressed") == "true"
+    assert "Telegram" in pg.locator(".ig-flow-node").last.inner_text()
+    pg.reload()
+    assert pg.locator('[data-ig-flow-dest="tg"]').get_attribute("aria-pressed") == "true", "Chosen destination must persist"
+    pg.evaluate("window.print=()=>{}")
+    pg.locator('#step-3 [data-save="print"]').click()
+    assert "Telegram" in pg.locator("#print").inner_text(), "Export must retain chosen destination"
+    assert "Instagram" in pg.locator("#print").inner_text(), "Export must retain originating platform"
     b.close()
 print("Ошибок в браузере нет." if not errs else "Ошибки:\n- " + "\n- ".join(errs))
 sys.exit(1 if errs else 0)
