@@ -1,6 +1,6 @@
 {
-  "version": "2026-11-28-working-v22-consult-review",
-  "status": "Рабочая редакция: первая цель консультации проверена по рекламной классификации, следующие цели ожидают проверки",
+  "version": "2026-11-28-working-v20.1-legal-patch",
+  "status": "Поправки к интерфейсу v20 на согласовании: Instagram, все вкладки и цель «Консультации»",
   "base_repository": "9479797/ru-legal-online",
   "base_commit": "60bf80361bd757522656631eb45ddb19cc1cee88",
   "old_book_links_preserved": 56,
@@ -137,7 +137,7 @@
   "palette_source_commit": "ce3ae10d2822a8a275c9c89891bba2f0fb435093",
   "risk_top_headers": true,
   "intrinsic_select_widths": true,
-  "browser_qa": "Not performed for v21; source-level routing and regression tests only.",
+  "browser_qa": "Not completed for v20.1; verified JS syntax, route partition and source-level regression checks.",
   "desktop_settings_single_row": true,
   "desktop_settings_direction": "row",
   "stage_navigation": "rollback-without-scroll",
@@ -160,5 +160,11 @@
     "other_goals_unchanged": true,
     "approved": false,
     "limitations": "Не проводилась полная медицинская правовая проверка и полноценный браузерный тест"
+  },
+  "derived_from": {
+    "site_version": "20",
+    "main_commit": "62d6ed5e4540f338bcb8dd6e874b6e5c6b6eb470",
+    "platform": "ChatGPT site",
+    "deployment_status": "Not deployed; changes are in working branch"
   }
 }
