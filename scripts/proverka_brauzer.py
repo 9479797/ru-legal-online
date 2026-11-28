@@ -17,7 +17,7 @@ with sync_playwright() as p:
     pg.route("**/fonts.g*/**", lambda r: r.abort())
     pg.on("pageerror", lambda e: errs.append(str(e)))
     pg.goto((SITE / "index.html").as_uri()); pg.evaluate("localStorage.clear()"); pg.reload(); pg.wait_for_timeout(300)
-    pg.evaluate("window.print=()=>{}")
+    pg.evaluate("window.__printCount=0; window.print=()=>{window.__printCount++}")
     for goal in pg.eval_on_selector_all("#goal option", "e=>e.map(x=>x.value)"):
         pg.select_option("#goal", goal)
         pg.click('[data-pick="0"]')
@@ -26,7 +26,14 @@ with sync_playwright() as p:
             kids[0].click()
             d = pg.query_selector('[data-pick="2"]')
             if d: d.click()
-        if pg.query_selector('[data-save="print"]'): pg.click('[data-save="print"]')
+        result = pg.locator('[data-open-result]:visible')
+        if result.count():
+            result.click()
+            assert pg.locator('dialog[open]').count() == 1
+            before = pg.evaluate("window.__printCount")
+            pg.click('dialog[open] [data-save="print"]')
+            pg.wait_for_function("window.__printCount > " + str(before))
+            pg.click('dialog[open] .x')
     for form in pg.eval_on_selector_all("#form option", "e=>e.map(x=>x.value)"):
         pg.select_option("#form", form)
         for tool in ["calendar", "compare"]:
