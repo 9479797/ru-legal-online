@@ -203,7 +203,7 @@ dialog::backdrop{background:rgba(20,21,34,.45)}
 <template id="navigation-help"><p>Схема помогает проверить, как вы рассказываете о своём продукте, куда ведёте читателя и какие рекламные требования нужно учесть. Она подходит для материалов, курсов, консультаций и других онлайн-проектов.</p><p>Выберите статус, цель и нужный раздел: «Продвижение» или «Продажу». Для текстовых материалов укажите формат и, при необходимости, бесплатный фрагмент.</p><ol><li><b>Площадка.</b> Выберите, где человек впервые видит материал.</li><li><b>Как вы рассказываете о материале.</b> Выберите конкретный способ: например, ответ на входящий вопрос или публикацию со ссылкой.</li><li><b>Чем заканчивается связка.</b> Выберите место, куда приходит читатель. Кнопка «Посмотреть итог» открывает разбор собранного маршрута.</li></ol><p>На ПК три этапа расположены рядом. Чтобы собрать другой маршрут, выберите площадку в первой колонке: следующие шаги обновятся, а настройки сохранятся.</p><p>Выберите «Обычные варианты» или «Рискованные и запрещённые» в меню «Варианты связки». Разделы переключаются в этой же вкладке. Выбор в каждом разделе сохраняется отдельно: при возвращении вы продолжите с прежнего этапа.</p><p>Цветная полоса показывает оценку риска, а фиолетовая рамка с галочкой — выбранную карточку. Кнопка «?» у карточки открывает пояснение с примерами, «Ответственность» — отдельный разбор ответственности.</p><p>Условия конкретной публикации нужно проверить даже для обычных вариантов. Примеры о здоровье требуют отдельной проверки объекта рекламы: книга, услуга, лекарство или БАД. Оформление и выполнение заказа относятся к сопровождению онлайн-бизнеса.</p></template>
 
 <footer>
-<details class="version-note"><summary>Рабочая версия · 26.11.2026 · v16 · навигация по этапам и единая справка</summary><p>Обновлены общие пояснения и первая цель. Другие девять целей сохранены и ждут последовательной проверки. Статус готовности маршрута не подтверждается одним цветом карточки.</p><p><a href="TASKS.md">Задачи и нерешённые вопросы</a> · <a href="LEGAL_REVIEW_2026-11-24.md">Результаты дополнительной сверки</a></p></details>
+<details class="version-note"><summary>Рабочая версия · 28.11.2026 · v20.1 · правки на основе сайта v20</summary><p>Сохранён интерфейс сайта v20, включая переключение разделов в той же вкладке и выбранные этапы. Проверено распределение вариантов по десяти целям; собственные сведения в Instagram отделены от запрещённой рекламы. Дополнительно пересмотрена цель консультаций. Полный правовой аудит остальных целей продолжается. Цвет карточки не является юридическим заключением.</p><p><a href="TASKS.md">Задачи и нерешённые вопросы</a> · <a href="LEGAL_REVIEW_2026-11-24.md">Результаты дополнительной сверки</a></p></details>
 <div class="foot">
 <div style="flex:1 1 340px;display:flex;flex-direction:column;gap:10px">
 <span class="tag" style="align-self:flex-start">Как пользоваться</span>
@@ -225,6 +225,8 @@ dialog::backdrop{background:rgba(20,21,34,.45)}
 <dialog id="dlg" aria-labelledby="dlg-t"></dialog>
 
 <script src="data.js"></script>
+<script src="instagram-legal.js"></script>
+<script src="consult-legal.js"></script>
 <script src="route-matrix.js"></script>
 <script src="book-ui.js"></script>
 <script src="card-help.js"></script>
@@ -288,7 +290,7 @@ const routePlace = (n, k) => {
   return p;
 };
 const resolve = (n) => (n.place ? place(n.place, n.id) : n);
-const level1 = () => window.DesktopBoard?.platforms((D.start[S.goal] || []).map(resolve), document.body.dataset.routeMode) || (D.start[S.goal] || []).map(resolve);
+const level1 = () => window.DesktopBoard?.platforms((D.start[S.goal] || []).map(resolve), document.body.dataset.routeMode, S.goal) || (D.start[S.goal] || []).map(resolve);
 const childrenOf = (n) => {
   if (S.goal === 'book' && n.dest && (n.uncommitted || bookUI.publicationIssue(level1().find(a => a.id === S.path[0]), n))) return null;
   return n.children ? n.children : n.dest ? n.dest.map((k) => routePlace(n, k)) : null;
@@ -310,14 +312,14 @@ function card(n, level, selected) {
   const sel = selected === n.id;
   return '<div class="opt ' + n.risk + (sel ? ' sel' : '') + '"' + (level===0?' data-brand="'+esc(n.id)+'"':'') + '>' +
     (sel ? '<div class="selection-label">✓ Шаг ' + (level + 1) + ' · Ваш выбор</div>' : '') +
-    '<div class="hd">' + ico(n.risk) + RL[n.risk] + '</div>' +
+    '<div class="hd">' + ico(n.risk) + (n.scenarioOnly ? (['vk','direct','rutube','site'].includes(n.id) ? 'Площадка разрешена · риск отдельного объявления' : 'Риск отдельных действий') : RL[n.risk]) + '</div>' +
     '<button class="bd" type="button" data-pick="' + level + '" data-id="' + esc(n.id) + '" aria-pressed="' + sel + '"><span class="t">' + esc(n.name) + (n.risk!=='g' ? '<span class="platform-risk '+n.risk+'">'+(n.risk==='r'?'Высокий риск':'Есть условия')+'</span>' : '') + '</span><span class="d">' + esc(n.short) + '</span></button>' +
     '<div class="ft"><button class="lnk" type="button" title="Подробнее: ' + esc(n.name) + '" data-more="' + level + '" data-id="' + esc(n.id) + '" aria-haspopup="dialog" aria-controls="dlg">Подробнее</button>' +
     '<button class="lnk" type="button" title="Ответственность: ' + esc(n.name) + '" data-fines="' + level + '" data-id="' + esc(n.id) + '">' + scale + 'Ответственность</button></div></div>';
 }
 
 function cardDetails(n) {
-  const h = window.CardHelp.get(n), g=n.guide;
+  const g=n.guide, h=n.instagramInfo && g ? Object.assign({editorial:true},g) : window.CardHelp.get(n);
   const paragraphs=(h.editorial ? [h.explanation] : [h.explanation,n.details]).filter((x,i,a)=>x&&a.indexOf(x)===i);
   let html='<div class="guide-copy"><h4>Что означает этот вариант</h4>'+paragraphs.map(x=>'<p>'+esc(x)+'</p>').join('');
   if(h.examples?.length) html+='<div class="guide-pair">'+h.examples.map(x=>'<section class="guide-example"><h4>'+esc(x.label)+'</h4><blockquote>'+esc(x.text)+'</blockquote><p><b>Что проверить:</b> '+esc(x.why)+'</p></section>').join('')+'</div>';
@@ -399,7 +401,7 @@ function finalPanel(link, p, from) {
     '<div class="big" style="background:var(--g)"><h3>Можно</h3>' + can + '</div>' +
     '<div class="big" style="background:var(--r)"><h3>Нельзя</h3>' + cannot + '</div>' +
     '<div class="big" style="background:var(--brand)"><h3>Ответственность ' + esc(who) + '</h3><p class="sub">Штрафы по КоАП для статуса «' + esc(curForm().name) + '». Сменить статус можно в поле «Как вы оформлены».</p>' + (S.goal === 'book' ? '<p class="sub">Рекламные составы ниже применяются, если конкретный материал признан рекламой и установлено соответствующее нарушение.' + (audienceOnly ? ' Публикация копии или перенос аудитории сами по себе не означают нарушения.' : '') + '</p>' : '') + formNote() + (fines.length ? fineRows(fines) : '<p class="sub">Для этого информационного сценария суммы автоматически не назначаются. Обязанности и последствия зависят от фактических действий.</p>') + '</div></div>' +
-    (audienceOnly ? '' : checkList(p)) + (S.goal === 'book' ? bookUI.outcome(link, p) + '<p><a class="winbtn" href="markirovka.html#publish-example">Пример рекламного поста и маркировки</a></p>' : '');
+    (audienceOnly ? '' : checkList(p)) + (S.goal === 'book' ? bookUI.outcome(link, p) + (platform?.id === 'instagram' ? '<p class="intro">Если исходное сообщение признано рекламой, его нельзя размещать в Instagram: маркировка запрет не отменяет.</p>' : '<p><a class="winbtn" href="markirovka.html#publish-example">Пример рекламного поста и маркировки</a></p>') : '');
 }
 
 function redPanel(link, siblings) {

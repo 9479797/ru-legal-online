@@ -38,6 +38,14 @@ jobs:
         run: python3 scripts/proverka.py
       - name: Test JS schema explicitly
         run: node scripts/proverka_skhemy.js
+      - name: Validate Instagram and all 10 goals in both route views
+        run: |
+          node site/checks/instagram_legal.test.js
+          node site/checks/consult_legal.test.js
+          node site/checks/all_goal_sectioning.test.js
+          node site/checks/goal1_copy.test.js
+          node site/checks/desktop_board.test.js
+          node site/checks/route_mode.test.js
       - name: Compile Python test scripts
         run: python3 -m py_compile scripts/proverka.py scripts/proverka_brauzer.py scripts/sravnit_tekst.py scripts/proverka_kontrolnyh_summ.py scripts/test_proverka_kontrolnyh_summ.py
       - name: Verify registered normative text checksums

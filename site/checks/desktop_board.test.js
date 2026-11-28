@@ -1,6 +1,6 @@
 const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
 const root=__dirname+'/../',c={window:{}};
-for(const f of ['data.js','route-matrix.js','desktop-board.js'])vm.runInNewContext(fs.readFileSync(root+f,'utf8'),c);
+for(const f of ['data.js','instagram-legal.js','route-matrix.js','desktop-board.js'])vm.runInNewContext(fs.readFileSync(root+f,'utf8'),c);
 const D=c.window.SCHEMA,B=c.window.DesktopBoard;
 const pairs=ps=>ps.flatMap(p=>p.children?p.children.map(n=>p.id+'/'+n.id):[p.id]);
 let total=0;
@@ -14,7 +14,10 @@ for(const [goal,ps] of Object.entries(D.start)){
  total+=all.length;
 }
 const normal=B.platforms(D.start.book,'ordinary'),risk=B.platforms(D.start.book,'risk');
-assert(!normal.some(p=>p.id==='instagram'));assert(risk.some(p=>p.id==='instagram'));
+assert(normal.some(p=>p.id==='instagram'));assert(risk.some(p=>p.id==='instagram'));
+assert(normal.find(p=>p.id==='instagram').children.some(n=>n.id==='ig-info'));
+assert(!risk.find(p=>p.id==='instagram').children.some(n=>n.id==='ig-info'));
+assert(risk.find(p=>p.id==='instagram').children.some(n=>n.id==='target'));
 assert(!normal.find(p=>p.id==='direct').children.some(n=>n.id==='dir-med'));
 assert(risk.find(p=>p.id==='direct').children.some(n=>n.id==='dir-med'));
 assert.equal(normal.find(p=>p.id==='vk').children.length,11);

@@ -198,7 +198,7 @@ function render() {
   html += '<div class="status ' + p.risk + '" style="background:' + bg + '"><h3>' + esc(p.name) + ' · ' + RL[p.risk] + '</h3><p>' + esc(p.status) + '</p></div>';
 
   if (p.stop) {
-    html += sec(1, 'Что делать вместо', '<div class="note"><p style="margin:0">Размещайте рекламу в VK, на Rutube или в Дзене. В Instagram можно вести экспертный блог без рекламы и вести людей к себе через имя автора — этот путь разобран в схеме продвижения.</p></div>');
+    html += sec(1, 'Что делать вместо', '<div class="note"><p style="margin:0">Размещайте рекламу в VK, на Rutube или в Дзене. В Instagram можно размещать справочную информацию о собственных товарах и услугах на своей странице, если конкретный материал не является рекламой. Цена и ссылка сами по себе не определяют статус; подробный маршрут — в схеме продвижения.</p></div>');
     $('#out').innerHTML = html; return;
   }
   if (S.mt === 'cabinet' && !p.cabinet) {

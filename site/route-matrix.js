@@ -6,6 +6,7 @@
   const informational = new Set(['author','bio','source','dm','tg-expert','tg-reply','vk-expert','vk-reply','yt-expert','rt-expert','tt-expert','tt-bio','tt-dm','book-site-page','book-site-article','book-site-sample']);
   const external = new Set(['tg-post','tg-posev','vk-post','vk-mail','vk-ads','vk-adblogger','vk-posev','yt-desc','yt-blogger','rt-desc','dzen-promo','rt-blogger','tt-video','tt-blogger','bl-paid','bl-barter','bl-partner','bl-mutual','dir-search','dir-rsya','dir-retarget','dir-tg','book-site-email']);
   const fixed = {
+    'ig-info':['none','site','vk','vkshop','tg','market'],
     'tglink':['tg'], 'tg-move':['vk'], 'vk-tg':['tg'], 'book-yt-tg':['tg'], 'book-tt-tg':['tg'],
     'yt-move':['vk','rutube'], 'tt-move':['vk','rutube'],
     'vk-shop':['vkshop'], 'vk-donut':['donut'], 'book-market-card':['market'], 'book-market-ads':['market'],

@@ -1,9 +1,45 @@
 /* Presentation only: preserve every route, separate existing risk categories. */
 (function(root){
- const isRisk=(p,n)=>p.risk!=='g'||n?.risk==='r'||!!n?.review;
- function platforms(nodes,mode){
-   return nodes.map(p=>p.children ? {...p,...(mode==='risk'&&p.risk==='g'?{name:p.name+' · опасные действия',details:'В этом разделе показаны действия с высоким риском, а не все варианты на площадке. '+(p.details||'')}:{}),children:p.children.filter(n=>isRisk(p,n)===(mode==='risk'))} : p)
-     .filter(p=>p.children?p.children.length:isRisk(p)===(mode==='risk'));
+ /* Вкладка описывает правовой статус действия, а не запрет площадки.
+    Зелёный или жёлтый статус ребёнка не наследует автоматически риск родителя. */
+ const restrictedAdResources=new Set(['telegram','tg','youtube','tiktok']);
+ function isRisk(p,n,goal){
+   if(!n) return p.risk==='r'||p.risk==='y';
+   if(n.section==='risk') return true;
+   if(n.section==='ordinary') return false;
+   if(n.risk==='r'||n.review) return true;
+   // Информация о собственных продуктах на своей странице Instagram
+   // оценивается отдельно от рекламы и не попадает в запрещённые маршруты.
+   if(p.id==='instagram') return false;
+   if(restrictedAdResources.has(p.id)){
+     // Продажа рекламных размещений здесь остаётся рискованной даже при
+     // прежнем зелёном статусе шаблонных карточек "договор"/"биржа".
+     if(goal==='adsell') return true;
+     // Для других целей жёлтый сценарий означает рекламный риск ресурса.
+     return n.risk==='y';
+   }
+   // VK, Директ, Rutube, сайт, база и работа с партнёрами
+   // не становятся запрещёнными из-за обычных условий размещения.
+   return false;
+ }
+ function platforms(nodes,mode,goal){
+   return nodes.map(p=>{
+     if(!p.children) return p;
+     const children=p.children.filter(n=>isRisk(p,n,goal)===(mode==='risk'));
+     if(mode!=='risk') return {...p,children};
+     if(p.risk==='g'){
+       const allowedPlatform=['vk','direct','rutube','site'].includes(p.id);
+       return {...p,children,scenarioOnly:true,
+         name:p.name + (allowedPlatform?' · риск отдельного объявления':' · риск отдельных действий'),
+         short:allowedPlatform
+           ? 'Реклама на площадке «'+p.name+'» разрешена. Здесь риск в конкретном объявлении, а не запрет площадки.'
+           : 'В этом разделе показаны отдельные нарушения, а не запрет всего способа продвижения.',
+         details:allowedPlatform
+           ? 'Сама площадка доступна для рекламы. Высокий риск относится только к выбранному объявлению, его содержанию, статусу рекламодателя или соблюдению обязанностей. '+(p.details||'')
+           : 'Здесь показаны отдельные опасные действия. Остальные варианты этого канала или способа находятся в обычном разделе. '+(p.details||'')};
+     }
+     return {...p,children};
+   }).filter(p=>p.children?p.children.length:isRisk(p,null,goal)===(mode==='risk'));
  }
  function decorate(host, context={}){
    const stages=[1,2,3].map(n=>host.querySelector('#step-'+n));
