@@ -91,7 +91,7 @@ for (const fo of D.forms) if (!M.ordData[fo.id] && !M.ordData[fo.col]) err.push(
 walk(M, 'MARK');
 
 // Регрессия: TikTok-варианты, окончания и одноэкранное переключение режимов.
-for (const name of ['instagram-legal.js','consult-legal.js','route-matrix.js','card-help.js','goal1-copy.js','desktop-board.js']) {
+for (const name of ['instagram-legal.js','consult-legal.js','youtube-funnels.js','route-matrix.js','card-help.js','goal1-copy.js','desktop-board.js']) {
   const filename = path.join(__dirname, '..', 'site', name);
   vm.runInNewContext(fs.readFileSync(filename, 'utf8'), ctx, { filename });
 }
@@ -109,6 +109,36 @@ for (const [mode, id] of [['ordinary','tt-direct'], ['ordinary','tt-gift-indepen
   if (!p?.children?.some(x => x.id === id)) err.push('TikTok ' + mode + ': не показан ' + id);
 }
 if (!tik.children.find(x=>x.id==='tt-sample')?.sample) err.push('TikTok: бесплатный фрагмент не включается на своём пути');
+
+const youtube = D.start.book.find(x => x.id === 'youtube');
+const youtubeIDs = [
+  'yt-expert','yt-own-info','yt-desc','yt-sample','yt-independent','yt-gift',
+  'yt-barter','yt-blogger','yt-affiliate','yt-sponsor','yt-shorts',
+  'yt-move','book-yt-tg','yt-vpn'
+];
+for (const id of youtubeIDs) {
+  const n = youtube?.children?.find(x => x.id === id);
+  if (!n) { err.push('YouTube: нет карточки ' + id); continue; }
+  if (!D.routeMatrix.rows.some(x => x.method === id)) err.push('YouTube: нет окончания ' + id);
+  const c = ctx.window.Goal1Copy.methods[id];
+  if (!c?.examples || c.examples.length !== 2) err.push('YouTube: нет двух примеров ' + id);
+  for (const dest of n.dest || []) if (!D.bookPlaces[dest]) err.push('YouTube ' + id + ': нет назначения ' + dest);
+}
+for (const [mode,id] of [
+  ['ordinary','yt-expert'],['ordinary','yt-own-info'],['ordinary','yt-sample'],
+  ['ordinary','yt-independent'],['ordinary','yt-gift'],['ordinary','yt-shorts'],
+  ['risk','yt-desc'],['risk','yt-barter'],['risk','yt-blogger'],
+  ['risk','yt-affiliate'],['risk','yt-sponsor'],['risk','yt-vpn']
+]) {
+  const p = ctx.window.DesktopBoard.platforms(D.start.book, mode, 'book').find(x => x.id === 'youtube');
+  if (!p?.children?.some(x => x.id === id)) err.push('YouTube: неверный режим '+mode+' для '+id);
+}
+if (!youtube?.children?.find(x=>x.id==='yt-sample')?.sample) err.push('YouTube: не включается фрагмент');
+if (!youtube?.children?.find(x=>x.id==='yt-gift')?.uncommitted) err.push('YouTube: подарок ошибочно обещает обзор');
+if (youtube?.children?.find(x=>x.id==='yt-vpn')?.saferGoto) err.push('YouTube: реклама VPN не должна вести к простому копированию ролика');
+if (!youtube?.children?.find(x=>x.id==='yt-shorts')?.details.includes('некликабельны')) err.push('YouTube: нет проверки некликабельности Shorts URL');
+if (youtube?.children?.find(x=>x.id==='book-yt-tg')?.risk !== 'g') err.push('YouTube: нейтральная ссылка ошибочно отмечена как реклама');
+
 if (!tik.children.find(x=>x.id==='tt-gift-independent')?.uncommitted) err.push('TikTok: подарок без условий должен завершаться без обещания обзора');
 for (const page of ['index.html','risk.html']) {
   const html = fs.readFileSync(path.join(__dirname, '..', 'site', page), 'utf8');
@@ -119,6 +149,7 @@ for (const page of ['index.html','risk.html']) {
   if (html.includes('scrollToStep(')) err.push(page+': осталась автопрокрутка выбора карточки');
   if (!html.includes('S.path = S.path.slice(0, num - 1)')) err.push(page+': кнопка этапа не возвращает к выбору');
   if (!html.includes('data-set-route-mode="ordinary"')) err.push(page+': выход из рискованного маршрута всё ещё ведёт на другой URL');
+  if (!html.includes('<script src="youtube-funnels.js"></script>')) err.push(page+': не подключён модуль YouTube');
 }
 
 const verify = Object.entries(D.fines).filter(([, f]) => f.verify).map(([k]) => k);
