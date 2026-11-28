@@ -1,6 +1,6 @@
 {
-  "version": "2026-11-28-working-v21-instagram-all-goals",
-  "status": "Рабочая версия на согласовании: Instagram + классификация вкладок всех 10 целей",
+  "version": "2026-11-28-working-v22-consult-review",
+  "status": "Рабочая редакция: первая цель консультации проверена по рекламной классификации, следующие цели ожидают проверки",
   "base_repository": "9479797/ru-legal-online",
   "base_commit": "60bf80361bd757522656631eb45ddb19cc1cee88",
   "old_book_links_preserved": 56,
@@ -151,5 +151,14 @@
   "vk_risk_examples_labeled": "Риск отдельного объявления, не запрет VK",
   "saved_main_base": "62d6ed5e4540f338bcb8dd6e874b6e5c6b6eb470",
   "files_hashes_baseline_only": true,
-  "checksums_need_refresh_before_final": true
+  "checksums_need_refresh_before_final": true,
+  "consultation_goal_review": {
+    "date": "2026-11-28",
+    "goal": "consult",
+    "method_count": 36,
+    "details": "Собственные сведения, объявления и ответы о записи разделены; VK разрешён; Telegram-ответ о записи отделён от оказания медицинской услуги; ссылки YouTube и TikTok оценены по контексту",
+    "other_goals_unchanged": true,
+    "approved": false,
+    "limitations": "Не проводилась полная медицинская правовая проверка и полноценный браузерный тест"
+  }
 }
