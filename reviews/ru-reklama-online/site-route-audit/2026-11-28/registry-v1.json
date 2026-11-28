@@ -1,10 +1,10 @@
 {
   "title": "Реестр юридической проверки первой цели",
-  "version": "0.1",
-  "site_version": "v20.6",
+  "version": "0.2",
+  "site_version": "v20.7",
   "snapshot_date": "2026-11-28",
   "source_branch": "site/tiktok-funnels-2026-11-28",
-  "notes": "Статус NOT_REVIEWED не означает ошибку карточки. Нужны подтверждённые нормативные источники и данные конкретной публикации.",
+  "notes": "Для девяти исторических P0 выполнена сверка применимых норм; ни один реальный креатив не представлен. Понижение категории TikTok Ads с красной на жёлтую отражает невозможность выводить запрет из одной иностранной регистрации.",
   "matrix": {
     "methods": 86,
     "cells": 774,
@@ -14,7 +14,11 @@
   },
   "readiness": {
     "methods_approved_for_real_projects": 0,
-    "methods_requiring_audit": 86
+    "methods_requiring_audit": 86,
+    "high_risk_rule_examples_reviewed": 9,
+    "p0_after_risk_correction": 8,
+    "p1": 58,
+    "p2": 20
   },
   "methods": [
     {
@@ -260,7 +264,12 @@
       "source_evidence": "NOT_LINKED_PER_CASE",
       "case_evidence": "NOT_AVAILABLE",
       "legal_approval": null,
-      "case_approval": null
+      "case_approval": null,
+      "p0_norm_review_2026_11_28": {
+        "status": "RULE_CHECKED_CREATIVE_UNKNOWN",
+        "case_specific_decision": "INSUFFICIENT_FACTS",
+        "reference_doc": "p0-review-v1.md"
+      }
     },
     {
       "platform_id": "instagram",
@@ -287,7 +296,12 @@
       "source_evidence": "NOT_LINKED_PER_CASE",
       "case_evidence": "NOT_AVAILABLE",
       "legal_approval": null,
-      "case_approval": null
+      "case_approval": null,
+      "p0_norm_review_2026_11_28": {
+        "status": "RULE_CHECKED_CREATIVE_UNKNOWN",
+        "case_specific_decision": "INSUFFICIENT_FACTS",
+        "reference_doc": "p0-review-v1.md"
+      }
     },
     {
       "platform_id": "telegram",
@@ -809,7 +823,12 @@
       "source_evidence": "NOT_LINKED_PER_CASE",
       "case_evidence": "NOT_AVAILABLE",
       "legal_approval": null,
-      "case_approval": null
+      "case_approval": null,
+      "p0_norm_review_2026_11_28": {
+        "status": "RULE_CHECKED_CREATIVE_UNKNOWN",
+        "case_specific_decision": "INSUFFICIENT_FACTS",
+        "reference_doc": "p0-review-v1.md"
+      }
     },
     {
       "platform_id": "vk",
@@ -1627,7 +1646,12 @@
       "source_evidence": "NOT_LINKED_PER_CASE",
       "case_evidence": "NOT_AVAILABLE",
       "legal_approval": null,
-      "case_approval": null
+      "case_approval": null,
+      "p0_norm_review_2026_11_28": {
+        "status": "RULE_CHECKED_CREATIVE_UNKNOWN",
+        "case_specific_decision": "INSUFFICIENT_FACTS",
+        "reference_doc": "p0-review-v1.md"
+      }
     },
     {
       "platform_id": "rutube",
@@ -2197,14 +2221,14 @@
       "platform_name": "TikTok",
       "method_id": "tt-ads",
       "title": "TikTok Ads через иностранный аккаунт",
-      "ui_risk": "r",
+      "ui_risk": "y",
       "ui_risk_disclaimer": "Техническая категория интерфейса; не заключение о законности",
       "technical_state": "terminal",
       "possible_destinations": [],
       "matrix_cells": 9,
       "gift_without_obligation": false,
       "publication_platform": null,
-      "priority": "P0",
+      "priority": "P1",
       "checks_required": [
         "Точный креатив и все видимые ссылки",
         "Дата публикации и целевая аудитория РФ",
@@ -2216,7 +2240,13 @@
       "source_evidence": "NOT_LINKED_PER_CASE",
       "case_evidence": "NOT_AVAILABLE",
       "legal_approval": null,
-      "case_approval": null
+      "case_approval": null,
+      "review_update_2026_11_28": "Иностранный кабинет — условная проверка; не доказан безусловный запрет",
+      "p0_norm_review_2026_11_28": {
+        "status": "CONDITIONAL_NO_BLANKET_PROHIBITION",
+        "case_specific_decision": "INSUFFICIENT_FACTS",
+        "reference_doc": "p0-review-v1.md"
+      }
     },
     {
       "platform_id": "tiktok",
@@ -2242,14 +2272,20 @@
       "source_evidence": "NOT_LINKED_PER_CASE",
       "case_evidence": "NOT_AVAILABLE",
       "legal_approval": null,
-      "case_approval": null
+      "case_approval": null,
+      "review_update_2026_11_28": "Удалена ссылка на перенос рекламы VPN",
+      "p0_norm_review_2026_11_28": {
+        "status": "RULE_CHECKED_CREATIVE_UNKNOWN",
+        "case_specific_decision": "INSUFFICIENT_FACTS",
+        "reference_doc": "p0-review-v1.md"
+      }
     },
     {
       "platform_id": "bloggers",
       "platform_name": "Реклама у блогеров",
       "method_id": "bl-paid",
       "title": "Платная интеграция по договору",
-      "ui_risk": "g",
+      "ui_risk": "y",
       "ui_risk_disclaimer": "Техническая категория интерфейса; не заключение о законности",
       "technical_state": "conditional",
       "possible_destinations": [
@@ -2280,7 +2316,8 @@
       "source_evidence": "NOT_LINKED_PER_CASE",
       "case_evidence": "NOT_AVAILABLE",
       "legal_approval": null,
-      "case_approval": null
+      "case_approval": null,
+      "review_update_2026_11_28": "Проверено без правки текста"
     },
     {
       "platform_id": "bloggers",
@@ -2450,13 +2487,19 @@
       "source_evidence": "NOT_LINKED_PER_CASE",
       "case_evidence": "NOT_AVAILABLE",
       "legal_approval": null,
-      "case_approval": null
+      "case_approval": null,
+      "review_update_2026_11_28": "Разъяснён словесный образ врача и исключения",
+      "p0_norm_review_2026_11_28": {
+        "status": "RULE_CHECKED_CREATIVE_UNKNOWN",
+        "case_specific_decision": "INSUFFICIENT_FACTS",
+        "reference_doc": "p0-review-v1.md"
+      }
     },
     {
       "platform_id": "bloggers",
       "platform_name": "Реклама у блогеров",
       "method_id": "bl-banned",
-      "title": "Блогер в Instagram, без реестра или иноагент",
+      "title": "Запрещённый ресурс или неподтверждённый статус блогера",
       "ui_risk": "r",
       "ui_risk_disclaimer": "Техническая категория интерфейса; не заключение о законности",
       "technical_state": "terminal",
@@ -2477,7 +2520,13 @@
       "source_evidence": "NOT_LINKED_PER_CASE",
       "case_evidence": "NOT_AVAILABLE",
       "legal_approval": null,
-      "case_approval": null
+      "case_approval": null,
+      "review_update_2026_11_28": "Разные основания: ресурс, запись РКН, иноагент",
+      "p0_norm_review_2026_11_28": {
+        "status": "RULE_CHECKED_CREATIVE_UNKNOWN",
+        "case_specific_decision": "INSUFFICIENT_FACTS",
+        "reference_doc": "p0-review-v1.md"
+      }
     },
     {
       "platform_id": "direct",
@@ -2653,7 +2702,13 @@
       "source_evidence": "NOT_LINKED_PER_CASE",
       "case_evidence": "NOT_AVAILABLE",
       "legal_approval": null,
-      "case_approval": null
+      "case_approval": null,
+      "review_update_2026_11_28": "Уточнены лечебные свойства и образ медработника",
+      "p0_norm_review_2026_11_28": {
+        "status": "RULE_CHECKED_CREATIVE_UNKNOWN",
+        "case_specific_decision": "INSUFFICIENT_FACTS",
+        "reference_doc": "p0-review-v1.md"
+      }
     },
     {
       "platform_id": "site",
