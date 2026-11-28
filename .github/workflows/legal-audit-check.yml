@@ -43,6 +43,7 @@ jobs:
           node site/checks/instagram_legal.test.js
           node site/checks/instagram_codeword_flow.test.js
           node site/checks/instagram_all_methods.test.js
+          node site/checks/telegram_all_methods.test.js
           node site/checks/consult_legal.test.js
           node site/checks/all_goal_sectioning.test.js
           node site/checks/goal1_copy.test.js
