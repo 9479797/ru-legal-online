@@ -52,4 +52,5 @@ assert.equal(D.routeMatrix.rows.reduce((n,r)=>n+r.destinations.length,0),774);
 assert(page.indexOf('src="instagram-legal.js"')>page.indexOf('src="data.js"'));
 assert(page.indexOf('src="route-matrix.js"')>page.indexOf('src="instagram-legal.js"'));
 assert(page.indexOf('src="route-matrix.js"')<page.indexOf('src="book-ui.js"'));
-assert.deepEqual(Array.from(find('tg-ads').dest),['tg','tgbot'],'Базовый Telegram Ads ведёт только внутри Telegram');\nconsole.log(JSON.stringify({methods:86,cells:774,potentialEndings:routeCount,terminalMethods:terminal,checkedStateCombinations:cases}));
+assert.deepEqual(Array.from(find('tg-ads').dest),['tg','tgbot'],'Базовый Telegram Ads ведёт только внутри Telegram');
+console.log(JSON.stringify({methods:86,cells:774,potentialEndings:routeCount,terminalMethods:terminal,checkedStateCombinations:cases}));
