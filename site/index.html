@@ -289,7 +289,7 @@ const routePlace = (n, k) => {
   return p;
 };
 const resolve = (n) => (n.place ? place(n.place, n.id) : n);
-const level1 = () => window.DesktopBoard?.platforms((D.start[S.goal] || []).map(resolve), document.body.dataset.routeMode) || (D.start[S.goal] || []).map(resolve);
+const level1 = () => window.DesktopBoard?.platforms((D.start[S.goal] || []).map(resolve), document.body.dataset.routeMode, S.goal) || (D.start[S.goal] || []).map(resolve);
 const childrenOf = (n) => {
   if (S.goal === 'book' && n.dest && (n.uncommitted || bookUI.publicationIssue(level1().find(a => a.id === S.path[0]), n))) return null;
   return n.children ? n.children : n.dest ? n.dest.map((k) => routePlace(n, k)) : null;
