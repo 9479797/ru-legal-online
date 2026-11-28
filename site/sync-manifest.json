@@ -49,7 +49,7 @@
     "TASKS.md": "1b59961afeec6f66232651eb27889608f2f56684a962e74ecd81e29284eff6e9",
     "telegram-funnels.js": "a7062e7dce716dfedf719486ba9667a52d9affe75dd5069ad92f08f7a87312d0",
     "youtube-funnels.js": "7b08f5fa66254135dcf5dab9bc833ec255ddf8307211117009e1ad82789ec9da",
-    "version.json": "60dbc61a7dad24817d38c591fa2184079abc9d140bf39d21d49bb84dddf8034a"
+    "version.json": "583a301f52e7b3598bdf52d2d34d3e2ab361282a811a2fc15c074942ac55362c"
   },
   "source_ref": "site/tiktok-funnels-2026-11-28",
   "source_commit_before_manifest": "880ea4f12b6dede45cdc7d50c2accb3f4836608e",
@@ -61,9 +61,9 @@
   "file_hash_algorithm": "SHA-256",
   "file_count": 47,
   "qa_status": {
-    "technical_regressions": "GitHub Actions run по v20.5, проверять итог после нового коммита",
-    "browser": "GitHub Actions browser/UI smoke run по v20.5",
-    "file_checksums": "SHA-256 источников site/"
+    "technical_regressions": "GitHub Actions test suite passed on code, verify latest workflow after this commit",
+    "browser": "GitHub Actions browser smoke checked for v20.5, verify latest workflow after this commit",
+    "file_checksums": "48 ZIP files, 47 SHA-256 checksums. Source-check mismatch corrected against byte-for-byte ZIP."
   },
   "note": "Рабочая синхронизация проекта; внешняя публикация и merge в main не выполнялись",
   "drive_previous_archive": "https://drive.google.com/file/d/1UQi2RzGC1ISd83QX5-H-kBc8iIZnl_5T/view?usp=drivesdk",
