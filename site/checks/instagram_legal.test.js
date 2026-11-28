@@ -60,12 +60,11 @@ assert(ui.publicationInfo(bloggers,bloggers.children.find(n=>n.id==='bl-barter')
 assert(ui.publicationInfo(bloggers,bloggers.children.find(n=>n.id==='bl-partner')).blocked,'Партнёрская реклама блогера разрешена');
 const mutual=ui.publicationInfo(bloggers,bloggers.children.find(n=>n.id==='bl-mutual'));
 assert(mutual.needsCheck&&!mutual.blocked,'Взаимное упоминание должно пройти проверку');
-const index=fs.readFileSync(root+'index.html','utf8'),risk=fs.readFileSync(root+'risk.html','utf8');
-for(const html of [index,risk]){
- const first=html.indexOf('src="data.js"'),legal=html.indexOf('src="instagram-legal.js"'),matrix=html.indexOf('src="route-matrix.js"');
- assert(first>=0&&first<legal&&legal<matrix,'Неверный порядок скриптов');
- for(const [,code] of html.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/g))new vm.Script(code);
-}
+const index=fs.readFileSync(root+'index.html','utf8'),legacy=fs.readFileSync(root+'risk.html','utf8');
+const first=index.indexOf('src="data.js"'),legal=index.indexOf('src="instagram-legal.js"'),matrix=index.indexOf('src="route-matrix.js"');
+assert(first>=0&&first<legal&&legal<matrix,'Неверный порядок скриптов');
+for(const [,code] of index.matchAll(/<script(?:\\s[^>]*)?>([\\s\\S]*?)<\\/script>/g))new vm.Script(code);
+assert(legacy.includes("window.location.replace('index.html')"),'Наследуемый URL рисков должен вести к единой схеме');
 const marking=fs.readFileSync(root+'markirovka.js','utf8');
 assert(marking.includes('Обычная информация о товарах'),'Нет пояснения об информационных публикациях на странице маркировки');
 console.log('Instagram: '+ordinary+' целей со справочными сообщениями, '+banned+' запрещённых сценариев; обе вкладки и 86 маршрутов первой цели сохранены.');
