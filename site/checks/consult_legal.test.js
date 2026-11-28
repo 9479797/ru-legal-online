@@ -32,7 +32,7 @@ assert.equal(node('youtube','consult-yt-tg').risk,'g');
 assert.equal(node('tiktok','consult-tt-tg').risk,'g');
 assert.equal(node('rutube','consult-rt-desc').risk,'y');
 assert(D.consultLegal&&D.consultLegal.status==='working');
-for(const page of ['index.html','risk.html']){
+for(const page of ['index.html']){
  const h=fs.readFileSync(base+page,'utf8');
  assert(h.indexOf('src="instagram-legal.js"')<h.indexOf('src="consult-legal.js"'),'Порядок загрузки '+page);
  assert(h.indexOf('src="consult-legal.js"')<h.indexOf('src="route-matrix.js"'),'Порядок загрузки '+page);
@@ -40,13 +40,15 @@ for(const page of ['index.html','risk.html']){
 vm.runInNewContext(fs.readFileSync(base+'route-matrix.js','utf8'),ctx);
 vm.runInNewContext(fs.readFileSync(base+'desktop-board.js','utf8'),ctx);
 const B=ctx.window.DesktopBoard;
-const ordinary=B.platforms(consulted,'ordinary','consult'),risk=B.platforms(consulted,'risk','consult');
-const paths=arr=>arr.flatMap(p=>p.children.map(x=>p.id+'/'+x.id));
-assert.equal(JSON.stringify([...paths(ordinary),...paths(risk)].sort()),JSON.stringify(paths(consulted).sort()),'Потери в фильтре');
-for(const id of ['k-vk-expert','k-vk-post'])assert(ordinary.find(p=>p.id==='vk').children.some(x=>x.id===id),id+' исчез из обычных вариантов');
-assert(ordinary.find(p=>p.id==='tg').children.some(x=>x.id==='k-tg-chat'),'Ответ в Telegram скрыт');
-assert(!risk.find(p=>p.id==='tg').children.some(x=>x.id==='k-tg-chat'),'Ответ ошибочно запрещён');
-assert(ordinary.find(p=>p.id==='youtube').children.some(x=>x.id==='consult-yt-tg'),'Ссылка в YouTube отмечена рекламой');
-assert(ordinary.find(p=>p.id==='tiktok').children.some(x=>x.id==='consult-tt-tg'),'Ссылка в TikTok отмечена рекламой');
-assert(risk.find(p=>p.id==='vk').scenarioOnly,'Риск отдельной рекламы VK');
+const all=B.platforms(consulted);
+const paths=arr=>arr.flatMap(p=>p.children?p.children.map(x=>p.id+'/'+x.id):[p.id]);
+assert.equal(JSON.stringify(paths(all).slice().sort()),JSON.stringify(paths(consulted).slice().sort()),'Потери в едином списке');
+const rank=B.riskRank;
+for(const p of all)if(p.children)assert(p.children.every((n,i)=>!i||rank(p.children[i-1])<=rank(n)),'Порядок: '+p.id);
+for(const id of ['k-vk-expert','k-vk-post'])assert(all.find(p=>p.id==='vk').children.some(x=>x.id===id),id+' исчез');
+assert.equal(all.find(p=>p.id==='vk').risk,'g','VK разрешён');
+assert(all.find(p=>p.id==='tg').children.some(x=>x.id==='k-tg-chat'),'Ответ в Telegram скрыт');
+assert(all.find(p=>p.id==='youtube').children.some(x=>x.id==='consult-yt-tg'),'Ссылка в YouTube скрыта');
+assert(all.find(p=>p.id==='tiktok').children.some(x=>x.id==='consult-tt-tg'),'Ссылка в TikTok скрыта');
+assert(all.find(p=>p.id==='vk').children.some(x=>x.risk==='r'),'Не потерять риск отдельного объявления в VK');
 console.log('Консультации: '+paths(consulted).length+' вариантов, все id и переходы сохранены, другие девять целей неизменны.');

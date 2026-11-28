@@ -43,6 +43,56 @@ with sync_playwright() as p:
     pg.goto((SITE / "markirovka.html").as_uri()); pg.wait_for_timeout(200)
     for form in pg.eval_on_selector_all("#form option", "e=>e.map(x=>x.value)"):
         pg.select_option("#form", form)
+    # One unified page; the old risk URL redirects to it.
+    pg.goto((SITE / "risk.html").as_uri())
+    pg.wait_for_url("**/index.html")
+    pg.evaluate("localStorage.clear()")
+    pg.reload()
+    assert pg.locator("#route-mode").count() == 0, "There must be only one view"
+    def sorted_risk(level):
+        values = pg.locator(f'#step-{level} .opt').evaluate_all(
+            "els=>els.map(e=>e.classList.contains('r')?0:e.classList.contains('y')?1:2)"
+        )
+        assert values == sorted(values), f"Incorrect risk order at stage {level}: {values}"
+    sorted_risk(1)
+    pg.select_option("#goal", "book")
+    pg.select_option("#format", "file")
+    pg.check("#sample")
+    pg.select_option("#scope", "promotion")
+    pg.locator('[data-pick="0"][data-id="instagram"]').click()
+    sorted_risk(2)
+    # Destination cards in third column must also be sorted, even for an informational route.
+    pg.locator('[data-pick="1"][data-id="ig-info"]').click()
+    sorted_risk(3)
+    pg.locator('[data-pick="1"][data-id="word"]').click()
+    assert pg.locator(".ig-codeword-flow").is_visible(), "Risk chain must be visible in column 3"
+    assert pg.locator(".ig-flow-node").count() == 4, "Four distinct stages required"
+    assert pg.locator('[data-ig-flow-dest="site"]').get_attribute("aria-pressed") == "true"
+    pg.locator('[data-ig-flow-dest="tg"]').click()
+    assert pg.locator('[data-ig-flow-dest="tg"]').get_attribute("aria-pressed") == "true"
+    assert "Telegram" in pg.locator(".ig-flow-node").last.inner_text()
+    pg.reload()
+    assert pg.locator('[data-ig-flow-dest="tg"]').get_attribute("aria-pressed") == "true", "Chosen destination must persist"
+    pg.evaluate("window.print=()=>{}")
+    pg.locator('#step-3 [data-save="print"]').click()
+    assert "Telegram" in pg.locator("#print").inner_text(), "Export must retain chosen destination"
+    assert "Instagram" in pg.locator("#print").inner_text(), "Export must retain originating platform"
+    # TikTok: all nine goals keep their original routes, examples and risk-first order.
+    for goal_id in ["consult", "club", "marathon", "event", "adsell", "presale", "course", "doula", "book"]:
+        pg.select_option("#goal", goal_id)
+        pg.locator('[data-pick="0"][data-id="tiktok"]').click()
+        assert pg.locator('#step-2 [data-pick="1"]').count() >= 6, f"Missing TikTok variants: {goal_id}"
+        colors = pg.locator('#step-2 .opt').evaluate_all(
+            "els=>els.map(e=>e.classList.contains('r')?0:e.classList.contains('y')?1:2)"
+        )
+        assert colors == sorted(colors), f"Risk order on TikTok: {goal_id}"
+        if goal_id == "book":
+            pg.locator('[data-more="1"][data-id="tt-video"]').click()
+            assert pg.locator("dialog[open] .guide-example").count() == 2, "TikTok video: paired examples"
+            assert "Сведения о своём продукте" in pg.locator("dialog[open]").inner_text()
+            pg.locator("dialog[open] .x").click()
+            pg.locator('[data-pick="1"][data-id="tt-video"]').click()
+            assert pg.locator('#step-3 [data-pick="2"]').count() >= 1
     b.close()
 print("Ошибок в браузере нет." if not errs else "Ошибки:\n- " + "\n- ".join(errs))
 sys.exit(1 if errs else 0)

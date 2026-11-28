@@ -41,6 +41,8 @@ jobs:
       - name: Validate Instagram and all 10 goals in both route views
         run: |
           node site/checks/instagram_legal.test.js
+          node site/checks/instagram_codeword_flow.test.js
+          node site/checks/tiktok_legal.test.js
           node site/checks/consult_legal.test.js
           node site/checks/all_goal_sectioning.test.js
           node site/checks/goal1_copy.test.js
