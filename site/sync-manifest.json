@@ -16,7 +16,7 @@
     "checks/goal1_copy.test.js": "2bda70391c95abb28f68725ce846419cd8c66d946e7e45b549e8d516e49f2097",
     "checks/goal1-route-inventory.json": "930b8c80da7389b8beb8785ca08973f81af4627281a36192e6174c330d762b62",
     "checks/instagram_legal.test.js": "42f65ee23ecb030514e63ff8fddfe4e918386a93967ecd6338a57707ea93e41b",
-    "checks/p0_legal_review.test.js": "1decd00e392529ddfaf6ca7d7513b24114fa1f4f271aec7a57bef8e22d28028f",
+    "checks/p0_legal_review.test.js": "e23d046325ca6ecb9b1d758f98daacb87f1402c4e93f01708fb02ad7305d818f",
     "checks/proverka_local.js": "f38c1621cb679e4edbafdbafe7948894ca54f01797689388349e8bb320bc8564",
     "checks/proverka_skhemy.js": "a5e269b276122e8149065fa3e683e1fe2e8b4311a896f62251212d44ea6c268f",
     "checks/route_matrix.test.js": "5dcaf1a836702131e8d79433e43376e26042dfd3b9b49767a190a65568492d42",
@@ -42,7 +42,7 @@
     "LEGAL_REVIEW_2026-11-24.md": "e81dd87e65e24cb0aab677593ac2e2b739a6382c4921900c64505903cba9b9fa",
     "markirovka.html": "9c00877e973f1ac02ad4e005a35ae40a8ca7fcc445482701bcf2a62db00256fa",
     "markirovka.js": "62b26c6c05d2c03d816417e95a7855de7dcd56fdb2d6d728e33b7f94359a6cb2",
-    "p0-legal-review.js": "55dafb5d497532e115ac7aeb4f1cf972df5126bc532f03928da73171ba85505a",
+    "p0-legal-review.js": "32162f319c0f9dd6b298ad1283258f868893d429d217e104179b39028e2469e4",
     "README.txt": "dfe1f9a9beca0a0c3a90a4a1842ab15986922ff6196095859978e90dfe35a92d",
     "risk.html": "bcfcde7eb2ae521a57d2c10280a51941232c465a8178c624fa459c00ffdb117e",
     "route-matrix.js": "8c700dc94789cb6b6610d09f2162bef048643d4765c960b9a84b064a817a4f59",
@@ -51,10 +51,10 @@
     "TASKS.md": "18ea434d5867aa637b1e34fc8ad20c406191047a5bc9f75b4ee6f8df8e8fb794",
     "telegram-funnels.js": "a7062e7dce716dfedf719486ba9667a52d9affe75dd5069ad92f08f7a87312d0",
     "youtube-funnels.js": "7b08f5fa66254135dcf5dab9bc833ec255ddf8307211117009e1ad82789ec9da",
-    "version.json": "7b63c14239d01f0406423847c754ea40a6c47a46dd2c8934d45a889726aae714"
+    "version.json": "b5e0bdf33ab2ec28524f490df7b43dc1949fc65149d1fffbbf3aaaf6d4cebca0"
   },
   "source_ref": "site/tiktok-funnels-2026-11-28",
-  "source_commit_before_manifest": "61489a7ea433fb3dfd56a6c31b224cf873570302",
+  "source_commit_before_manifest": "7dd28a801a3f41a31a1088fc04f7dce0b50ff850",
   "previous_published_url_unverified": "https://reklama-frontend.gulfopt.chatgpt.site",
   "publish_status": "Рабочая версия на согласовании; main и внешний сайт не обновлялись.",
   "drive_site_folder": "https://drive.google.com/drive/folders/10BkTBIjl9sIcI2GvyHU4arxgByXkQ8gp",
@@ -63,9 +63,9 @@
   "file_hash_algorithm": "SHA-256",
   "file_count": 49,
   "qa_status": {
-    "technical_regressions": "Проверка после v20.7 в GitHub Actions",
-    "browser": "Smoke tests v20.7 в GitHub Actions",
-    "file_checksums": "SHA-256 GitHub source, package CI"
+    "technical_regressions": "CI run pending latest source correction",
+    "browser": "CI browser pending",
+    "file_checksums": "SHA-256 checks in CI"
   },
   "note": "Рабочая синхронизация проекта; внешняя публикация и merge в main не выполнялись",
   "drive_previous_archive": "https://drive.google.com/file/d/17A8Q78osn34RJsBQIoNvstFRIxKsbGWL/view?usp=drivesdk",
