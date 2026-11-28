@@ -15,10 +15,10 @@ for(const [goal,roots] of Object.entries(D.start)){
 for(const p of previous.consult){
   const n=at(p.id);assert(n,'Площадка исчезла: '+p.id);
   const old=p.children||[],fresh=n.children||[];
-  assert.deepEqual(fresh.map(x=>x.id),old.map(x=>x.id),'Состав вариантов изменён: '+p.id);
+  assert.equal(JSON.stringify(fresh.map(x=>x.id)),JSON.stringify(old.map(x=>x.id)),'Состав вариантов изменён: '+p.id);
   for(const c of old){
     const x=node(p.id,c.id);
-    assert.deepEqual(x.dest,c.dest,'Переход изменён: '+c.id);
+    assert.equal(JSON.stringify(x.dest),JSON.stringify(c.dest),'Переход изменён: '+c.id);
   }
 }
 assert.equal(at('vk').risk,'g');
@@ -42,7 +42,7 @@ vm.runInNewContext(fs.readFileSync(base+'desktop-board.js','utf8'),ctx);
 const B=ctx.window.DesktopBoard;
 const ordinary=B.platforms(consulted,'ordinary','consult'),risk=B.platforms(consulted,'risk','consult');
 const paths=arr=>arr.flatMap(p=>p.children.map(x=>p.id+'/'+x.id));
-assert.deepEqual([...paths(ordinary),...paths(risk)].sort(),paths(consulted).sort(),'Потери в фильтре');
+assert.equal(JSON.stringify([...paths(ordinary),...paths(risk)].sort()),JSON.stringify(paths(consulted).sort()),'Потери в фильтре');
 for(const id of ['k-vk-expert','k-vk-post'])assert(ordinary.find(p=>p.id==='vk').children.some(x=>x.id===id),id+' исчез из обычных вариантов');
 assert(ordinary.find(p=>p.id==='tg').children.some(x=>x.id==='k-tg-chat'),'Ответ в Telegram скрыт');
 assert(!risk.find(p=>p.id==='tg').children.some(x=>x.id==='k-tg-chat'),'Ответ ошибочно запрещён');
