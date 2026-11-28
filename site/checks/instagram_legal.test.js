@@ -63,7 +63,7 @@ assert(mutual.needsCheck&&!mutual.blocked,'Взаимное упоминание
 const index=fs.readFileSync(root+'index.html','utf8'),legacy=fs.readFileSync(root+'risk.html','utf8');
 const first=index.indexOf('src="data.js"'),legal=index.indexOf('src="instagram-legal.js"'),matrix=index.indexOf('src="route-matrix.js"');
 assert(first>=0&&first<legal&&legal<matrix,'Неверный порядок скриптов');
-for(const [,code] of index.matchAll(/<script(?:\\s[^>]*)?>([\\s\\S]*?)<\\/script>/g))new vm.Script(code);
+const script=index.split('<script>')[1]?.split('</script>')[0]; if(script)new vm.Script(script);
 assert(legacy.includes("window.location.replace('index.html')"),'Наследуемый URL рисков должен вести к единой схеме');
 const marking=fs.readFileSync(root+'markirovka.js','utf8');
 assert(marking.includes('Обычная информация о товарах'),'Нет пояснения об информационных публикациях на странице маркировки');
