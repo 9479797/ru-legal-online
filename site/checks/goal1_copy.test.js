@@ -1,7 +1,7 @@
 const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
 const root=__dirname+'/../',c={window:{}};
 const load=f=>vm.runInNewContext(fs.readFileSync(root+f,'utf8'),c);
-for(const f of ['data.js','instagram-legal.js','route-matrix.js','card-help.js'])load(f);
+for(const f of ['data.js','instagram-legal.js','youtube-funnels.js','route-matrix.js','card-help.js'])load(f);
 const D=c.window.SCHEMA,previous=JSON.stringify(D);
 const other=Object.entries(D.start).filter(([id])=>id!=='book').flatMap(([,ps])=>ps.flatMap(p=>[p,...p.children||[]]));
 const otherHelp=other.map(n=>JSON.stringify(c.window.CardHelp.get(n)));
@@ -9,7 +9,7 @@ load('goal1-copy.js');
 assert.equal(JSON.stringify(D),previous,'Editorial help must preserve all legal data and routes');
 other.forEach((n,i)=>assert.equal(JSON.stringify(c.window.CardHelp.get(n)),otherHelp[i],'Other goal help changed: '+n.id));
 const C=c.window.Goal1Copy;
-assert.equal(Object.keys(C.methods).length,65);
+assert.equal(Object.keys(C.methods).length,79);
 assert.equal(Object.keys(C.platforms).length,10);
 assert.equal(Object.keys(C.places).length,9);
 for(const n of D.start.book.flatMap(p=>[p,...p.children||[]])){
@@ -32,4 +32,4 @@ assert(!source.includes('Модель бота требует отдельной
 assert(!source.includes("box('Дальнейшая проверка'"));
 assert(source.includes('Пример: что увидит читатель'));
 assert(source.includes('Что ещё нужно проверить перед приёмом оплаты'));
-console.log('Editorial coverage: 65 methods, 10 platforms, 9 endings; Dzen promotion and video-copy examples match the action; other goals and legal data preserved.');
+console.log('Editorial coverage: 79 methods, 10 platforms, 9 endings; Dzen promotion and video-copy examples match the action; other goals and legal data preserved.');
