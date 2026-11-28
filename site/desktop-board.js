@@ -1,6 +1,6 @@
 /* Presentation only: preserve every route, separate existing risk categories. */
 (function(root){
- const isRisk=(p,n)=>p.risk!=='g'||n?.risk==='r'||!!n?.review;
+ const isRisk=(p,n)=>p.id==='instagram'&&n ? n.risk==='r'||!!n.review : p.risk!=='g'||n?.risk==='r'||!!n?.review;
  function platforms(nodes,mode){
    return nodes.map(p=>p.children ? {...p,...(mode==='risk'&&p.risk==='g'?{name:p.name+' · опасные действия',details:'В этом разделе показаны действия с высоким риском, а не все варианты на площадке. '+(p.details||'')}:{}),children:p.children.filter(n=>isRisk(p,n)===(mode==='risk'))} : p)
      .filter(p=>p.children?p.children.length:isRisk(p)===(mode==='risk'));
