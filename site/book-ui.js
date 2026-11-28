@@ -32,7 +32,7 @@ window.BookUI = {
           blocked:plannedAd,needsCheck:!plannedAd,
           title:plannedAd ? 'Рекламное размещение в Instagram запрещено' : 'Проверьте публикацию блогера в Instagram'};
       }
-      return {name:option.name, risk:source.risk, text:source.details, blocked:false, needsCheck:id === 'tiktok', title:id === 'tiktok' ? 'Подтвердите текущую допустимость рекламы в TikTok' : ''};
+      return {name:option.name, risk:source.risk, text:source.details, blocked:false, needsCheck:['tiktok','telegram','youtube'].includes(id), title:id === 'tiktok' ? 'Подтвердите текущую допустимость рекламы в TikTok' : ['telegram','youtube'].includes(id) ? 'Подтвердите правовой статус рекламы на выбранной площадке' : ''};
     }
     function publicationIssue(a, b) {
       if (b?.why || b?.uncommitted) return null;
