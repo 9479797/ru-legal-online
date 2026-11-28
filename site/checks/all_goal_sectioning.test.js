@@ -2,7 +2,7 @@
    Юридические статусы: справочная информация / рекламные ограничения / запрет. */
 const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
 const dir=__dirname+'/../',ctx={window:{}};
-for(const p of ['data.js','instagram-legal.js','consult-legal.js','youtube-funnels.js','route-matrix.js','desktop-board.js'])
+for(const p of ['data.js','instagram-legal.js','consult-legal.js','youtube-funnels.js','telegram-funnels.js','route-matrix.js','desktop-board.js'])
   vm.runInNewContext(fs.readFileSync(dir+p,'utf8'),ctx,{filename:p});
 const D=ctx.window.SCHEMA,B=ctx.window.DesktopBoard;
 const goals=Object.entries(D.start);
@@ -53,8 +53,8 @@ for(const [goal,raw] of goals){
     restricted++;
   }
 }
-assert.equal(total,393,'Нарушена полнота маршрутов после восстановления');
-assert.equal(D.routeMatrix.rows.length,79,'Первая цель вернулась к старой версии');
+assert.equal(total,400,'Нарушена полнота маршрутов после восстановления');
+assert.equal(D.routeMatrix.rows.length,86,'Первая цель вернулась к старой версии');
 assert.equal(ig,8,'Информация о собственных товарах покрыта не во всех целях');
 assert(vkHigh>0,'Нет проверки рискованных креативов VK');
 for(const page of ['index.html','risk.html']){
