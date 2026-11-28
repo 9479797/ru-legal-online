@@ -406,7 +406,7 @@ function finalPanel(link, p, from) {
 
 function redPanel(link, siblings) {
   const target = (siblings || []).find(x => x.id === (link.saferGoto || 'author'));
-  const change = target ? '<p class="sub">Кнопка заменит ваш выбор на шаге 2. Затем вы сможете посмотреть условия этого способа.</p><button type="button" class="wbtn" data-goto="' + esc(target.id) + '">Выбрать «' + esc(target.name) + '»</button>' : '<a class="wbtn" href="index.html">Открыть обычные варианты</a>';
+  const change = target ? '<p class="sub">Кнопка заменит ваш выбор на шаге 2. Затем вы сможете посмотреть условия этого способа.</p><button type="button" class="wbtn" data-goto="' + esc(target.id) + '">Выбрать «' + esc(target.name) + '»</button>' : '<button type="button" class="wbtn" data-set-route-mode="ordinary">Открыть обычные варианты</button>';
   return '<div class="row" style="align-items:stretch">' +
     '<div class="big" style="background:var(--r)"><h3>' + (link.review ? 'Что нужно проверить' : 'Почему нельзя') + '</h3>' + list(link.why) + '<div class="risk-entry"><button type="button" class="wbtn" data-risk-options>' + (routeMode==='risk'?'Другие рискованные варианты':'Хочу рискнуть') + '</button><p class="sub">Показать рискованные варианты и их последствия.</p></div></div>' +
     '<div class="big" style="background:var(--g)"><h3>Как сделать безопаснее</h3><p>' + esc(link.safer) + '</p>' + change + '</div>' +
@@ -437,7 +437,11 @@ function changeRouteMode(next) {
     ? 'Открыты рискованные и запрещённые варианты. Прежний выбор обычных вариантов сохранён.'
     : 'Открыты обычные варианты. Прежний выбор рискованных вариантов сохранён.';
 }
-function openRiskOptions() { if(routeMode==='risk'){if(dlg.open)dlg.close();}else changeRouteMode('risk'); }
+function openRiskOptions() {
+  if (dlg.open) dlg.close();
+  if (routeMode === 'risk') returnToChoice(2);
+  else changeRouteMode('risk');
+}
 
 function syncRouteLayout() {
   if(S.scope !== 'promotion') motion.sync(S.goal + '|' + S.scope);
@@ -657,6 +661,8 @@ document.addEventListener('click', (e) => {
   }
   const nav = e.target.closest('[data-step-nav]');
   if (nav) { returnToChoice(+nav.dataset.stepNav); return; }
+  const switchMode = e.target.closest('[data-set-route-mode]');
+  if (switchMode) { changeRouteMode(switchMode.dataset.setRouteMode); return; }
   if (e.target.closest('[data-risk-options]')) { openRiskOptions(); return; }
   const riskPick = e.target.closest('[data-risk-pick]');
   if (riskPick) {
