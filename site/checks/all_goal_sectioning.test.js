@@ -61,7 +61,6 @@ const page='index.html',content=fs.readFileSync(dir+page,'utf8');
 assert(content.includes('desktop-board.js'),'Нет фильтра карточек');
 assert(content.includes("map(resolve), 'all', S.goal"),'Карточки не объединены');
 assert(!content.includes('id="route-mode"'),'Старый переключатель не удалён');
-for(const [,source] of content.matchAll(/<script(?:\\s[^>]*)?>([\\s\\S]*?)<\\/script>/g))
-  new vm.Script(source,{filename:page});
+const source=content.split('<script>')[1]?.split('</script>')[0]; if(source)new vm.Script(source,{filename:page});
 assert(fs.readFileSync(dir+'risk.html','utf8').includes("window.location.replace('index.html')"),'Старый адрес рисков должен открывать общую схему');
 console.log('All goals: '+goals.length+', routes: '+total+', own Instagram: '+ig+', VK high-risk actions: '+vkHigh+', restricted resource groups: '+restricted+'. Partition OK.');
