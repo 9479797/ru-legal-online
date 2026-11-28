@@ -6,7 +6,7 @@ const fs=require('node:fs'),vm=require('node:vm'),path=require('node:path'),asse
 const root=path.join(__dirname,'..'),site=path.join(root,'site');
 const audit=path.join(root,'reviews','ru-reklama-online','site-route-audit','2026-11-28');
 const C={window:{}};
-for(const file of ['data.js','instagram-legal.js','consult-legal.js','youtube-funnels.js','telegram-funnels.js','route-matrix.js']){
+for(const file of ['data.js','instagram-legal.js','consult-legal.js','youtube-funnels.js','telegram-funnels.js','p0-legal-review.js','route-matrix.js']){
   vm.runInNewContext(fs.readFileSync(path.join(site,file),'utf8'),C,{filename:file});
 }
 const D=C.window.SCHEMA;
