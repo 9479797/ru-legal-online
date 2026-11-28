@@ -145,7 +145,7 @@
     }
     const id = (expert?.id || ad?.id || '').replace(/-ig-(expert|ad)$/, '-ig-info');
     if (id && !a.children.some(n => n.id === id)) {
-      const dest = expert?.dest || [];
+      const dest = expert?.dest || a.children.find(n => n.risk === 'g' && Array.isArray(n.dest) && n.dest.length)?.dest || [];
       if (!dest.length) throw Error('Instagram legal: нет направления для ' + goal);
       const node = information(id, dest, goal === 'consult' ? 'консультации' : goal === 'doula' ? 'сопровождении' : goal === 'course' ? 'курсе' : goal === 'club' ? 'клубе' : goal === 'presale' ? 'предзаписи' : 'продукте');
       a.children.splice(expert ? a.children.indexOf(expert) + 1 : 0, 0, node);
