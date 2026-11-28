@@ -40,9 +40,9 @@ for(const id of ['author','bio','source','dm','tglink']) {
 }
 const guide=book.children.find(x=>x.id==='ig-info').guide;
 assert(guide&&guide.examples.length===2,'Не хватает примеров');
-load('route-matrix.js');load('book-ui.js');load('card-help.js');load('goal1-copy.js');load('desktop-board.js');
-assert.equal(D.routeMatrix.rows.length,65);
-assert.equal(Object.keys(c.window.Goal1Copy.methods).length,65);
+load('youtube-funnels.js');load('route-matrix.js');load('book-ui.js');load('card-help.js');load('goal1-copy.js');load('desktop-board.js');
+assert.equal(D.routeMatrix.rows.length,79);
+assert.equal(Object.keys(c.window.Goal1Copy.methods).length,79);
 for(const [goal,starts] of Object.entries(D.start)) {
  const p=starts.find(x=>x.id==='instagram');if(!p)continue;
  const normal=c.window.DesktopBoard.platforms(starts,'ordinary').find(x=>x.id==='instagram');
