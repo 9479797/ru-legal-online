@@ -186,3 +186,8 @@ footer{max-width:1680px;padding:0 24px}.version-note{padding:10px 16px;margin-bo
 .crumbs button.crumb:focus-visible{outline:3px solid var(--selection);outline-offset:2px}
 .route-board .step.stage-target{outline:2px solid var(--selection);outline-offset:2px}
 @media(max-width:700px){.hero .fields #book-settings{flex-wrap:wrap}.hero .fields #book-settings>.sample-with-help{margin-top:0;width:max-content;flex:0 0 auto}}
+
+/* Center each icon independently of its hidden text label. */
+.route-board .lnk{display:inline-flex;align-items:center;justify-content:center;gap:0;line-height:1;flex-shrink:0;text-align:center}
+.route-board .lnk[data-more]::after{display:block;line-height:1}
+.route-board .lnk[data-fines] svg{display:block;flex:none;margin:0}

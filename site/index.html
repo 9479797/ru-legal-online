@@ -178,13 +178,14 @@ dialog::backdrop{background:rgba(20,21,34,.45)}
 <div class="sr-only" id="route-status" role="status" aria-live="polite"></div>
 
 <main>
-<nav class="route-pages" aria-label="Разделы схемы"><a href="index.html" target="_blank" rel="noopener noreferrer" data-route-page="ordinary">Обычные варианты</a><a href="risk.html" target="_blank" rel="noopener noreferrer" data-route-page="risk">Рискованные и запрещённые</a><span id="route-page-note"></span></nav>
+
 <section class="hero" aria-labelledby="h0">
 <div class="hero-about">
 <h1 id="h0">Проверка рекламной связки</h1>
 
 </div>
 <div class="fields">
+<div><label for="route-mode">Варианты связки</label><div class="sw"><select id="route-mode" aria-describedby="route-page-note"><option value="ordinary">Обычные варианты</option><option value="risk">Рискованные и запрещённые</option></select><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4F5BD5" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></div><span id="route-page-note" hidden></span></div>
 <div><div class="label-help"><label for="scope">Что проверяем</label><button type="button" class="help-button" data-help="scope" aria-label="Чем отличаются продвижение и продажа" aria-haspopup="dialog">?</button></div><div class="sw"><select id="scope"><option value="promotion">Продвижение</option><option value="sale">Продажу</option></select></div></div>
 <div><label for="form">Как вы оформлены</label><div class="sw"><select id="form"></select><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4F5BD5" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></div></div>
 <div><label for="goal">Цель</label><div class="sw"><select id="goal"></select><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4F5BD5" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></div></div>
@@ -199,7 +200,7 @@ dialog::backdrop{background:rgba(20,21,34,.45)}
 <template id="scope-help"><p><b>Продвижение</b> — как человек узнаёт о предложении и приходит к нему: публикации, реклама, рекомендации и переходы между площадками.</p><p><b>Продажа</b> — что человек видит в месте продажи: страница товара, карточка или предложение в боте. Здесь проверяем рекламный характер, содержание и необходимые сведения.</p><p>Выдача материалов, доставка и оказание услуг относятся к сопровождению онлайн-бизнеса.</p></template>
 
 <template id="sample-help"><p>Это часть материала, с которой человек может ознакомиться до покупки: например, две страницы памятки или одна таблица из гайда.</p><p>Включите флажок, если предлагаете такой фрагмент в выбранной связке. Если сразу предлагаете полную версию, оставьте его выключенным. В маршрутах, где фрагмент уже выбран как способ знакомства, флажок включается автоматически.</p><p>Получение фрагмента и согласие на рекламную рассылку — отдельные действия.</p></template>
-<template id="navigation-help"><p>Схема помогает проверить, как вы рассказываете о своём продукте, куда ведёте читателя и какие рекламные требования нужно учесть. Она подходит для материалов, курсов, консультаций и других онлайн-проектов.</p><p>Выберите статус, цель и нужный раздел: «Продвижение» или «Продажу». Для текстовых материалов укажите формат и, при необходимости, бесплатный фрагмент.</p><ol><li><b>Площадка.</b> Выберите, где человек впервые видит материал.</li><li><b>Как вы рассказываете о материале.</b> Выберите конкретный способ: например, ответ на входящий вопрос или публикацию со ссылкой.</li><li><b>Чем заканчивается связка.</b> Выберите место, куда приходит читатель. Кнопка «Посмотреть итог» открывает разбор собранного маршрута.</li></ol><p>На ПК три этапа расположены рядом. Чтобы собрать другой маршрут, выберите площадку в первой колонке: следующие шаги обновятся, а настройки сохранятся.</p><p>«Обычные варианты» и «Рискованные и запрещённые» открываются в отдельных вкладках браузера. В каждой сохраняется свой выбранный маршрут.</p><p>Цветная полоса показывает оценку риска, а фиолетовая рамка с галочкой — выбранную карточку. Кнопка «?» у карточки открывает пояснение с примерами, «Ответственность» — отдельный разбор ответственности.</p><p>Условия конкретной публикации нужно проверить даже для обычных вариантов. Примеры о здоровье требуют отдельной проверки объекта рекламы: книга, услуга, лекарство или БАД. Оформление и выполнение заказа относятся к сопровождению онлайн-бизнеса.</p></template>
+<template id="navigation-help"><p>Схема помогает проверить, как вы рассказываете о своём продукте, куда ведёте читателя и какие рекламные требования нужно учесть. Она подходит для материалов, курсов, консультаций и других онлайн-проектов.</p><p>Выберите статус, цель и нужный раздел: «Продвижение» или «Продажу». Для текстовых материалов укажите формат и, при необходимости, бесплатный фрагмент.</p><ol><li><b>Площадка.</b> Выберите, где человек впервые видит материал.</li><li><b>Как вы рассказываете о материале.</b> Выберите конкретный способ: например, ответ на входящий вопрос или публикацию со ссылкой.</li><li><b>Чем заканчивается связка.</b> Выберите место, куда приходит читатель. Кнопка «Посмотреть итог» открывает разбор собранного маршрута.</li></ol><p>На ПК три этапа расположены рядом. Чтобы собрать другой маршрут, выберите площадку в первой колонке: следующие шаги обновятся, а настройки сохранятся.</p><p>Выберите «Обычные варианты» или «Рискованные и запрещённые» в меню «Варианты связки». Другой раздел откроется в отдельной вкладке браузера. В каждой сохраняется свой выбранный маршрут.</p><p>Цветная полоса показывает оценку риска, а фиолетовая рамка с галочкой — выбранную карточку. Кнопка «?» у карточки открывает пояснение с примерами, «Ответственность» — отдельный разбор ответственности.</p><p>Условия конкретной публикации нужно проверить даже для обычных вариантов. Примеры о здоровье требуют отдельной проверки объекта рекламы: книга, услуга, лекарство или БАД. Оформление и выполнение заказа относятся к сопровождению онлайн-бизнеса.</p></template>
 
 <footer>
 <details class="version-note"><summary>Рабочая версия · 26.11.2026 · v16 · навигация по этапам и единая справка</summary><p>Обновлены общие пояснения и первая цель. Другие девять целей сохранены и ждут последовательной проверки. Статус готовности маршрута не подтверждается одним цветом карточки.</p><p><a href="TASKS.md">Задачи и нерешённые вопросы</a> · <a href="LEGAL_REVIEW_2026-11-24.md">Результаты дополнительной сверки</a></p></details>
@@ -254,7 +255,7 @@ const motion = window.FrontendMotion.create({host:$('#steps'), bar:$('.pathbar')
 
 const routeMode = document.body.dataset.routeMode;
 const stateKey = 'skhema-state-' + routeMode;
-document.querySelector('[data-route-page="' + routeMode + '"]').setAttribute('aria-current','page');
+$('#route-mode').value = routeMode;
 $('#route-page-note').textContent = routeMode === 'risk' ? 'Ограничения площадок и действия с высоким риском' : 'Условия конкретной публикации всё равно нужно проверить';
 let S = Object.assign({ form: 'ip', goal: 'book', path: [], scope: 'promotion', format: 'file', sample: false, salePlace: 'site', publisher:'' }, store.get(stateKey, store.get('skhema-state', {})));
 Object.assign(S, store.get('skhema-settings', {}));
@@ -710,6 +711,11 @@ $('#form').value = S.form; $('#goal').value = S.goal;
 $('#form').addEventListener('change', (e) => { S.form = e.target.value; render(); });
 $('#goal').addEventListener('change', (e) => { S.goal = e.target.value; S.path = []; render(); });
 $('#scope').addEventListener('change', e => changeScope(e.target.value));
+$('#route-mode').addEventListener('change', e => {
+  const next = e.target.value;
+  e.target.value = routeMode;
+  if (next !== routeMode) window.open(next === 'risk' ? 'risk.html' : 'index.html', '_blank', 'noopener,noreferrer');
+});
 
 $('#format').addEventListener('change', e => { S.format = e.target.value; render(); });
 $('#sample').addEventListener('change', e => { S.sample = e.target.checked; render(); });
