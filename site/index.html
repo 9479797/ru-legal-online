@@ -317,7 +317,7 @@ function card(n, level, selected) {
 }
 
 function cardDetails(n) {
-  const h = window.CardHelp.get(n), g=n.guide;
+  const g=n.guide, h=n.instagramInfo && g ? Object.assign({editorial:true},g) : window.CardHelp.get(n);
   const paragraphs=(h.editorial ? [h.explanation] : [h.explanation,n.details]).filter((x,i,a)=>x&&a.indexOf(x)===i);
   let html='<div class="guide-copy"><h4>Что означает этот вариант</h4>'+paragraphs.map(x=>'<p>'+esc(x)+'</p>').join('');
   if(h.examples?.length) html+='<div class="guide-pair">'+h.examples.map(x=>'<section class="guide-example"><h4>'+esc(x.label)+'</h4><blockquote>'+esc(x.text)+'</blockquote><p><b>Что проверить:</b> '+esc(x.why)+'</p></section>').join('')+'</div>';
