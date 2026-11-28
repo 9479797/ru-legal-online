@@ -77,6 +77,22 @@ with sync_playwright() as p:
     pg.locator('#step-3 [data-save="print"]').click()
     assert "Telegram" in pg.locator("#print").inner_text(), "Export must retain chosen destination"
     assert "Instagram" in pg.locator("#print").inner_text(), "Export must retain originating platform"
+    # TikTok: all nine goals keep their original routes, examples and risk-first order.
+    for goal_id in ["consult", "club", "marathon", "event", "adsell", "presale", "course", "doula", "book"]:
+        pg.select_option("#goal", goal_id)
+        pg.locator('[data-pick="0"][data-id="tiktok"]').click()
+        assert pg.locator('#step-2 [data-pick="1"]').count() >= 6, f"Missing TikTok variants: {goal_id}"
+        colors = pg.locator('#step-2 .opt').evaluate_all(
+            "els=>els.map(e=>e.classList.contains('r')?0:e.classList.contains('y')?1:2)"
+        )
+        assert colors == sorted(colors), f"Risk order on TikTok: {goal_id}"
+        if goal_id == "book":
+            pg.locator('[data-more="1"][data-id="tt-video"]').click()
+            assert pg.locator("dialog[open] .guide-example").count() == 2, "TikTok video: paired examples"
+            assert "цена и ссылка" in pg.locator("dialog[open]").inner_text()
+            pg.locator("dialog[open] .x").click()
+            pg.locator('[data-pick="1"][data-id="tt-video"]').click()
+            assert pg.locator('#step-3 [data-pick="2"]').count() >= 1
     b.close()
 print("Ошибок в браузере нет." if not errs else "Ошибки:\n- " + "\n- ".join(errs))
 sys.exit(1 if errs else 0)
