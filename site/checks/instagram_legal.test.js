@@ -68,4 +68,4 @@ for(const html of [index,risk]){
 }
 const marking=fs.readFileSync(root+'markirovka.js','utf8');
 assert(marking.includes('Обычная информация о товарах'),'Нет пояснения об информационных публикациях на странице маркировки');
-console.log('Instagram: '+ordinary+' целей со справочными сообщениями, '+banned+' запрещённых сценариев; обе вкладки и 65 маршрутов первой цели сохранены.');
+console.log('Instagram: '+ordinary+' целей со справочными сообщениями, '+banned+' запрещённых сценариев; обе вкладки и 79 маршрутов первой цели сохранены.');
