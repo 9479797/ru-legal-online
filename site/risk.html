@@ -231,6 +231,7 @@ dialog::backdrop{background:rgba(20,21,34,.45)}
 <script src="book-ui.js"></script>
 <script src="card-help.js"></script>
 <script src="goal1-copy.js"></script>
+<script src="instagram-codeword-flow.js"></script>
 <script src="frontend-motion.js"></script>
 <script src="desktop-board.js"></script>
 <script src="settings-layout.js"></script>
@@ -259,7 +260,7 @@ const routeMode = document.body.dataset.routeMode;
 const stateKey = 'skhema-state-' + routeMode;
 $('#route-mode').value = routeMode;
 $('#route-page-note').textContent = routeMode === 'risk' ? 'Ограничения площадок и действия с высоким риском' : 'Условия конкретной публикации всё равно нужно проверить';
-let S = Object.assign({ form: 'ip', goal: 'book', path: [], scope: 'promotion', format: 'file', sample: false, salePlace: 'site', publisher:'' }, store.get(stateKey, store.get('skhema-state', {})));
+let S = Object.assign({ form: 'ip', goal: 'book', path: [], scope: 'promotion', format: 'file', sample: false, salePlace: 'site', publisher:'', igFlowDest:'site' }, store.get(stateKey, store.get('skhema-state', {})));
 if (!store.get(stateKey, null)) Object.assign(S, store.get('skhema-settings', {}));
 if (!store.get(stateKey, null)) S.scope = 'promotion';
 if(typeof S.saleChosen !== 'boolean') S.saleChosen=false;
@@ -271,6 +272,7 @@ if (!['promotion','sale'].includes(S.scope)) S.scope = 'promotion';
 if (!['file','print'].includes(S.format)) S.format = 'file';
 S.sample = S.sample === true;
 if (!['site','vkshop','market','donut','tgbot'].includes(S.salePlace)) S.salePlace = 'site';
+if (!['site','tg'].includes(S.igFlowDest)) S.igFlowDest = 'site';
 if (!(D.bookPublishers || []).some(p => p.id === S.publisher)) S.publisher = '';
 const bookUI = window.BookUI.create({ D, S, esc, curForm, saveBar });
 
@@ -469,6 +471,9 @@ function render() {
         const destinationHint = S.goal === 'book' ? (b.republish ? 'где публикуете копию' : b.transfer ? 'куда переводите аудиторию' : b.id === 'tg-bot' ? 'где размещено предложение' : 'какой результат нужен: информация, переход или предложение') : goal.destHint || 'где продаёте';
         html += step(3, 'Куда ведёт «' + b.name + '»', destinationHint, '<div class="row">' + b.dest.map((k) => card(routePlace(b, k), 2, S.path[2])).join('') + '</div>');
         if (d) html += step(4, 'Итог: ' + (S.goal === 'book' ? bookUI.publicationInfo(a, b)?.name || a.name : a.name) + ' → ' + d.name, '', finalPanel(b, d, a.name) + saveBar());
+      } else if (b && window.InstagramCodewordFlow.active(S, routeMode)) {
+        html += step(3, 'Цепочка с кодовым словом', 'Instagram → директ → бесплатный фрагмент PDF → сайт или Telegram',
+          window.InstagramCodewordFlow.render({dest:S.igFlowDest,esc}) + saveBar());
       } else if (b) {
         html += step(3, b.review ? 'Требуется отдельная проверка' : 'Почему так нельзя', '', (S.goal === 'book' ? bookUI.publicationNotice(a, b) : '') + redPanel(b, a.children) + saveBar());
       }
@@ -501,6 +506,9 @@ function summaryParts() {
   const publicationIssue = S.goal === 'book' ? bookUI.publicationIssue(a, b) : null;
   if (S.goal === 'book' && (b?.uncommitted || publicationIssue || (b?.dest && !d))) {
     out.blocks.push(['Действия выбранного маршрута', b.here?.can || []], ['Ограничения', b.here?.cannot || []]);
+  } else if (b && window.InstagramCodewordFlow.active(S, routeMode)) {
+    out.blocks.push(...window.InstagramCodewordFlow.summary({dest:S.igFlowDest}));
+    out.blocks.push(['Ответственность, если установлен состав нарушения', F(b.fines || [])]);
   } else if (b && b.why) {
     out.blocks.push([b.review ? 'Что нужно проверить' : 'Почему нельзя', b.why], ['Как сделать безопаснее', [b.safer]], ['Ответственность', F(b.fines || [])]);
   } else if (S.goal === 'book' && b && d && (b.transfer || b.republish || bookUI.nonPurchase(b, d) || bookUI.incompatible(d) || bookUI.verification(d, b))) {
@@ -631,6 +639,15 @@ document.addEventListener('click', (e) => {
     const terminal=!!e.target.closest('[data-open-terminal]');
     const panel=terminal?$('#board-terminal'):$('#step-4');
     if(panel) openDlg(head(terminal?'Разбор выбранного действия':'Итог выбранной связки',chain().map(n=>n.name).join(' → ')) + [...panel.children].filter(x=>!x.classList.contains('sh')).map(x=>x.outerHTML).join(''),false,true);
+    return;
+  }
+  const igDestination = e.target.closest('[data-ig-flow-dest]');
+  if (igDestination) {
+    if (!window.InstagramCodewordFlow.active(S, routeMode)) return;
+    S.igFlowDest = window.InstagramCodewordFlow.destination(igDestination.dataset.igFlowDest);
+    render();
+    $('#route-status').textContent = 'Следующее место цепочки: ' + (S.igFlowDest === 'tg' ? 'Telegram' : 'свой сайт');
+    document.querySelector('[data-ig-flow-dest="' + S.igFlowDest + '"]')?.focus({preventScroll:true});
     return;
   }
   const help = e.target.closest('[data-help]');
