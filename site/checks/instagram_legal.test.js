@@ -45,12 +45,12 @@ assert.equal(D.routeMatrix.rows.length,65);
 assert.equal(Object.keys(c.window.Goal1Copy.methods).length,65);
 for(const [goal,starts] of Object.entries(D.start)) {
  const p=starts.find(x=>x.id==='instagram');if(!p)continue;
- const normal=c.window.DesktopBoard.platforms(starts,'ordinary').find(x=>x.id==='instagram');
- const risk=c.window.DesktopBoard.platforms(starts,'risk').find(x=>x.id==='instagram');
- const all=[...(normal?.children||[]),...(risk?.children||[])];
- assert.equal(all.length,p.children.length,'Потеря карточки при разбиении: '+goal);
- assert.equal(new Set(all.map(x=>x.id)).size,all.length,'Дублирование карточки: '+goal);
- if(goal!=='adsell')assert(normal.children.some(x=>/-ig-info$/.test(x.id)||x.id==='ig-info'),'Не виден инфомаршрут: '+goal);
+ const all=c.window.DesktopBoard.platforms(starts).find(x=>x.id==='instagram');
+ assert.equal(all.children.length,p.children.length,'Потеря карточки: '+goal);
+ assert.equal(new Set(all.children.map(x=>x.id)).size,all.children.length,'Дубликат: '+goal);
+ const rank=c.window.DesktopBoard.riskRank;
+ assert(all.children.every((n,i)=>!i||rank(all.children[i-1])<=rank(n)),'Неверный порядок: '+goal);
+ if(goal!=='adsell')assert(all.children.some(x=>/-ig-info$/.test(x.id)||x.id==='ig-info'),'Не виден инфомаршрут: '+goal);
 }
 const S={goal:'book',scope:'promotion',form:'ip',format:'file',publisher:'instagram',path:[]};
 const ui=c.window.BookUI.create({D,S,esc:s=>String(s),curForm:()=>D.forms.find(f=>f.id==='ip'),saveBar:()=>''});
@@ -60,12 +60,12 @@ assert(ui.publicationInfo(bloggers,bloggers.children.find(n=>n.id==='bl-barter')
 assert(ui.publicationInfo(bloggers,bloggers.children.find(n=>n.id==='bl-partner')).blocked,'Партнёрская реклама блогера разрешена');
 const mutual=ui.publicationInfo(bloggers,bloggers.children.find(n=>n.id==='bl-mutual'));
 assert(mutual.needsCheck&&!mutual.blocked,'Взаимное упоминание должно пройти проверку');
-const index=fs.readFileSync(root+'index.html','utf8'),risk=fs.readFileSync(root+'risk.html','utf8');
-for(const html of [index,risk]){
+const index=fs.readFileSync(root+'index.html','utf8');
+for(const html of [index]){
  const first=html.indexOf('src="data.js"'),legal=html.indexOf('src="instagram-legal.js"'),matrix=html.indexOf('src="route-matrix.js"');
  assert(first>=0&&first<legal&&legal<matrix,'Неверный порядок скриптов');
  for(const [,code] of html.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/g))new vm.Script(code);
 }
 const marking=fs.readFileSync(root+'markirovka.js','utf8');
 assert(marking.includes('Обычная информация о товарах'),'Нет пояснения об информационных публикациях на странице маркировки');
-console.log('Instagram: '+ordinary+' целей со справочными сообщениями, '+banned+' запрещённых сценариев; обе вкладки и 65 маршрутов первой цели сохранены.');
+console.log('Instagram: '+ordinary+' целей со справочными сообщениями, '+banned+' запрещённых сценариев; единый список и 65 маршрутов первой цели сохранены.');

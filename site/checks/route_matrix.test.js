@@ -52,4 +52,27 @@ assert.equal(D.routeMatrix.rows.reduce((n,r)=>n+r.destinations.length,0),585);
 assert(page.indexOf('src="instagram-legal.js"')>page.indexOf('src="data.js"'));
 assert(page.indexOf('src="route-matrix.js"')>page.indexOf('src="instagram-legal.js"'));
 assert(page.indexOf('src="route-matrix.js"')<page.indexOf('src="book-ui.js"'));
+// Защита от устаревания сохранённого реестра: все методы, площадки и 9 состояний
+// должны в точности соответствовать собираемой текущим кодом матрице.
+const inventory=JSON.parse(fs.readFileSync(root+'checks/goal1-route-inventory.json','utf8'));
+assert.equal(inventory.methods,D.routeMatrix.rows.length,'Реестр способов отстаёт от схемы');
+assert.equal(inventory.cells,D.routeMatrix.rows.length*D.routeMatrix.targets.length,'Число ячеек реестра');
+assert.equal(inventory.rows.length,D.routeMatrix.rows.length,'Число записей реестра');
+const actual=new Map(D.routeMatrix.rows.map(row=>[row.platform+'/'+row.method,row]));
+for(const saved of inventory.rows){
+ const key=saved.platform+'/'+saved.method, row=actual.get(key);
+ assert(row,'Нет актуального способа '+key);
+ for(const cell of row.destinations){
+   assert.equal(saved.targets[cell.id],cell.state,'Состояние назначения изменилось: '+key+'/'+cell.id);
+ }
+ actual.delete(key);
+}
+assert.equal(actual.size,0,'Новые способы отсутствуют в реестре: '+[...actual.keys()].join(', '));
+const tally={conditional:0,'not-applicable':0,terminal:0};
+for(const row of inventory.rows)for(const state of Object.values(row.targets)){
+ assert(Object.hasOwn(tally,state),'Неизвестное состояние: '+state);
+ tally[state]++;
+}
+assert.deepEqual(tally,inventory.counts,'Итоговые числа реестра расходятся с ячейками');
+
 console.log(JSON.stringify({methods:65,cells:585,potentialEndings:routeCount,terminalMethods:terminal,checkedStateCombinations:cases}));
