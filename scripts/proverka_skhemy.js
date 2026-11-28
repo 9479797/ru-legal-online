@@ -8,6 +8,8 @@ const vm = require('vm');
 const file = path.join(__dirname, '..', 'site', 'data.js');
 const ctx = { window: {} };
 vm.runInNewContext(fs.readFileSync(file, 'utf8'), ctx, { filename: file });
+const ytfile = path.join(__dirname, '..', 'site', 'youtube-funnels.js');
+vm.runInNewContext(fs.readFileSync(ytfile, 'utf8'), ctx, { filename: ytfile });
 const D = ctx.window.SCHEMA;
 const err = [];
 const forms = D.forms.map((f) => f.id);
@@ -91,7 +93,7 @@ for (const fo of D.forms) if (!M.ordData[fo.id] && !M.ordData[fo.col]) err.push(
 walk(M, 'MARK');
 
 // Регрессия: TikTok-варианты, окончания и одноэкранное переключение режимов.
-for (const name of ['instagram-legal.js','consult-legal.js','youtube-funnels.js','route-matrix.js','card-help.js','goal1-copy.js','desktop-board.js']) {
+for (const name of ['instagram-legal.js','consult-legal.js','route-matrix.js','card-help.js','goal1-copy.js','desktop-board.js']) {
   const filename = path.join(__dirname, '..', 'site', name);
   vm.runInNewContext(fs.readFileSync(filename, 'utf8'), ctx, { filename });
 }
