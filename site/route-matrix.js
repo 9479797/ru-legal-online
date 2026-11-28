@@ -3,12 +3,14 @@
   const D = window.SCHEMA;
   const targets = ['none','site','vk','vkshop','tg','market','donut','tgbot','rutube'];
   const offers = ['site','vk','vkshop','tg','market','donut','tgbot'];
-  const informational = new Set(['author','bio','source','dm','tg-expert','tg-reply','vk-expert','vk-reply','yt-expert','rt-expert','tt-expert','tt-bio','tt-dm','book-site-page','book-site-article','book-site-sample']);
-  const external = new Set(['tg-post','tg-posev','vk-post','vk-mail','vk-ads','vk-adblogger','vk-posev','yt-desc','yt-blogger','rt-desc','dzen-promo','rt-blogger','tt-video','tt-blogger','bl-paid','bl-barter','bl-partner','bl-mutual','dir-search','dir-rsya','dir-retarget','dir-tg','book-site-email']);
+  const informational = new Set(['author','bio','source','dm','tg-expert','tg-reply','vk-expert','vk-reply','yt-expert','rt-expert','tt-expert','tt-bio','tt-dm','tt-direct','tt-chat','tt-sample','tt-independent','book-site-page','book-site-article','book-site-sample']);
+  const external = new Set(['tg-post','tg-posev','vk-post','vk-mail','vk-ads','vk-adblogger','vk-posev','yt-desc','yt-blogger','rt-desc','dzen-promo','rt-blogger','tt-video','tt-blogger','tt-barter','bl-paid','bl-barter','bl-partner','bl-mutual','dir-search','dir-rsya','dir-retarget','dir-tg','book-site-email']);
   const fixed = {
     'ig-info':['none','site','vk','vkshop','tg','market'],
     'tglink':['tg'], 'tg-move':['vk'], 'vk-tg':['tg'], 'book-yt-tg':['tg'], 'book-tt-tg':['tg'],
     'yt-move':['vk','rutube'], 'tt-move':['vk','rutube'],
+    'tt-direct':['site'], 'tt-chat':['none','tg','site'], 'tt-sample':['site'],
+    'tt-independent':['none','site','market'],
     'vk-shop':['vkshop'], 'vk-donut':['donut'], 'book-market-card':['market'], 'book-market-ads':['market'],
     'tg-bot':['tgbot','site'], 'tg-ads':['tg','tgbot','site'],
     'tg-promo':['none','site','vkshop','market'], 'vk-promo':['none','site','vkshop','market']
@@ -59,8 +61,8 @@
     for(const k of allowed) b.routeConditions[k]=conditions[k]+(b.republish?' Копия должна пройти отдельную оценку содержания на новой площадке.':'')+(/^(dir-|vk-ads|vk-adblogger|dzen-promo|tg-ads)/.test(b.id)?' Подтвердите поддержку такой ссылки выбранным рекламным форматом.':'');
     rows.push({platform:a.id,method:b.id,name:b.name,previous,destinations:targets.map(k=>({id:k,state:allowed.includes(k)?'conditional':terminal?'terminal':'not-applicable',reason:allowed.includes(k)?b.routeConditions[k]:terminal?(b.uncommitted?'Подарок не гарантирует публикацию или переход.':b.review?'Модель требует отдельной проверки; готовое продолжение не подтверждено.':'Предупреждающий маршрут сохраняет запрет; окончание не делает его допустимым.'):'Узкий сценарий: '+(b.republish?'размещение копии':b.transfer?'переход в указанный канал':'действие внутри выбранного сервиса')+'. Для другого действия выберите соответствующий способ.'}))});
   }
-  D.routeMatrix={date:'25.11.2026',targets,rows,scope:'Полнота сценариев первой цели; условные переходы не являются правовым разрешением.'};
-  D.review.date='25.11.2026';
-  D.review.status='Рабочая версия · v9';
-  D.review.scope='Сверена матрица окончаний 64 способов первой цели. Добавлены отсутствующие переходы и результат без покупки; переход в канал отделён от заказа. Условия сервисов и спорные правовые вопросы остаются открытыми.';
+  D.routeMatrix={date:'28.11.2026',targets,rows,scope:'Полнота сценариев первой цели, включая TikTok Т1–Т4; условные переходы не являются правовым разрешением.'};
+  D.review.date='28.11.2026';
+  D.review.status='Рабочая версия · v10';
+  D.review.scope='К матрице первой цели добавлены TikTok-маршруты Т1–Т4: прямой переход, переписка, бесплатный фрагмент и варианты чужого обзора. Прежние окончания сохранены. Юридическая допустимость каждого размещения проверяется отдельно.';
 })();
