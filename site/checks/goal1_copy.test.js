@@ -1,0 +1,35 @@
+const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
+const root=__dirname+'/../',c={window:{}};
+const load=f=>vm.runInNewContext(fs.readFileSync(root+f,'utf8'),c);
+for(const f of ['data.js','route-matrix.js','card-help.js'])load(f);
+const D=c.window.SCHEMA,previous=JSON.stringify(D);
+const other=Object.entries(D.start).filter(([id])=>id!=='book').flatMap(([,ps])=>ps.flatMap(p=>[p,...p.children||[]]));
+const otherHelp=other.map(n=>JSON.stringify(c.window.CardHelp.get(n)));
+load('goal1-copy.js');
+assert.equal(JSON.stringify(D),previous,'Editorial help must preserve all legal data and routes');
+other.forEach((n,i)=>assert.equal(JSON.stringify(c.window.CardHelp.get(n)),otherHelp[i],'Other goal help changed: '+n.id));
+const C=c.window.Goal1Copy;
+assert.equal(Object.keys(C.methods).length,64);
+assert.equal(Object.keys(C.platforms).length,10);
+assert.equal(Object.keys(C.places).length,9);
+for(const n of D.start.book.flatMap(p=>[p,...p.children||[]])){
+ const h=c.window.CardHelp.get(n);
+ assert(h.editorial&&h.examples.length===2,n.id);
+ assert(!h.examples.some(x=>[...n.here?.can||[],...n.can||[]].includes(x.text)),'Checklist repeated as example: '+n.id);
+ assert(!JSON.stringify(h).includes('Посмотрите условия этого действия'),n.id);
+}
+assert(C.methods['dzen-promo'].explanation.includes('статьи в Дзене'));
+assert(!JSON.stringify(C.methods['dzen-promo']).includes('розыгрыш'));
+const copy=c.window.CardHelp.get({id:'vk',routeResult:'copy'});
+assert(copy.explanation.includes('копию своего ролика'));
+const print=c.window.CardHelp.get({id:'site',routeResult:'offer',materialFormat:'print'});
+assert(print.examples[0].text.includes('пять памяток'));
+const file=c.window.CardHelp.get({id:'site',routeResult:'offer',materialFormat:'file'});
+assert(file.examples[0].text.includes('PDF'));
+const source=fs.readFileSync(root+'book-ui.js','utf8');
+assert(!source.includes('проект сопровождения онлайн-бизнеса'));
+assert(!source.includes('Модель бота требует отдельной проверки'));
+assert(!source.includes("box('Дальнейшая проверка'"));
+assert(source.includes('Пример: что увидит читатель'));
+assert(source.includes('Что ещё нужно проверить перед приёмом оплаты'));
+console.log('Editorial coverage: 64 methods, 10 platforms, 9 endings; Dzen promotion and video-copy examples match the action; other goals and legal data preserved.');
