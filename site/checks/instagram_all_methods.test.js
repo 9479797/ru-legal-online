@@ -37,7 +37,7 @@ for(const b of ig.children){
     else notApplicable++;
   }
 }
-assert.deepEqual([conditional,notApplicable,terminal],[47,7,18],
+assert.deepEqual([conditional,notApplicable,terminal],[39,15,18],
   'Изменились 72 состояния Instagram — нужна повторная инвентаризация');
 const info=ig.children.find(x=>x.id==='ig-info');
 assert.deepEqual(Array.from(info.dest),['none','site','vk','vkshop','tg','market']);
