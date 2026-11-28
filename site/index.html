@@ -311,7 +311,7 @@ function card(n, level, selected) {
   const sel = selected === n.id;
   return '<div class="opt ' + n.risk + (sel ? ' sel' : '') + '"' + (level===0?' data-brand="'+esc(n.id)+'"':'') + '>' +
     (sel ? '<div class="selection-label">✓ Шаг ' + (level + 1) + ' · Ваш выбор</div>' : '') +
-    '<div class="hd">' + ico(n.risk) + RL[n.risk] + '</div>' +
+    '<div class="hd">' + ico(n.risk) + (n.scenarioOnly ? (['vk','direct','rutube','site'].includes(n.id) ? 'Площадка разрешена · риск отдельного объявления' : 'Риск отдельных действий') : RL[n.risk]) + '</div>' +
     '<button class="bd" type="button" data-pick="' + level + '" data-id="' + esc(n.id) + '" aria-pressed="' + sel + '"><span class="t">' + esc(n.name) + (n.risk!=='g' ? '<span class="platform-risk '+n.risk+'">'+(n.risk==='r'?'Высокий риск':'Есть условия')+'</span>' : '') + '</span><span class="d">' + esc(n.short) + '</span></button>' +
     '<div class="ft"><button class="lnk" type="button" title="Подробнее: ' + esc(n.name) + '" data-more="' + level + '" data-id="' + esc(n.id) + '" aria-haspopup="dialog" aria-controls="dlg">Подробнее</button>' +
     '<button class="lnk" type="button" title="Ответственность: ' + esc(n.name) + '" data-fines="' + level + '" data-id="' + esc(n.id) + '">' + scale + 'Ответственность</button></div></div>';
