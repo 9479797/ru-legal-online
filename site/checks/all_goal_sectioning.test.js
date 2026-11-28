@@ -16,7 +16,7 @@ for(const [goal,raw] of goals){
   assert.equal(new Set(o).size,o.length,goal+' повтор обычной карточки');
   assert.equal(new Set(r).size,r.length,goal+' повтор рискованной карточки');
   assert(!o.some(x=>r.includes(x)),goal+' карточка попала в две вкладки');
-  assert.deepEqual([...o,...r].sort(),a.slice().sort(),goal+' потерян маршрут');
+  assert.equal(JSON.stringify([...o,...r].sort()),JSON.stringify(a.slice().sort()),goal+' потерян маршрут');
   total+=a.length;
   for(const p of risky){
     if(p.id==='vk'){
