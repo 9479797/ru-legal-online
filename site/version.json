@@ -1,6 +1,6 @@
 {
-  "version": "2026-11-28-working-v20.3-unified-risks",
-  "status": "Рабочая редакция: единая схема всех вариантов, сортировка красные/жёлтые/обычные в каждом шаге. На согласовании.",
+  "version": "2026-11-28-working-v20.4-tiktok-legal-audit",
+  "status": "Рабочая редакция: системная юридическая проверка 59 карточек TikTok в девяти целях. На согласовании.",
   "base_repository": "9479797/ru-legal-online",
   "base_commit": "60bf80361bd757522656631eb45ddb19cc1cee88",
   "old_book_links_preserved": 56,
@@ -137,7 +137,7 @@
   "palette_source_commit": "ce3ae10d2822a8a275c9c89891bba2f0fb435093",
   "risk_top_headers": true,
   "intrinsic_select_widths": true,
-  "browser_qa": "Pending automated checks for v20.3",
+  "browser_qa": "GitHub Actions pending for v20.4",
   "desktop_settings_single_row": true,
   "desktop_settings_direction": "row",
   "stage_navigation": "rollback-without-scroll",
@@ -187,5 +187,17 @@
   "ui_mode_legacy_links": "risk.html redirects to index.html",
   "ui_sorting": "Каждая колонка r → y → g, собственный риск каждой карточки; родитель не наследует статус потомка",
   "route_state_key": "skhema-state-all",
-  "state_migration": "Перенос сохранённых путей из skhema-state-risk / skhema-state-ordinary, без удаления прежних записей"
+  "state_migration": "Перенос сохранённых путей из skhema-state-risk / skhema-state-ordinary, без удаления прежних записей",
+  "tiktok_review": {
+    "checked": "2026-11-28",
+    "groups": 9,
+    "variants": 59,
+    "goal_without_tiktok": "partner",
+    "source": "site/tiktok-legal.js",
+    "legal_status": "Не приравнивать ограничения TikTok как сервиса к ограничению доступа РКН, требуется проверка фактического ресурса",
+    "platform_rules": "Региональные ограничения публикаций/Ads и commercial disclosure проверяются отдельно",
+    "changes": "Убраны автоматические выводы о рекламе по цене и ссылке, скорректирован порог реестра, VPN и тексты ссылок; сохранены оригинальные ID/назначения",
+    "approved": false,
+    "other_platforms_unchanged": true
+  }
 }
