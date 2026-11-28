@@ -2,10 +2,10 @@ const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/st
 const root=__dirname+'/../',c={window:{}};
 const load=f=>vm.runInNewContext(fs.readFileSync(root+f,'utf8'),c);
 load('data.js');load('instagram-legal.js');const before=JSON.parse(JSON.stringify(c.window.SCHEMA));
-load('route-matrix.js');load('book-ui.js');load('card-help.js');load('goal1-copy.js');
+load('youtube-funnels.js');load('route-matrix.js');load('book-ui.js');load('card-help.js');load('goal1-copy.js');
 const D=c.window.SCHEMA, page=fs.readFileSync(root+'index.html','utf8');
 for(const id of Object.keys(before.start).filter(x=>x!=='book'))assert.equal(JSON.stringify(D.start[id]),JSON.stringify(before.start[id]),id);
-assert.equal(D.routeMatrix.rows.length,65);
+assert.equal(D.routeMatrix.rows.length,79);
 assert.equal(JSON.stringify(D.places),JSON.stringify(before.places),'Shared destinations for other goals changed');
 const S={goal:'book',format:'file',scope:'promotion',salePlace:'site',form:D.forms[0].id,sample:false,publisher:'vk',path:[]};
 const esc=s=>String(s).replace(/[&<>"]/g,x=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[x]));
@@ -48,8 +48,8 @@ for(const id of ['dm','tg-reply','vk-reply','tt-dm'])for(const k of ['none','sit
 for(const id of ['yt-move','tt-move'])assert.deepEqual(Array.from(find(id).dest),['vk','rutube']);
 assert.deepEqual(Array.from(find('vk-shop').dest),['vkshop']);
 assert.deepEqual(Array.from(find('book-market-card').dest),['market']);
-assert.equal(D.routeMatrix.rows.reduce((n,r)=>n+r.destinations.length,0),585);
+assert.equal(D.routeMatrix.rows.reduce((n,r)=>n+r.destinations.length,0),711);
 assert(page.indexOf('src="instagram-legal.js"')>page.indexOf('src="data.js"'));
 assert(page.indexOf('src="route-matrix.js"')>page.indexOf('src="instagram-legal.js"'));
 assert(page.indexOf('src="route-matrix.js"')<page.indexOf('src="book-ui.js"'));
-console.log(JSON.stringify({methods:65,cells:585,potentialEndings:routeCount,terminalMethods:terminal,checkedStateCombinations:cases}));
+console.log(JSON.stringify({methods:79,cells:711,potentialEndings:routeCount,terminalMethods:terminal,checkedStateCombinations:cases}));
