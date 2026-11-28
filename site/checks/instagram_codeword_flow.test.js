@@ -54,6 +54,7 @@ const persisted=[];
 const status={textContent:''};
 const ctx={window:c.window,S:{...state},routeMode:'all',
   render(){persisted.push(JSON.parse(JSON.stringify(ctx.S)));},
+  $:selector=>selector==='#route-status'?status:null,
   document:{querySelector(selector){
     if(selector==='#route-status')return status;
     if(selector.startsWith('[data-ig-flow-dest='))return {focus(options){
