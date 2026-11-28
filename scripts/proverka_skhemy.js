@@ -90,6 +90,37 @@ for (const p of M.platforms) if (!(D.platforms || {})[p.id]) err.push(`марк�
 for (const fo of D.forms) if (!M.ordData[fo.id] && !M.ordData[fo.col]) err.push(`маркировка: нет данных для ОРД формы ${fo.id}`);
 walk(M, 'MARK');
 
+// Регрессия: TikTok-варианты, окончания и одноэкранное переключение режимов.
+for (const name of ['instagram-legal.js','consult-legal.js','route-matrix.js','card-help.js','goal1-copy.js','desktop-board.js']) {
+  const filename = path.join(__dirname, '..', 'site', name);
+  vm.runInNewContext(fs.readFileSync(filename, 'utf8'), ctx, { filename });
+}
+const tik = D.start.book.find(x => x.id === 'tiktok');
+const needed = ['tt-direct', 'tt-chat', 'tt-sample', 'tt-independent', 'tt-gift-independent', 'tt-barter'];
+for (const id of needed) {
+  const n = tik.children.find(x => x.id === id);
+  if (!n) { err.push('TikTok: нет карточки ' + id); continue; }
+  if (!D.routeMatrix.rows.some(x => x.method === id)) err.push('TikTok: нет маршрута ' + id);
+  if (!ctx.window.Goal1Copy.methods[id]) err.push('TikTok: нет парных примеров ' + id);
+  for (const dest of n.dest || []) if (!D.bookPlaces[dest]) err.push('TikTok ' + id + ': нет назначения ' + dest);
+}
+for (const [mode, id] of [['ordinary','tt-direct'], ['ordinary','tt-gift-independent'],['risk','tt-barter'],['risk','tt-blogger']]) {
+  const p = ctx.window.DesktopBoard.platforms(D.start.book, mode, 'book').find(x => x.id === 'tiktok');
+  if (!p?.children?.some(x => x.id === id)) err.push('TikTok ' + mode + ': не показан ' + id);
+}
+if (!tik.children.find(x=>x.id==='tt-sample')?.sample) err.push('TikTok: бесплатный фрагмент не включается на своём пути');
+if (!tik.children.find(x=>x.id==='tt-gift-independent')?.uncommitted) err.push('TikTok: подарок без условий должен завершаться без обещания обзора');
+for (const page of ['index.html','risk.html']) {
+  const html = fs.readFileSync(path.join(__dirname, '..', 'site', page), 'utf8');
+  const inline = /<script>\s*([\s\S]*?)<\/script>/.exec(html);
+  if (!inline) err.push(page+': нет кода интерфейса');
+  else { try { new vm.Script(inline[1]); } catch (e) { err.push(page+': ошибка синтаксиса '+e.message); } }
+  if (html.includes("window.location.assign(next === 'risk'")) err.push(page+': переключение ещё открывает другую страницу');
+  if (html.includes('scrollToStep(')) err.push(page+': осталась автопрокрутка выбора карточки');
+  if (!html.includes('S.path = S.path.slice(0, num - 1)')) err.push(page+': кнопка этапа не возвращает к выбору');
+  if (!html.includes('data-set-route-mode="ordinary"')) err.push(page+': выход из рискованного маршрута всё ещё ведёт на другой URL');
+}
+
 const verify = Object.entries(D.fines).filter(([, f]) => f.verify).map(([k]) => k);
 console.log(`Схема: ${uzly} узлов, ${Object.keys(D.places).length} площадок, ${Object.keys(D.fines).length} штрафов, на сверке: ${verify.join(', ') || 'нет'}`);
 if (err.length) { console.log('Ошибки:\n- ' + err.join('\n- ')); process.exit(1); }
