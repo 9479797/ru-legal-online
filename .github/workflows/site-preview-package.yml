@@ -22,11 +22,11 @@ jobs:
           test -f site/youtube-funnels.js
           test -f site/data.js
           cd site
-          zip -q -r ../reklama-site-v20.4-2026-11-28.zip . -x '*.DS_Store'
+          zip -q -r ../reklama-site-v20.5-2026-11-28.zip . -x '*.DS_Store'
       - name: Upload site package
         uses: actions/upload-artifact@v4
         with:
-          name: reklama-site-v20.4
-          path: reklama-site-v20.4-2026-11-28.zip
+          name: reklama-site-v20.5
+          path: reklama-site-v20.5-2026-11-28.zip
           if-no-files-found: error
           retention-days: 30
