@@ -10,7 +10,7 @@
     'tglink':['tg'], 'tg-move':['vk'], 'vk-tg':['tg'], 'book-yt-tg':['tg'], 'book-tt-tg':['tg'],
     'yt-move':['vk','rutube'], 'tt-move':['vk','rutube'],
     'tt-direct':['site'], 'tt-chat':['none','tg','site'], 'tt-sample':['site'],
-    'tt-independent':['none','site','market'],
+    'tt-independent':['none','site','market'], 'tt-barter':['site','market'],
     'vk-shop':['vkshop'], 'vk-donut':['donut'], 'book-market-card':['market'], 'book-market-ads':['market'],
     'tg-bot':['tgbot','site'], 'tg-ads':['tg','tgbot','site'],
     'tg-promo':['none','site','vkshop','market'], 'vk-promo':['none','site','vkshop','market']
