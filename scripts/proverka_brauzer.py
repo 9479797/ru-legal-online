@@ -89,7 +89,7 @@ with sync_playwright() as p:
         if goal_id == "book":
             pg.locator('[data-more="1"][data-id="tt-video"]').click()
             assert pg.locator("dialog[open] .guide-example").count() == 2, "TikTok video: paired examples"
-            assert "цена и ссылка" in pg.locator("dialog[open]").inner_text()
+            assert "Сведения о своём продукте" in pg.locator("dialog[open]").inner_text()
             pg.locator("dialog[open] .x").click()
             pg.locator('[data-pick="1"][data-id="tt-video"]').click()
             assert pg.locator('#step-3 [data-pick="2"]').count() >= 1
