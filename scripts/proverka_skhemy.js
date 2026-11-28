@@ -12,6 +12,8 @@ const ytfile = path.join(__dirname, '..', 'site', 'youtube-funnels.js');
 vm.runInNewContext(fs.readFileSync(ytfile, 'utf8'), ctx, { filename: ytfile });
 const tgfile = path.join(__dirname, '..', 'site', 'telegram-funnels.js');
 vm.runInNewContext(fs.readFileSync(tgfile, 'utf8'), ctx, { filename: tgfile });
+const p0file = path.join(__dirname, '..', 'site', 'p0-legal-review.js');
+vm.runInNewContext(fs.readFileSync(p0file, 'utf8'), ctx, { filename: p0file });
 const D = ctx.window.SCHEMA;
 const err = [];
 const forms = D.forms.map((f) => f.id);
