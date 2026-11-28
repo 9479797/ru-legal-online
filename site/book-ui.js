@@ -37,7 +37,9 @@ window.BookUI = {
     function publicationIssue(a, b) {
       if (b?.why || b?.uncommitted) return null;
       const info = publicationInfo(a, b);
-      return info && (info.blocked || info.needsCheck) ? info : null;
+      // Для собственного TikTok-маршрута показываем предупреждение, но не обрываем
+      // выбор назначения. Блогерское размещение сохраняет отдельную проверку.
+      return info && (info.blocked || (info.needsCheck && a?.id !== 'tiktok')) ? info : null;
     }
     function publicationNotice(a, b) {
       const info = publicationInfo(a, b);
