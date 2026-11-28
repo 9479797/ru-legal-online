@@ -42,4 +42,36 @@ for(const p of ['index.html']){
 }
 const desktop=fs.readFileSync(root+'desktop-board.js','utf8');
 assert(desktop.includes("!stage.querySelector('.ig-codeword-flow')"),'Шаги скрыты в диалоге');
+
+// Проверка обработчика клика из настоящей страницы: выбор меняется,
+// вызывается render (там состояние записывается в localStorage), фокус не прокручивает страницу.
+const page=fs.readFileSync(root+'index.html','utf8');
+const start=page.indexOf("  const igDestination = e.target.closest('[data-ig-flow-dest]');");
+const end=page.indexOf("  const help = e.target.closest('[data-help]');",start);
+assert(start>=0 && end>start,'Обработчик смены места должен присутствовать');
+const handler=page.slice(start,end);
+const persisted=[];
+const status={textContent:''};
+const ctx={window:c.window,S:{...state},routeMode:'all',
+  render(){persisted.push(JSON.parse(JSON.stringify(ctx.S)));},
+  document:{querySelector(selector){
+    if(selector==='#route-status')return status;
+    if(selector.startsWith('[data-ig-flow-dest='))return {focus(options){
+      assert.equal(options.preventScroll,true,'Смена места не должна прокручивать экран');
+    }};
+    return null;
+  }}};
+vm.createContext(ctx);
+for(const id of ['tg','site','tg']){
+  const e={target:{closest(selector){
+    return selector==='[data-ig-flow-dest]'?{dataset:{igFlowDest:id}}:null;
+  }}};
+  vm.runInContext('(function(e){'+handler+'})(e)',Object.assign(ctx,{e}));
+  assert.equal(ctx.S.igFlowDest,id,'Выбор места должен меняться');
+  assert.equal(persisted.at(-1).igFlowDest,id,'render должен сохранить изменённый выбор');
+}
+assert.equal(status.textContent,'Следующее место цепочки: Telegram');
+assert.equal(persisted.length,3,'Каждая смена должна инициировать сохранение');
+assert(page.includes('store.set(stateKey, S);'),'render обязан сохранять маршрут и место в localStorage');
+
 console.log('Instagram codeword: one risk route, 4 inspected actions, 2 destinations, export, no changes to 65 existing book routes.');
