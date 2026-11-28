@@ -160,17 +160,29 @@ if (!youtube?.children?.find(x=>x.id==='yt-shorts')?.details.includes('некл�
 if (youtube?.children?.find(x=>x.id==='book-yt-tg')?.risk !== 'g') err.push('YouTube: нейтральная ссылка ошибочно отмечена как реклама');
 
 if (!tik.children.find(x=>x.id==='tt-gift-independent')?.uncommitted) err.push('TikTok: подарок без условий должен завершаться без обещания обзора');
-for (const page of ['index.html','risk.html']) {
-  const html = fs.readFileSync(path.join(__dirname, '..', 'site', page), 'utf8');
-  const inline = /<script>\s*([\s\S]*?)<\/script>/.exec(html);
-  if (!inline) err.push(page+': нет кода интерфейса');
-  else { try { new vm.Script(inline[1]); } catch (e) { err.push(page+': ошибка синтаксиса '+e.message); } }
-  if (html.includes("window.location.assign(next === 'risk'")) err.push(page+': переключение ещё открывает другую страницу');
-  if (html.includes('scrollToStep(')) err.push(page+': осталась автопрокрутка выбора карточки');
-  if (!html.includes('S.path = S.path.slice(0, num - 1)')) err.push(page+': кнопка этапа не возвращает к выбору');
-  if (!html.includes('data-set-route-mode="ordinary"')) err.push(page+': выход из рискованного маршрута всё ещё ведёт на другой URL');
-  if (!html.includes('<script src="youtube-funnels.js"></script>')) err.push(page+': не подключён модуль YouTube');
-  if (!html.includes('<script src="telegram-funnels.js"></script>')) err.push(page+': не подключён модуль Telegram');
+// Единая схема: все цвета сохраняются, режимы не скрывают карточки.
+const html = fs.readFileSync(path.join(__dirname, '..', 'site', 'index.html'), 'utf8');
+const inline = /<script>\s*([\s\S]*?)<\/script>/.exec(html);
+if (!inline) err.push('index.html: нет кода интерфейса');
+else { try { new vm.Script(inline[1]); } catch (e) { err.push('index.html: ошибка синтаксиса '+e.message); } }
+if (!html.includes('data-route-mode="all"')) err.push('Схема не переведена в единый режим');
+if (!html.includes("map(resolve), 'all', S.goal")) err.push('Неверный набор карточек');
+if (html.includes('id="route-mode"')) err.push('Остался переключатель «Варианты связки»');
+if (html.includes('scrollToStep(')) err.push('Осталась автопрокрутка выбора');
+if (!html.includes('S.path = S.path.slice(0, num - 1)')) err.push('Кнопка этапа не возвращает к выбору');
+for(const module of ['youtube-funnels.js','telegram-funnels.js','desktop-board.js']) {
+  if(!html.includes('<script src="'+module+'"></script>')) err.push('Не подключён модуль '+module);
+}
+const riskAlias = fs.readFileSync(path.join(__dirname,'..','site','risk.html'),'utf8');
+if(!riskAlias.includes("window.location.replace('index.html')"))err.push('Старый risk.html не перенаправляет в общую схему');
+for(const [goal,raw] of Object.entries(D.start)){
+  const nodes=raw.map(n=>n.place?Object.assign({id:n.id},D.places[n.place]):n);
+  const all=ctx.window.DesktopBoard.platforms(nodes,'all',goal);
+  const ids=xs=>xs.flatMap(p=>p.children?p.children.map(n=>p.id+'/'+n.id):[p.id]);
+  if(JSON.stringify(ids(all).sort())!==JSON.stringify(ids(nodes).sort()))err.push('Единая схема потеряла карточки '+goal);
+  const order=xs=>xs.every((n,i)=>i===0||({r:0,y:1,g:2}[xs[i-1].risk]??3)<=({r:0,y:1,g:2}[n.risk]??3));
+  if(!order(all))err.push('Площадки идут не в порядке риска '+goal);
+  for(const p of all)if(p.children&&!order(p.children))err.push('Способы идут не в порядке риска '+goal+'/'+p.id);
 }
 
 const verify = Object.entries(D.fines).filter(([, f]) => f.verify).map(([k]) => k);
