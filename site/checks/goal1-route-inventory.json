@@ -1,0 +1,1612 @@
+{
+  "date": "25.11.2026",
+  "scope": "Полнота сценариев первой цели; условные переходы не являются правовым разрешением.",
+  "baseCommit": "bfe10ee7327e55f967ebbdf4ccdaf4a07f88d2a3",
+  "counts": {
+    "conditional": 315,
+    "not-applicable": 171,
+    "terminal": 90
+  },
+  "methods": 64,
+  "cells": 576,
+  "states": {
+    "conditional": "Сценарий учитывается с условиями; не является подтверждением законности или готовности размещения",
+    "terminal": "Предупреждение, отдельная проверка или подарок без гарантии публикации",
+    "not-applicable": "Другой тип действия; причина хранится в routeMatrix и route-matrix.js"
+  },
+  "sources": [
+    {
+      "url": "https://www.consultant.ru/document/cons_doc_LAW_539057/",
+      "checked": "25.11.2026",
+      "use": "Оценка конкретной информации по содержанию и обстоятельствам"
+    },
+    {
+      "url": "https://ads.telegram.org/guidelines",
+      "checked": "25.11.2026",
+      "use": "Каналы, боты и работоспособность страниц назначения; формат требует проверки"
+    },
+    {
+      "url": "https://core.telegram.org/bots/payments-stars",
+      "checked": "25.11.2026",
+      "use": "Правила сервиса для цифровых продаж внутри бота"
+    },
+    {
+      "url": "https://www.yandex.ru/support/direct/ru/messengers-ads/features",
+      "checked": "25.11.2026",
+      "use": "Условия размещения в мессенджерах; доступность сервиса не означает юридического разрешения"
+    }
+  ],
+  "limits": [
+    "Не выполнена новая полная сверка размеров штрафов и всех налоговых обязанностей.",
+    "Сохраняются условия VK, цифровых маркетплейсов, Доната, рекламных форматов и текущей допустимости TikTok.",
+    "315 — число структурных продолжений до применения условий формата и площадки публикации, а не количество юридически одобренных цепочек."
+  ],
+  "rows": [
+    {
+      "platform": "instagram",
+      "method": "author",
+      "name": "Через имя автора",
+      "previous": [
+        "site",
+        "vk",
+        "tg"
+      ],
+      "targets": {
+        "none": "conditional",
+        "site": "conditional",
+        "vk": "conditional",
+        "vkshop": "conditional",
+        "tg": "conditional",
+        "market": "conditional",
+        "donut": "conditional",
+        "tgbot": "conditional",
+        "rutube": "not-applicable"
+      },
+      "added": [
+        "none",
+        "vkshop",
+        "market",
+        "donut",
+        "tgbot"
+      ]
+    },
+    {
+      "platform": "instagram",
+      "method": "bio",
+      "name": "Шапка профиля",
+      "previous": [
+        "site",
+        "vk",
+        "tg"
+      ],
+      "targets": {
+        "none": "conditional",
+        "site": "conditional",
+        "vk": "conditional",
+        "vkshop": "conditional",
+        "tg": "conditional",
+        "market": "conditional",
+        "donut": "conditional",
+        "tgbot": "conditional",
+        "rutube": "not-applicable"
+      },
+      "added": [
+        "none",
+        "vkshop",
+        "market",
+        "donut",
+        "tgbot"
+      ]
+    },
+    {
+      "platform": "instagram",
+      "method": "source",
+      "name": "Памятка как источник",
+      "previous": [
+        "site",
+        "vk",
+        "tg"
+      ],
+      "targets": {
+        "none": "conditional",
+        "site": "conditional",
+        "vk": "conditional",
+        "vkshop": "conditional",
+        "tg": "conditional",
+        "market": "conditional",
+        "donut": "conditional",
+        "tgbot": "conditional",
+        "rutube": "not-applicable"
+      },
+      "added": [
+        "none",
+        "vkshop",
+        "market",
+        "donut",
+        "tgbot"
+      ]
+    },
+    {
+      "platform": "instagram",
+      "method": "dm",
+      "name": "Ответ в директ по запросу",
+      "previous": [
+        "site",
+        "vk"
+      ],
+      "targets": {
+        "none": "conditional",
+        "site": "conditional",
+        "vk": "conditional",
+        "vkshop": "conditional",
+        "tg": "conditional",
+        "market": "conditional",
+        "donut": "conditional",
+        "tgbot": "conditional",
+        "rutube": "not-applicable"
+      },
+      "added": [
+        "none",
+        "vkshop",
+        "tg",
+        "market",
+        "donut",
+        "tgbot"
+      ]
+    },
+    {
+      "platform": "instagram",
+      "method": "tglink",
+      "name": "Ссылка на Telegram",
+      "previous": [
+        "tg"
+      ],
+      "targets": {
+        "none": "not-applicable",
+        "site": "not-applicable",
+        "vk": "not-applicable",
+        "vkshop": "not-applicable",
+        "tg": "conditional",
+        "market": "not-applicable",
+        "donut": "not-applicable",
+        "tgbot": "not-applicable",
+        "rutube": "not-applicable"
+      },
+      "added": []
+    },
+    {
+      "platform": "instagram",
+      "method": "word",
+      "name": "«Напиши слово в директ»",
+      "previous": [],
+      "targets": {
+        "none": "terminal",
+        "site": "terminal",
+        "vk": "terminal",
+        "vkshop": "terminal",
+        "tg": "terminal",
+        "market": "terminal",
+        "donut": "terminal",
+        "tgbot": "terminal",
+        "rutube": "terminal"
+      },
+      "added": []
+    },
+    {
+      "platform": "instagram",
+      "method": "target",
+      "name": "Таргет и платные функции",
+      "previous": [],
+      "targets": {
+        "none": "terminal",
+        "site": "terminal",
+        "vk": "terminal",
+        "vkshop": "terminal",
+        "tg": "terminal",
+        "market": "terminal",
+        "donut": "terminal",
+        "tgbot": "terminal",
+        "rutube": "terminal"
+      },
+      "added": []
+    },
+    {
+      "platform": "telegram",
+      "method": "tg-expert",
+      "name": "Экспертная публикация в канале",
+      "previous": [
+        "site",
+        "vk"
+      ],
+      "targets": {
+        "none": "conditional",
+        "site": "conditional",
+        "vk": "conditional",
+        "vkshop": "conditional",
+        "tg": "conditional",
+        "market": "conditional",
+        "donut": "conditional",
+        "tgbot": "conditional",
+        "rutube": "not-applicable"
+      },
+      "added": [
+        "none",
+        "vkshop",
+        "tg",
+        "market",
+        "donut",
+        "tgbot"
+      ]
+    },
+    {
+      "platform": "telegram",
+      "method": "tg-reply",
+      "name": "Ответ на входящий вопрос о материале",
+      "previous": [
+        "site",
+        "vkshop"
+      ],
+      "targets": {
+        "none": "conditional",
+        "site": "conditional",
+        "vk": "conditional",
+        "vkshop": "conditional",
+        "tg": "conditional",
+        "market": "conditional",
+        "donut": "conditional",
+        "tgbot": "conditional",
+        "rutube": "not-applicable"
+      },
+      "added": [
+        "none",
+        "vk",
+        "tg",
+        "market",
+        "donut",
+        "tgbot"
+      ]
+    },
+    {
+      "platform": "telegram",
+      "method": "tg-post",
+      "name": "Пост или закреп со ссылкой",
+      "previous": [
+        "site"
+      ],
+      "targets": {
+        "none": "not-applicable",
+        "site": "conditional",
+        "vk": "conditional",
+        "vkshop": "conditional",
+        "tg": "conditional",
+        "market": "conditional",
+        "donut": "conditional",
+        "tgbot": "conditional",
+        "rutube": "not-applicable"
+      },
+      "added": [
+        "vk",
+        "vkshop",
+        "tg",
+        "market",
+        "donut",
+        "tgbot"
+      ]
+    },
+    {
+      "platform": "telegram",
+      "method": "tg-posev",
+      "name": "Посев в чужом канале",
+      "previous": [
+        "site"
+      ],
+      "targets": {
+        "none": "not-applicable",
+        "site": "conditional",
+        "vk": "conditional",
+        "vkshop": "conditional",
+        "tg": "conditional",
+        "market": "conditional",
+        "donut": "conditional",
+        "tgbot": "conditional",
+        "rutube": "not-applicable"
+      },
+      "added": [
+        "vk",
+        "vkshop",
+        "tg",
+        "market",
+        "donut",
+        "tgbot"
+      ]
+    },
+    {
+      "platform": "telegram",
+      "method": "tg-ads",
+      "name": "Telegram Ads",
+      "previous": [
+        "site"
+      ],
+      "targets": {
+        "none": "not-applicable",
+        "site": "conditional",
+        "vk": "not-applicable",
+        "vkshop": "not-applicable",
+        "tg": "conditional",
+        "market": "not-applicable",
+        "donut": "not-applicable",
+        "tgbot": "conditional",
+        "rutube": "not-applicable"
+      },
+      "added": [
+        "tg",
+        "tgbot"
+      ]
+    },
+    {
+      "platform": "telegram",
+      "method": "tg-bot",
+      "name": "Бот-магазин или переход из бота на сайт",
+      "previous": [
+        "tgbot",
+        "site"
+      ],
+      "targets": {
+        "none": "not-applicable",
+        "site": "conditional",
+        "vk": "not-applicable",
+        "vkshop": "not-applicable",
+        "tg": "not-applicable",
+        "market": "not-applicable",
+        "donut": "not-applicable",
+        "tgbot": "conditional",
+        "rutube": "not-applicable"
+      },
+      "added": []
+    },
+    {
+      "platform": "telegram",
+      "method": "tg-promo",
+      "name": "Розыгрыш памятки",
+      "previous": [
+        "site"
+      ],
+      "targets": {
+        "none": "conditional",
+        "site": "conditional",
+        "vk": "not-applicable",
+        "vkshop": "conditional",
+        "tg": "not-applicable",
+        "market": "conditional",
+        "donut": "not-applicable",
+        "tgbot": "not-applicable",
+        "rutube": "not-applicable"
+      },
+      "added": [
+        "none",
+        "vkshop",
+        "market"
+      ]
+    },
+    {
+      "platform": "telegram",
+      "method": "tg-move",
+      "name": "Перевести аудиторию в VK",
+      "previous": [
+        "vk"
+      ],
+      "targets": {
+        "none": "not-applicable",
+        "site": "not-applicable",
+        "vk": "conditional",
+        "vkshop": "not-applicable",
+        "tg": "not-applicable",
+        "market": "not-applicable",
+        "donut": "not-applicable",
+        "tgbot": "not-applicable",
+        "rutube": "not-applicable"
+      },
+      "added": []
+    },
+    {
+      "platform": "telegram",
+      "method": "tg-vpn",
+      "name": "Реклама VPN и средств доступа к ограниченным ресурсам",
+      "previous": [],
+      "targets": {
+        "none": "terminal",
+        "site": "terminal",
+        "vk": "terminal",
+        "vkshop": "terminal",
+        "tg": "terminal",
+        "market": "terminal",
+        "donut": "terminal",
+        "tgbot": "terminal",
+        "rutube": "terminal"
+      },
+      "added": []
+    },
+    {
+      "platform": "vk",
+      "method": "vk-expert",
+      "name": "Экспертное сообщество",
+      "previous": [
+        "site",
+        "vkshop"
+      ],
+      "targets": {
+        "none": "conditional",
+        "site": "conditional",
+        "vk": "conditional",
+        "vkshop": "conditional",
+        "tg": "conditional",
+        "market": "conditional",
+        "donut": "conditional",
+        "tgbot": "conditional",
+        "rutube": "not-applicable"
+      },
+      "added": [
+        "none",
+        "vk",
+        "tg",
+        "market",
+        "donut",
+        "tgbot"
+      ]
+    },
+    {
+      "platform": "vk",
+      "method": "vk-post",
+      "name": "Пост со ссылкой на памятку",
+      "previous": [
+        "site",
+        "vkshop",
+        "market"
+      ],
+      "targets": {
+        "none": "not-applicable",
+        "site": "conditional",
+        "vk": "conditional",
+        "vkshop": "conditional",
+        "tg": "conditional",
+        "market": "conditional",
+        "donut": "conditional",
+        "tgbot": "conditional",
+        "rutube": "not-applicable"
+      },
+      "added": [
+        "vk",
+        "tg",
+        "donut",
+        "tgbot"
+      ]
+    },
+    {
+      "platform": "vk",
+      "method": "vk-shop",
+      "name": "Раздел «Товары»",
+      "previous": [
+        "vkshop"
+      ],
+      "targets": {
+        "none": "not-applicable",
+        "site": "not-applicable",
+        "vk": "not-applicable",
+        "vkshop": "conditional",
+        "tg": "not-applicable",
+        "market": "not-applicable",
+        "donut": "not-applicable",
+        "tgbot": "not-applicable",
+        "rutube": "not-applicable"
+      },
+      "added": []
+    },
+    {
+      "platform": "vk",
+      "method": "vk-mail",
+      "name": "Рассылка сообщений сообщества",
+      "previous": [
+        "site",
+        "vkshop"
+      ],
+      "targets": {
+        "none": "not-applicable",
+        "site": "conditional",
+        "vk": "conditional",
+        "vkshop": "conditional",
+        "tg": "conditional",
+        "market": "conditional",
+        "donut": "conditional",
+        "tgbot": "conditional",
+        "rutube": "not-applicable"
+      },
+      "added": [
+        "vk",
+        "tg",
+        "market",
+        "donut",
+        "tgbot"
+      ]
+    },
+    {
+      "platform": "vk",
+      "method": "vk-ads",
+      "name": "VK Реклама",
+      "previous": [
+        "site",
+        "vkshop",
+        "market"
+      ],
+      "targets": {
+        "none": "not-applicable",
+        "site": "conditional",
+        "vk": "conditional",
+        "vkshop": "conditional",
+        "tg": "conditional",
+        "market": "conditional",
+        "donut": "conditional",
+        "tgbot": "conditional",
+        "rutube": "not-applicable"
+      },
+      "added": [
+        "vk",
+        "tg",
+        "donut",
+        "tgbot"
+      ]
+    },
+    {
+      "platform": "vk",
+      "method": "vk-adblogger",
+      "name": "Посев через VK AdBlogger",
+      "previous": [
+        "site",
+        "vkshop"
+      ],
+      "targets": {
+        "none": "not-applicable",
+        "site": "conditional",
+        "vk": "conditional",
+        "vkshop": "conditional",
+        "tg": "conditional",
+        "market": "conditional",
+        "donut": "conditional",
+        "tgbot": "conditional",
+        "rutube": "not-applicable"
+      },
+      "added": [
+        "vk",
+        "tg",
+        "market",
+        "donut",
+        "tgbot"
+      ]
+    },
+    {
+      "platform": "vk",
+      "method": "vk-posev",
+      "name": "Посев напрямую у сообщества",
+      "previous": [
+        "site",
+        "vkshop"
+      ],
+      "targets": {
+        "none": "not-applicable",
+        "site": "conditional",
+        "vk": "conditional",
+        "vkshop": "conditional",
+        "tg": "conditional",
+        "market": "conditional",
+        "donut": "conditional",
+        "tgbot": "conditional",
+        "rutube": "not-applicable"
+      },
+      "added": [
+        "vk",
+        "tg",
+        "market",
+        "donut",
+        "tgbot"
+      ]
+    },
+    {
+      "platform": "vk",
+      "method": "vk-donut",
+      "name": "VK Донат",
+      "previous": [
+        "donut"
+      ],
+      "targets": {
+        "none": "not-applicable",
+        "site": "not-applicable",
+        "vk": "not-applicable",
+        "vkshop": "not-applicable",
+        "tg": "not-applicable",
+        "market": "not-applicable",
+        "donut": "conditional",
+        "tgbot": "not-applicable",
+        "rutube": "not-applicable"
+      },
+      "added": []
+    },
+    {
+      "platform": "vk",
+      "method": "vk-promo",
+      "name": "Розыгрыш памятки",
+      "previous": [
+        "site",
+        "vkshop"
+      ],
+      "targets": {
+        "none": "conditional",
+        "site": "conditional",
+        "vk": "not-applicable",
+        "vkshop": "conditional",
+        "tg": "not-applicable",
+        "market": "conditional",
+        "donut": "not-applicable",
+        "tgbot": "not-applicable",
+        "rutube": "not-applicable"
+      },
+      "added": [
+        "none",
+        "market"
+      ]
+    },
+    {
+      "platform": "vk",
+      "method": "vk-tg",
+      "name": "Ссылка на Telegram",
+      "previous": [
+        "tg"
+      ],
+      "targets": {
+        "none": "not-applicable",
+        "site": "not-applicable",
+        "vk": "not-applicable",
+        "vkshop": "not-applicable",
+        "tg": "conditional",
+        "market": "not-applicable",
+        "donut": "not-applicable",
+        "tgbot": "not-applicable",
+        "rutube": "not-applicable"
+      },
+      "added": []
+    },
+    {
+      "platform": "vk",
+      "method": "vk-reply",
+      "name": "Ответ на входящий вопрос в сообщениях",
+      "previous": [
+        "site",
+        "vkshop"
+      ],
+      "targets": {
+        "none": "conditional",
+        "site": "conditional",
+        "vk": "conditional",
+        "vkshop": "conditional",
+        "tg": "conditional",
+        "market": "conditional",
+        "donut": "conditional",
+        "tgbot": "conditional",
+        "rutube": "not-applicable"
+      },
+      "added": [
+        "none",
+        "vk",
+        "tg",
+        "market",
+        "donut",
+        "tgbot"
+      ]
+    },
+    {
+      "platform": "youtube",
+      "method": "yt-expert",
+      "name": "Экспертные видео",
+      "previous": [
+        "site",
+        "vk"
+      ],
+      "targets": {
+        "none": "conditional",
+        "site": "conditional",
+        "vk": "conditional",
+        "vkshop": "conditional",
+        "tg": "conditional",
+        "market": "conditional",
+        "donut": "conditional",
+        "tgbot": "conditional",
+        "rutube": "not-applicable"
+      },
+      "added": [
+        "none",
+        "vkshop",
+        "tg",
+        "market",
+        "donut",
+        "tgbot"
+      ]
+    },
+    {
+      "platform": "youtube",
+      "method": "yt-desc",
+      "name": "Ссылка на памятку в описании видео",
+      "previous": [
+        "site",
+        "vk"
+      ],
+      "targets": {
+        "none": "not-applicable",
+        "site": "conditional",
+        "vk": "conditional",
+        "vkshop": "conditional",
+        "tg": "conditional",
+        "market": "conditional",
+        "donut": "conditional",
+        "tgbot": "conditional",
+        "rutube": "not-applicable"
+      },
+      "added": [
+        "vkshop",
+        "tg",
+        "market",
+        "donut",
+        "tgbot"
+      ]
+    },
+    {
+      "platform": "youtube",
+      "method": "yt-blogger",
+      "name": "Интеграция у блогера на YouTube",
+      "previous": [
+        "site",
+        "vk"
+      ],
+      "targets": {
+        "none": "not-applicable",
+        "site": "conditional",
+        "vk": "conditional",
+        "vkshop": "conditional",
+        "tg": "conditional",
+        "market": "conditional",
+        "donut": "conditional",
+        "tgbot": "conditional",
+        "rutube": "not-applicable"
+      },
+      "added": [
+        "vkshop",
+        "tg",
+        "market",
+        "donut",
+        "tgbot"
+      ]
+    },
+    {
+      "platform": "youtube",
+      "method": "yt-move",
+      "name": "Разместить копии видео в VK Видео и на Rutube",
+      "previous": [
+        "vk",
+        "rutube"
+      ],
+      "targets": {
+        "none": "not-applicable",
+        "site": "not-applicable",
+        "vk": "conditional",
+        "vkshop": "not-applicable",
+        "tg": "not-applicable",
+        "market": "not-applicable",
+        "donut": "not-applicable",
+        "tgbot": "not-applicable",
+        "rutube": "conditional"
+      },
+      "added": []
+    },
+    {
+      "platform": "youtube",
+      "method": "book-yt-tg",
+      "name": "Ссылка на свой Telegram-канал",
+      "previous": [
+        "tg"
+      ],
+      "targets": {
+        "none": "not-applicable",
+        "site": "not-applicable",
+        "vk": "not-applicable",
+        "vkshop": "not-applicable",
+        "tg": "conditional",
+        "market": "not-applicable",
+        "donut": "not-applicable",
+        "tgbot": "not-applicable",
+        "rutube": "not-applicable"
+      },
+      "added": []
+    },
+    {
+      "platform": "youtube",
+      "method": "yt-vpn",
+      "name": "Реклама VPN и средств доступа к ограниченным ресурсам",
+      "previous": [],
+      "targets": {
+        "none": "terminal",
+        "site": "terminal",
+        "vk": "terminal",
+        "vkshop": "terminal",
+        "tg": "terminal",
+        "market": "terminal",
+        "donut": "terminal",
+        "tgbot": "terminal",
+        "rutube": "terminal"
+      },
+      "added": []
+    },
+    {
+      "platform": "rutube",
+      "method": "rt-expert",
+      "name": "Экспертные видео и статьи",
+      "previous": [
+        "site",
+        "vk"
+      ],
+      "targets": {
+        "none": "conditional",
+        "site": "conditional",
+        "vk": "conditional",
+        "vkshop": "conditional",
+        "tg": "conditional",
+        "market": "conditional",
+        "donut": "conditional",
+        "tgbot": "conditional",
+        "rutube": "not-applicable"
+      },
+      "added": [
+        "none",
+        "vkshop",
+        "tg",
+        "market",
+        "donut",
+        "tgbot"
+      ]
+    },
+    {
+      "platform": "rutube",
+      "method": "rt-desc",
+      "name": "Видео или статья со ссылкой на памятку",
+      "previous": [
+        "site",
+        "vkshop"
+      ],
+      "targets": {
+        "none": "not-applicable",
+        "site": "conditional",
+        "vk": "conditional",
+        "vkshop": "conditional",
+        "tg": "conditional",
+        "market": "conditional",
+        "donut": "conditional",
+        "tgbot": "conditional",
+        "rutube": "not-applicable"
+      },
+      "added": [
+        "vk",
+        "tg",
+        "market",
+        "donut",
+        "tgbot"
+      ]
+    },
+    {
+      "platform": "rutube",
+      "method": "dzen-promo",
+      "name": "Продвижение статьи в Дзене",
+      "previous": [
+        "site",
+        "vkshop"
+      ],
+      "targets": {
+        "none": "not-applicable",
+        "site": "conditional",
+        "vk": "conditional",
+        "vkshop": "conditional",
+        "tg": "conditional",
+        "market": "conditional",
+        "donut": "conditional",
+        "tgbot": "conditional",
+        "rutube": "not-applicable"
+      },
+      "added": [
+        "vk",
+        "tg",
+        "market",
+        "donut",
+        "tgbot"
+      ]
+    },
+    {
+      "platform": "rutube",
+      "method": "rt-blogger",
+      "name": "Интеграция у блогера на Rutube или в Дзене",
+      "previous": [
+        "site",
+        "vk"
+      ],
+      "targets": {
+        "none": "not-applicable",
+        "site": "conditional",
+        "vk": "conditional",
+        "vkshop": "conditional",
+        "tg": "conditional",
+        "market": "conditional",
+        "donut": "conditional",
+        "tgbot": "conditional",
+        "rutube": "not-applicable"
+      },
+      "added": [
+        "vkshop",
+        "tg",
+        "market",
+        "donut",
+        "tgbot"
+      ]
+    },
+    {
+      "platform": "tiktok",
+      "method": "tt-expert",
+      "name": "Экспертные ролики",
+      "previous": [
+        "site",
+        "vk"
+      ],
+      "targets": {
+        "none": "conditional",
+        "site": "conditional",
+        "vk": "conditional",
+        "vkshop": "conditional",
+        "tg": "conditional",
+        "market": "conditional",
+        "donut": "conditional",
+        "tgbot": "conditional",
+        "rutube": "not-applicable"
+      },
+      "added": [
+        "none",
+        "vkshop",
+        "tg",
+        "market",
+        "donut",
+        "tgbot"
+      ]
+    },
+    {
+      "platform": "tiktok",
+      "method": "tt-bio",
+      "name": "Ссылка в профиле",
+      "previous": [
+        "site",
+        "vk"
+      ],
+      "targets": {
+        "none": "conditional",
+        "site": "conditional",
+        "vk": "conditional",
+        "vkshop": "conditional",
+        "tg": "conditional",
+        "market": "conditional",
+        "donut": "conditional",
+        "tgbot": "conditional",
+        "rutube": "not-applicable"
+      },
+      "added": [
+        "none",
+        "vkshop",
+        "tg",
+        "market",
+        "donut",
+        "tgbot"
+      ]
+    },
+    {
+      "platform": "tiktok",
+      "method": "tt-dm",
+      "name": "Ответ в личные сообщения",
+      "previous": [
+        "site",
+        "vk"
+      ],
+      "targets": {
+        "none": "conditional",
+        "site": "conditional",
+        "vk": "conditional",
+        "vkshop": "conditional",
+        "tg": "conditional",
+        "market": "conditional",
+        "donut": "conditional",
+        "tgbot": "conditional",
+        "rutube": "not-applicable"
+      },
+      "added": [
+        "none",
+        "vkshop",
+        "tg",
+        "market",
+        "donut",
+        "tgbot"
+      ]
+    },
+    {
+      "platform": "tiktok",
+      "method": "tt-video",
+      "name": "Ролик о памятке со ссылкой",
+      "previous": [
+        "site",
+        "vk"
+      ],
+      "targets": {
+        "none": "not-applicable",
+        "site": "conditional",
+        "vk": "conditional",
+        "vkshop": "conditional",
+        "tg": "conditional",
+        "market": "conditional",
+        "donut": "conditional",
+        "tgbot": "conditional",
+        "rutube": "not-applicable"
+      },
+      "added": [
+        "vkshop",
+        "tg",
+        "market",
+        "donut",
+        "tgbot"
+      ]
+    },
+    {
+      "platform": "tiktok",
+      "method": "tt-blogger",
+      "name": "Интеграция у блогера",
+      "previous": [
+        "site",
+        "vk"
+      ],
+      "targets": {
+        "none": "not-applicable",
+        "site": "conditional",
+        "vk": "conditional",
+        "vkshop": "conditional",
+        "tg": "conditional",
+        "market": "conditional",
+        "donut": "conditional",
+        "tgbot": "conditional",
+        "rutube": "not-applicable"
+      },
+      "added": [
+        "vkshop",
+        "tg",
+        "market",
+        "donut",
+        "tgbot"
+      ]
+    },
+    {
+      "platform": "tiktok",
+      "method": "tt-move",
+      "name": "Разместить копии роликов в VK и на Rutube",
+      "previous": [
+        "vk",
+        "rutube"
+      ],
+      "targets": {
+        "none": "not-applicable",
+        "site": "not-applicable",
+        "vk": "conditional",
+        "vkshop": "not-applicable",
+        "tg": "not-applicable",
+        "market": "not-applicable",
+        "donut": "not-applicable",
+        "tgbot": "not-applicable",
+        "rutube": "conditional"
+      },
+      "added": []
+    },
+    {
+      "platform": "tiktok",
+      "method": "book-tt-tg",
+      "name": "Ссылка на Telegram-канал в профиле",
+      "previous": [
+        "tg"
+      ],
+      "targets": {
+        "none": "not-applicable",
+        "site": "not-applicable",
+        "vk": "not-applicable",
+        "vkshop": "not-applicable",
+        "tg": "conditional",
+        "market": "not-applicable",
+        "donut": "not-applicable",
+        "tgbot": "not-applicable",
+        "rutube": "not-applicable"
+      },
+      "added": []
+    },
+    {
+      "platform": "tiktok",
+      "method": "tt-ads",
+      "name": "TikTok Ads через иностранный аккаунт",
+      "previous": [],
+      "targets": {
+        "none": "terminal",
+        "site": "terminal",
+        "vk": "terminal",
+        "vkshop": "terminal",
+        "tg": "terminal",
+        "market": "terminal",
+        "donut": "terminal",
+        "tgbot": "terminal",
+        "rutube": "terminal"
+      },
+      "added": []
+    },
+    {
+      "platform": "tiktok",
+      "method": "tt-vpn",
+      "name": "Реклама VPN и средств доступа к ограниченным ресурсам",
+      "previous": [],
+      "targets": {
+        "none": "terminal",
+        "site": "terminal",
+        "vk": "terminal",
+        "vkshop": "terminal",
+        "tg": "terminal",
+        "market": "terminal",
+        "donut": "terminal",
+        "tgbot": "terminal",
+        "rutube": "terminal"
+      },
+      "added": []
+    },
+    {
+      "platform": "bloggers",
+      "method": "bl-paid",
+      "name": "Платная интеграция по договору",
+      "previous": [
+        "site",
+        "vk",
+        "vkshop",
+        "market"
+      ],
+      "targets": {
+        "none": "not-applicable",
+        "site": "conditional",
+        "vk": "conditional",
+        "vkshop": "conditional",
+        "tg": "conditional",
+        "market": "conditional",
+        "donut": "conditional",
+        "tgbot": "conditional",
+        "rutube": "not-applicable"
+      },
+      "added": [
+        "tg",
+        "donut",
+        "tgbot"
+      ]
+    },
+    {
+      "platform": "bloggers",
+      "method": "bl-gift",
+      "name": "Подарить памятку без условий",
+      "previous": [
+        "site",
+        "vk"
+      ],
+      "targets": {
+        "none": "terminal",
+        "site": "terminal",
+        "vk": "terminal",
+        "vkshop": "terminal",
+        "tg": "terminal",
+        "market": "terminal",
+        "donut": "terminal",
+        "tgbot": "terminal",
+        "rutube": "terminal"
+      },
+      "added": []
+    },
+    {
+      "platform": "bloggers",
+      "method": "bl-barter",
+      "name": "Бартер: памятка за публикацию",
+      "previous": [
+        "site",
+        "vk",
+        "vkshop",
+        "market"
+      ],
+      "targets": {
+        "none": "not-applicable",
+        "site": "conditional",
+        "vk": "conditional",
+        "vkshop": "conditional",
+        "tg": "conditional",
+        "market": "conditional",
+        "donut": "conditional",
+        "tgbot": "conditional",
+        "rutube": "not-applicable"
+      },
+      "added": [
+        "tg",
+        "donut",
+        "tgbot"
+      ]
+    },
+    {
+      "platform": "bloggers",
+      "method": "bl-partner",
+      "name": "Партнёрская ссылка с процентом",
+      "previous": [
+        "site",
+        "vkshop",
+        "market"
+      ],
+      "targets": {
+        "none": "not-applicable",
+        "site": "conditional",
+        "vk": "conditional",
+        "vkshop": "conditional",
+        "tg": "conditional",
+        "market": "conditional",
+        "donut": "conditional",
+        "tgbot": "conditional",
+        "rutube": "not-applicable"
+      },
+      "added": [
+        "vk",
+        "tg",
+        "donut",
+        "tgbot"
+      ]
+    },
+    {
+      "platform": "bloggers",
+      "method": "bl-mutual",
+      "name": "Взаимный пиар с другим автором",
+      "previous": [
+        "site",
+        "vk"
+      ],
+      "targets": {
+        "none": "not-applicable",
+        "site": "conditional",
+        "vk": "conditional",
+        "vkshop": "conditional",
+        "tg": "conditional",
+        "market": "conditional",
+        "donut": "conditional",
+        "tgbot": "conditional",
+        "rutube": "not-applicable"
+      },
+      "added": [
+        "vkshop",
+        "tg",
+        "market",
+        "donut",
+        "tgbot"
+      ]
+    },
+    {
+      "platform": "bloggers",
+      "method": "bl-doctor",
+      "name": "Врач-блогер рекламирует памятку как врач",
+      "previous": [],
+      "targets": {
+        "none": "terminal",
+        "site": "terminal",
+        "vk": "terminal",
+        "vkshop": "terminal",
+        "tg": "terminal",
+        "market": "terminal",
+        "donut": "terminal",
+        "tgbot": "terminal",
+        "rutube": "terminal"
+      },
+      "added": []
+    },
+    {
+      "platform": "bloggers",
+      "method": "bl-banned",
+      "name": "Блогер в Instagram, без реестра или иноагент",
+      "previous": [],
+      "targets": {
+        "none": "terminal",
+        "site": "terminal",
+        "vk": "terminal",
+        "vkshop": "terminal",
+        "tg": "terminal",
+        "market": "terminal",
+        "donut": "terminal",
+        "tgbot": "terminal",
+        "rutube": "terminal"
+      },
+      "added": []
+    },
+    {
+      "platform": "direct",
+      "method": "dir-search",
+      "name": "Реклама в поиске",
+      "previous": [
+        "site",
+        "market"
+      ],
+      "targets": {
+        "none": "not-applicable",
+        "site": "conditional",
+        "vk": "conditional",
+        "vkshop": "conditional",
+        "tg": "conditional",
+        "market": "conditional",
+        "donut": "conditional",
+        "tgbot": "conditional",
+        "rutube": "not-applicable"
+      },
+      "added": [
+        "vk",
+        "vkshop",
+        "tg",
+        "donut",
+        "tgbot"
+      ]
+    },
+    {
+      "platform": "direct",
+      "method": "dir-rsya",
+      "name": "Баннеры в Рекламной сети Яндекса",
+      "previous": [
+        "site",
+        "vk",
+        "market"
+      ],
+      "targets": {
+        "none": "not-applicable",
+        "site": "conditional",
+        "vk": "conditional",
+        "vkshop": "conditional",
+        "tg": "conditional",
+        "market": "conditional",
+        "donut": "conditional",
+        "tgbot": "conditional",
+        "rutube": "not-applicable"
+      },
+      "added": [
+        "vkshop",
+        "tg",
+        "donut",
+        "tgbot"
+      ]
+    },
+    {
+      "platform": "direct",
+      "method": "dir-retarget",
+      "name": "Ретаргетинг: контакты или посетители сайта",
+      "previous": [
+        "site",
+        "market"
+      ],
+      "targets": {
+        "none": "not-applicable",
+        "site": "conditional",
+        "vk": "conditional",
+        "vkshop": "conditional",
+        "tg": "conditional",
+        "market": "conditional",
+        "donut": "conditional",
+        "tgbot": "conditional",
+        "rutube": "not-applicable"
+      },
+      "added": [
+        "vk",
+        "vkshop",
+        "tg",
+        "donut",
+        "tgbot"
+      ]
+    },
+    {
+      "platform": "direct",
+      "method": "dir-tg",
+      "name": "Посты в Telegram-каналах через Директ",
+      "previous": [
+        "site"
+      ],
+      "targets": {
+        "none": "not-applicable",
+        "site": "conditional",
+        "vk": "conditional",
+        "vkshop": "conditional",
+        "tg": "conditional",
+        "market": "conditional",
+        "donut": "conditional",
+        "tgbot": "conditional",
+        "rutube": "not-applicable"
+      },
+      "added": [
+        "vk",
+        "vkshop",
+        "tg",
+        "market",
+        "donut",
+        "tgbot"
+      ]
+    },
+    {
+      "platform": "direct",
+      "method": "dir-med",
+      "name": "Объявление с медицинским обещанием",
+      "previous": [],
+      "targets": {
+        "none": "terminal",
+        "site": "terminal",
+        "vk": "terminal",
+        "vkshop": "terminal",
+        "tg": "terminal",
+        "market": "terminal",
+        "donut": "terminal",
+        "tgbot": "terminal",
+        "rutube": "terminal"
+      },
+      "added": []
+    },
+    {
+      "platform": "site",
+      "method": "book-site-page",
+      "name": "Страница материала",
+      "previous": [
+        "site",
+        "market"
+      ],
+      "targets": {
+        "none": "conditional",
+        "site": "conditional",
+        "vk": "conditional",
+        "vkshop": "conditional",
+        "tg": "conditional",
+        "market": "conditional",
+        "donut": "conditional",
+        "tgbot": "conditional",
+        "rutube": "not-applicable"
+      },
+      "added": [
+        "none",
+        "vk",
+        "vkshop",
+        "tg",
+        "donut",
+        "tgbot"
+      ]
+    },
+    {
+      "platform": "site",
+      "method": "book-site-article",
+      "name": "Статья в блоге",
+      "previous": [
+        "site",
+        "market"
+      ],
+      "targets": {
+        "none": "conditional",
+        "site": "conditional",
+        "vk": "conditional",
+        "vkshop": "conditional",
+        "tg": "conditional",
+        "market": "conditional",
+        "donut": "conditional",
+        "tgbot": "conditional",
+        "rutube": "not-applicable"
+      },
+      "added": [
+        "none",
+        "vk",
+        "vkshop",
+        "tg",
+        "donut",
+        "tgbot"
+      ]
+    },
+    {
+      "platform": "site",
+      "method": "book-site-email",
+      "name": "Письмо по своей базе",
+      "previous": [
+        "site",
+        "market"
+      ],
+      "targets": {
+        "none": "not-applicable",
+        "site": "conditional",
+        "vk": "conditional",
+        "vkshop": "conditional",
+        "tg": "conditional",
+        "market": "conditional",
+        "donut": "conditional",
+        "tgbot": "conditional",
+        "rutube": "not-applicable"
+      },
+      "added": [
+        "vk",
+        "vkshop",
+        "tg",
+        "donut",
+        "tgbot"
+      ]
+    },
+    {
+      "platform": "site",
+      "method": "book-site-sample",
+      "name": "Бесплатный фрагмент",
+      "previous": [
+        "site",
+        "market"
+      ],
+      "targets": {
+        "none": "conditional",
+        "site": "conditional",
+        "vk": "conditional",
+        "vkshop": "conditional",
+        "tg": "conditional",
+        "market": "conditional",
+        "donut": "conditional",
+        "tgbot": "conditional",
+        "rutube": "not-applicable"
+      },
+      "added": [
+        "none",
+        "vk",
+        "vkshop",
+        "tg",
+        "donut",
+        "tgbot"
+      ]
+    },
+    {
+      "platform": "book-market",
+      "method": "book-market-card",
+      "name": "Обычная карточка",
+      "previous": [
+        "market"
+      ],
+      "targets": {
+        "none": "not-applicable",
+        "site": "not-applicable",
+        "vk": "not-applicable",
+        "vkshop": "not-applicable",
+        "tg": "not-applicable",
+        "market": "conditional",
+        "donut": "not-applicable",
+        "tgbot": "not-applicable",
+        "rutube": "not-applicable"
+      },
+      "added": []
+    },
+    {
+      "platform": "book-market",
+      "method": "book-market-ads",
+      "name": "Внутреннее продвижение",
+      "previous": [
+        "market"
+      ],
+      "targets": {
+        "none": "not-applicable",
+        "site": "not-applicable",
+        "vk": "not-applicable",
+        "vkshop": "not-applicable",
+        "tg": "not-applicable",
+        "market": "conditional",
+        "donut": "not-applicable",
+        "tgbot": "not-applicable",
+        "rutube": "not-applicable"
+      },
+      "added": []
+    }
+  ]
+}
