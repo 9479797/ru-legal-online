@@ -10,11 +10,13 @@ for(const id of P0)assert(D.start.book.some(p=>p.children?.some(x=>x.id===id)),i
 assert.equal(byId('bloggers','bl-paid').risk,'y','Paid post cannot be green before actual platform is chosen');
 assert.equal(byId('tiktok','tt-ads').risk,'y','Foreign advertising account alone is not an absolute prohibition');
 assert(byId('tiktok','tt-ads').review,'TikTok Ads must require further review');
+assert.equal(byId('tiktok','tt-ads').fines.length,0,'Unverified TikTok Ads must not show presumptive fines');
 assert(!byId('tiktok','tt-vpn').saferGoto,'Cannot redirect advertising of VPN to same content on another platform');
 assert(byId('telegram','tg-vpn').details.includes('10.8'));
 assert(byId('youtube','yt-vpn').details.includes('10.8'));
 assert(byId('bloggers','bl-doctor').details.includes('исключения'));
 assert(!byId('bloggers','bl-banned').fines.includes('meta_pay'),'Meta payment penalty cannot be automatic without transaction proof');
+assert.equal(byId('bloggers','bl-banned').fines.length,0,'Composite restriction needs confirmed violation before fines');
 assert(byId('direct','dir-med').details.includes('п.6 ч.5'));
 assert.equal(byId('instagram','target').risk,'r');
 const bloggers=D.start.book.find(x=>x.id==='bloggers');
