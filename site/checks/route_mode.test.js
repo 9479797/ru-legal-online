@@ -1,18 +1,39 @@
+/* Переключение режимов в рамках одной страницы без потери выбора каждого режима. */
 const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
 const html=fs.readFileSync(__dirname+'/../index.html','utf8');
-const db={'skhema-state-ordinary':{goal:'book',form:'self',path:['vk','vk-reply','site'],format:'file',sample:false},'skhema-state-risk':{goal:'course',form:'ip',path:['instagram','author'],format:'print',sample:true},'skhema-settings':{goal:'course',form:'ip',format:'print',sample:true}};
-const store={get:(k,d)=>db[k]===undefined?d:JSON.parse(JSON.stringify(db[k])),set:(k,v)=>db[k]=JSON.parse(JSON.stringify(v))};
-const D={forms:[{id:'self'},{id:'ip'}],goals:[{id:'book'},{id:'course'}],bookPublishers:[]};
-function page(mode){
- const c={D,store,routeMode:mode,stateKey:'skhema-state-'+mode,window:{location:{assign:url=>c.url=url}}};
- vm.createContext(c);
- vm.runInContext(html.slice(html.indexOf('let S = Object.assign('),html.indexOf('const bookUI = '))+'\nglobalThis.state=S;',c);
- vm.runInContext(html.slice(html.indexOf('function changeRouteMode('),html.indexOf('function openRiskOptions(')),c);return c;
-}
-let normal=page('ordinary');assert.equal(normal.state.goal,'book','Other section settings must not overwrite a saved goal');assert.equal(normal.state.form,'self');
-normal.changeRouteMode('risk');assert.equal(normal.url,'risk.html');
-let risk=page('risk');assert.equal(risk.state.path.join('/'),'instagram/author');risk.state.path.push('site');risk.changeRouteMode('ordinary');assert.equal(risk.url,'index.html');
-normal=page('ordinary');assert.equal(normal.state.path.join('/'),'vk/vk-reply/site');assert.equal(normal.state.format,'file');
-risk=page('risk');assert.equal(risk.state.path.join('/'),'instagram/author/site');assert.equal(risk.state.sample,true);
-risk.changeRouteMode('risk');assert.equal(risk.url,undefined,'Reselecting current section must not reload or reset it');
-console.log('Same-tab sections: both directions navigate and restore independent goals, settings and selected stages.');
+const db={
+  'skhema-state-ordinary':{goal:'book',form:'self',path:['vk','vk-reply','site'],scope:'promotion',format:'file',sample:false},
+  'skhema-state-risk':{goal:'book',form:'ip',path:['youtube','yt-blogger','site'],scope:'promotion',format:'print',sample:true}
+};
+const clone=x=>JSON.parse(JSON.stringify(x));
+const store={get:(k,d)=>db[k]===undefined?d:clone(db[k]),set:(k,v)=>db[k]=clone(v)};
+const D={forms:[{id:'self'},{id:'ip'}],goals:[{id:'book'}],bookPublishers:[]};
+const control={value:'ordinary'},status={textContent:''},doc={body:{dataset:{routeMode:'ordinary'}}};
+let renders=0,cancels=0;
+const c={D,store,routeMode:'ordinary',stateKey:'skhema-state-ordinary',document:doc,
+  $:s=>s==='#route-mode'?control:status,
+  motion:{cancelScroll(){cancels++;}},
+  dlg:{open:false,close(){}},render(){renders++;}};
+vm.createContext(c);
+vm.runInContext(html.slice(html.indexOf('let S = Object.assign('),html.indexOf('const bookUI = '))+'\nglobalThis.state=S;',c);
+vm.runInContext(html.slice(html.indexOf('function changeRouteMode('),html.indexOf('function openRiskOptions(')),c);
+const identity=c.state;
+assert.equal(identity.goal,'book');
+assert.equal(identity.path.join('/'),'vk/vk-reply/site');
+c.changeRouteMode('risk');
+assert.strictEqual(c.state,identity,'Вложенный интерфейс должен сохранить ссылку на объект состояния');
+assert.equal(c.state.path.join('/'),'youtube/yt-blogger/site');
+assert.equal(doc.body.dataset.routeMode,'risk');
+assert.equal(control.value,'risk');
+c.state.path=['youtube','yt-affiliate','site'];
+c.changeRouteMode('ordinary');
+assert.equal(c.state.path.join('/'),'vk/vk-reply/site');
+assert.equal(c.state.format,'file');
+c.changeRouteMode('risk');
+assert.equal(c.state.path.join('/'),'youtube/yt-affiliate/site');
+assert.equal(c.state.sample,true);
+const prev=renders;
+c.changeRouteMode('risk');assert.equal(renders,prev,'Повторный выбор не должен перезагружать страницу');
+assert.equal(renders,3);assert.equal(cancels,3);
+assert(!html.includes("window.location.assign(next === 'risk'"),'Не открывать второй HTML-документ');
+console.log('One-page route-mode navigation: both selections restored, no document reload.');
