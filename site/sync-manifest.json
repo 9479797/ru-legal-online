@@ -49,25 +49,25 @@
     "TASKS.md": "3029d4f99794cda50082c68cc2938df5afe8b090764c9a3504f1e87ee7fa4a57",
     "telegram-funnels.js": "a7062e7dce716dfedf719486ba9667a52d9affe75dd5069ad92f08f7a87312d0",
     "youtube-funnels.js": "7b08f5fa66254135dcf5dab9bc833ec255ddf8307211117009e1ad82789ec9da",
-    "version.json": "cd777b728954949c8466f6bd68622804ca7a56d078e88d25b1321ab27c4c5c0e"
+    "version.json": "d1b547ee11424cc3833dde363e30daefcd9f0584d544e6f3123519b70da04553"
   },
   "source_ref": "site/tiktok-funnels-2026-11-28",
-  "source_commit_before_manifest": "54236e12bb498d562ef17cf492d26ff3b7e5b673",
+  "source_commit_before_manifest": "37a373078ca5b992b407cf420018f235faa477aa",
   "previous_published_url_unverified": "https://reklama-frontend.gulfopt.chatgpt.site",
   "publish_status": "Рабочая версия 20.6 на согласовании; не слита в main и не опубликована.",
   "drive_site_folder": "https://drive.google.com/drive/folders/10BkTBIjl9sIcI2GvyHU4arxgByXkQ8gp",
-  "drive_archive_file": null,
+  "drive_archive_file": "https://drive.google.com/file/d/17A8Q78osn34RJsBQIoNvstFRIxKsbGWL/view?usp=drivesdk",
   "drive_preview_file": null,
   "file_hash_algorithm": "SHA-256",
   "file_count": 47,
   "qa_status": {
-    "technical_regressions": "11 local JS checks passed, verification of full workflow pending",
-    "browser": "Browser smoke test pending in GitHub Actions",
-    "file_checksums": "47 SHA-256 source files; validated by package workflow"
+    "technical_regressions": "11/11 local Node tests passed; GitHub Actions run 46162567928 successful",
+    "browser": "GitHub Actions browser/UI smoke run 46162567928 successful",
+    "file_checksums": "47/47 SHA-256 source checksums; CI package verification passed"
   },
   "note": "Рабочая синхронизация проекта; внешняя публикация и merge в main не выполнялись",
   "drive_previous_archive": "https://drive.google.com/file/d/17v5kbw0-wabKrJr38Sqz2ntb1JiNg0O0/view?usp=drivesdk",
   "drive_previous_preview": "https://drive.google.com/file/d/1fdl7JPRpj-f_Sr1DiBryk5ch7yBehrig/view?usp=drivesdk",
-  "drive_backup_status": "Резервная копия v20.6 ожидает загрузки.",
+  "drive_backup_status": "Проверенный ZIP загружен на Google Диск, папка ru-reklama-online.",
   "drive_markirovka_preview": "https://drive.google.com/file/d/1EJepG1pNllOfIpQWD7x9gD3T6a292GQq/view?usp=drivesdk"
 }
