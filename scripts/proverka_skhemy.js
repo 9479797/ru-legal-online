@@ -10,6 +10,8 @@ const ctx = { window: {} };
 vm.runInNewContext(fs.readFileSync(file, 'utf8'), ctx, { filename: file });
 const ytfile = path.join(__dirname, '..', 'site', 'youtube-funnels.js');
 vm.runInNewContext(fs.readFileSync(ytfile, 'utf8'), ctx, { filename: ytfile });
+const tgfile = path.join(__dirname, '..', 'site', 'telegram-funnels.js');
+vm.runInNewContext(fs.readFileSync(tgfile, 'utf8'), ctx, { filename: tgfile });
 const D = ctx.window.SCHEMA;
 const err = [];
 const forms = D.forms.map((f) => f.id);
@@ -97,6 +99,22 @@ for (const name of ['instagram-legal.js','consult-legal.js','route-matrix.js','c
   const filename = path.join(__dirname, '..', 'site', name);
   vm.runInNewContext(fs.readFileSync(filename, 'utf8'), ctx, { filename });
 }
+const telegram = D.start.book.find(x=>x.id==='telegram');
+const telegramIDs=['tg-own-info','tg-sample','tg-independent','tg-gift','tg-barter','tg-affiliate','tg-mutual'];
+for(const id of telegramIDs){
+  const n=telegram?.children?.find(x=>x.id===id);
+  if(!n){err.push('Telegram: отсутствует '+id);continue;}
+  const method=ctx.window.Goal1Copy.methods[id];
+  if(method?.examples?.length!==2)err.push('Telegram: нет двух примеров '+id);
+  if(!D.routeMatrix.rows.some(x=>x.method===id))err.push('Telegram: отсутствует маршрут '+id);
+  for(const dest of n.dest||[])if(!D.bookPlaces[dest])err.push('Telegram: нет назначения '+id+'/'+dest);
+}
+if(telegram?.children?.find(x=>x.id==='tg-ads')?.dest?.includes('site'))err.push('Официальный Telegram Ads не должен вести напрямую на сайт');
+if(!telegram?.children?.find(x=>x.id==='tg-sample')?.sample)err.push('Telegram: бесплатный фрагмент без флага');
+if(!telegram?.children?.find(x=>x.id==='tg-gift')?.uncommitted)err.push('Telegram: подарок должен завершаться без обязательной публикации');
+if(telegram?.children?.find(x=>x.id==='tg-vpn')?.saferGoto)err.push('Telegram: реклама VPN ошибочно предлагает сменить площадку');
+for (const pl of ['youtube','tiktok'])for(const n of D.start.book.find(x=>x.id===pl)?.children||[])
+  if(/^[YТ][1-5] · /.test(n.name))err.push('Не удалён служебный префикс '+n.id+': '+n.name);
 const tik = D.start.book.find(x => x.id === 'tiktok');
 const needed = ['tt-direct', 'tt-chat', 'tt-sample', 'tt-independent', 'tt-gift-independent', 'tt-barter'];
 for (const id of needed) {
@@ -152,6 +170,7 @@ for (const page of ['index.html','risk.html']) {
   if (!html.includes('S.path = S.path.slice(0, num - 1)')) err.push(page+': кнопка этапа не возвращает к выбору');
   if (!html.includes('data-set-route-mode="ordinary"')) err.push(page+': выход из рискованного маршрута всё ещё ведёт на другой URL');
   if (!html.includes('<script src="youtube-funnels.js"></script>')) err.push(page+': не подключён модуль YouTube');
+  if (!html.includes('<script src="telegram-funnels.js"></script>')) err.push(page+': не подключён модуль Telegram');
 }
 
 const verify = Object.entries(D.fines).filter(([, f]) => f.verify).map(([k]) => k);
