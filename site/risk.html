@@ -399,7 +399,7 @@ function finalPanel(link, p, from) {
     '<div class="big" style="background:var(--g)"><h3>Можно</h3>' + can + '</div>' +
     '<div class="big" style="background:var(--r)"><h3>Нельзя</h3>' + cannot + '</div>' +
     '<div class="big" style="background:var(--brand)"><h3>Ответственность ' + esc(who) + '</h3><p class="sub">Штрафы по КоАП для статуса «' + esc(curForm().name) + '». Сменить статус можно в поле «Как вы оформлены».</p>' + (S.goal === 'book' ? '<p class="sub">Рекламные составы ниже применяются, если конкретный материал признан рекламой и установлено соответствующее нарушение.' + (audienceOnly ? ' Публикация копии или перенос аудитории сами по себе не означают нарушения.' : '') + '</p>' : '') + formNote() + (fines.length ? fineRows(fines) : '<p class="sub">Для этого информационного сценария суммы автоматически не назначаются. Обязанности и последствия зависят от фактических действий.</p>') + '</div></div>' +
-    (audienceOnly ? '' : checkList(p)) + (S.goal === 'book' ? bookUI.outcome(link, p) + '<p><a class="winbtn" href="markirovka.html#publish-example">Пример рекламного поста и маркировки</a></p>' : '');
+    (audienceOnly ? '' : checkList(p)) + (S.goal === 'book' ? bookUI.outcome(link, p) + (platform?.id === 'instagram' ? '<p class="intro">Если исходное сообщение признано рекламой, его нельзя размещать в Instagram: маркировка запрет не отменяет.</p>' : '<p><a class="winbtn" href="markirovka.html#publish-example">Пример рекламного поста и маркировки</a></p>') : '');
 }
 
 function redPanel(link, siblings) {
