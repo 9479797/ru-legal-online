@@ -32,6 +32,11 @@ assert(!index.includes('id="route-mode"'));
 assert(alias.includes("window.location.replace('index.html')"));
 const script=index.split('<script>')[1]?.split('</script>')[0]; if(script)new vm.Script(script);
 assert(index.includes('data-open-result'));assert(index.includes('stateKey'));
+// Порядок распространяется и на третью колонку (место назначения).
+const third=[{id:'ordinary',risk:'g'},{id:'warning',risk:'y'},{id:'blocked',risk:'r'},{id:'blocked-2',risk:'r'}];
+assert.deepEqual(B.riskFirst(third).map(x=>x.id),['blocked','blocked-2','warning','ordinary']);
+assert(third[0].id==='ordinary','Сортировка не должна менять исходные объекты');
+assert(index.includes('window.DesktopBoard.riskFirst(n.dest.map'),'Окончания третьей колонки должны сортироваться по риску');
 const red=B.platforms(D.start.book,'all','book').find(p=>p.id==='instagram').children.filter(n=>n.risk==='r');
 assert(red.length>0,'Красные Instagram-карточки не должны исчезнуть');
 console.log('Unified board: '+total+' route/root choices retained; red/yellow/green ordered in every column.');
