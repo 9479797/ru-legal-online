@@ -255,8 +255,8 @@ const store = {
 const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const motion = window.FrontendMotion.create({host:$('#steps'), bar:$('.pathbar'), reduce});
 
-const routeMode = document.body.dataset.routeMode;
-const stateKey = 'skhema-state-' + routeMode;
+let routeMode = document.body.dataset.routeMode;
+let stateKey = 'skhema-state-' + routeMode;
 $('#route-mode').value = routeMode;
 $('#route-page-note').textContent = routeMode === 'risk' ? 'Ограничения площадок и действия с высоким риском' : 'Условия конкретной публикации всё равно нужно проверить';
 let S = Object.assign({ form: 'ip', goal: 'book', path: [], scope: 'promotion', format: 'file', sample: false, salePlace: 'site', publisher:'' }, store.get(stateKey, store.get('skhema-state', {})));
@@ -415,8 +415,27 @@ function redPanel(link, siblings) {
 
 function changeRouteMode(next) {
   if (!['ordinary','risk'].includes(next) || next === routeMode) return;
+  // Оба режима работают в текущем документе. Состояние каждого сохраняется
+  // отдельно; BookUI держит ссылку на S, поэтому объект не заменяем.
+  motion.cancelScroll();
   store.set(stateKey, S);
-  window.location.assign(next === 'risk' ? 'risk.html' : 'index.html');
+  const nextKey = 'skhema-state-' + next;
+  const previous = store.get(nextKey, null);
+  const restored = previous && typeof previous === 'object' && !Array.isArray(previous)
+    ? previous
+    : Object.assign({}, S, {path: Array.isArray(S.path) ? S.path.slice(0, 1) : []});
+  for (const key of Object.keys(S)) delete S[key];
+  Object.assign(S, restored);
+  if (!Array.isArray(S.path)) S.path = [];
+  routeMode = next;
+  stateKey = nextKey;
+  document.body.dataset.routeMode = next;
+  $('#route-mode').value = next;
+  if (dlg.open) dlg.close();
+  render();
+  $('#route-status').textContent = next === 'risk'
+    ? 'Открыты рискованные и запрещённые варианты. Прежний выбор обычных вариантов сохранён.'
+    : 'Открыты обычные варианты. Прежний выбор рискованных вариантов сохранён.';
 }
 function openRiskOptions() { if(routeMode==='risk'){if(dlg.open)dlg.close();}else changeRouteMode('risk'); }
 
@@ -428,6 +447,9 @@ function render() {
   const goal = D.goals.find((g) => g.id === S.goal);
   if (S.goal !== 'book') S.scope = 'promotion';
   $('#scope').value = S.scope;
+  $('#route-mode').value = routeMode;
+  $('#form').value = S.form;
+  $('#goal').value = S.goal;
   [...$('#scope').options].forEach(o => o.disabled = S.goal !== 'book' && o.value !== 'promotion');
   $('#book-settings').hidden = S.goal !== 'book';
   $('#format').value = S.format;
@@ -606,24 +628,18 @@ function changeScope(next) {
   S.scope=next;render();
 }
 
-function scrollToStep(num) {
-  if (num === 4 && S.scope === 'promotion') num = 3;
-  const el = document.getElementById('step-' + num);
-  if (el) motion.scrollToElement(el);
-}
-
 function returnToChoice(num) {
   motion.cancelScroll();
   const position = {left:window.scrollX, top:window.scrollY};
   const lists = [...document.querySelectorAll('.board-choices')].map(el=>({id:el.closest('.step').id, top:el.scrollTop, left:el.scrollLeft}));
-  if (num > 0) S.path = S.path.slice(0, num);
+  if (num > 0) S.path = S.path.slice(0, num - 1);
   render();
   for (const saved of lists) {
     const list = document.getElementById(saved.id)?.querySelector('.board-choices');
     if(list){list.scrollTop=saved.top;list.scrollLeft=saved.left;}
   }
   window.scrollTo({...position, behavior:'instant'});
-  document.querySelector('[data-step-nav="' + num + '"]')?.focus({preventScroll:true});
+  (document.querySelector('#step-' + num + ' [data-pick]') || document.querySelector('#step-' + num + ' button'))?.focus({preventScroll:true});
 }
 
 document.addEventListener('click', (e) => {
@@ -649,7 +665,7 @@ document.addEventListener('click', (e) => {
     if (!n) return;
     dlg.close(); S.path = [platform.id, n.id]; render();
     $('#route-status').textContent = 'Выбран рискованный вариант: ' + n.name;
-    requestAnimationFrame(() => { scrollToStep(3); $('#st-3')?.focus({preventScroll:true}); });
+    requestAnimationFrame(() => document.querySelector('#step-3 [data-pick]')?.focus({preventScroll:true}));
     return;
   }
   const bs = e.target.closest('[data-book-scope]');
@@ -664,11 +680,10 @@ document.addEventListener('click', (e) => {
   if (!t) return;
   if (t.dataset.pick !== undefined) {
     const lv = +t.dataset.pick;
-    if (S.goal === 'book' && lv === 1 && findAt(lv, t.dataset.id)?.sample) S.sample = true;
     S.path = S.path.slice(0, lv).concat(t.dataset.id);
     render();
     $('#route-status').textContent = 'Шаг ' + (lv + 1) + ': ' + (findAt(lv, t.dataset.id)?.name || '') + '. Следующий этап открыт в соседней колонке.';
-    requestAnimationFrame(() => { scrollToStep(lv + 2); const target = document.getElementById('st-' + Math.min(lv + 2,3)) || document.getElementById('st-' + (lv + 1)); target?.focus({preventScroll:true}); });
+    requestAnimationFrame(() => { const next = document.querySelector('#step-' + (lv + 2) + ' [data-pick]'); next?.focus({preventScroll:true}); });
   } else if (t.dataset.more !== undefined) {
     const n = findAt(+t.dataset.more, t.dataset.id);
     if (n) openDlg(head(n.name, 'Подробнее', n.risk) + cardDetails(n), false, true);
@@ -685,7 +700,7 @@ document.addEventListener('click', (e) => {
     S.path = [S.path[0], t.dataset.goto];
     render();
     $('#route-status').textContent = 'Способ на шаге 2 изменён: ' + chain()[1].name;
-    requestAnimationFrame(() => { scrollToStep(2); $('#steps [data-pick="1"][aria-pressed="true"]')?.focus({preventScroll:true}); });
+    requestAnimationFrame(() => $('#steps [data-pick="1"][aria-pressed="true"]')?.focus({preventScroll:true}));
   } else if (t.dataset.goal) {
     S.goal = t.dataset.goal; S.path = []; $('#goal').value = S.goal; render();
   } else if (t.dataset.explain) {
@@ -718,11 +733,7 @@ $('#form').value = S.form; $('#goal').value = S.goal;
 $('#form').addEventListener('change', (e) => { S.form = e.target.value; render(); });
 $('#goal').addEventListener('change', (e) => { S.goal = e.target.value; S.path = []; render(); });
 $('#scope').addEventListener('change', e => changeScope(e.target.value));
-$('#route-mode').addEventListener('change', e => {
-  const next = e.target.value;
-  e.target.value = routeMode;
-  changeRouteMode(next);
-});
+$('#route-mode').addEventListener('change', e => changeRouteMode(e.target.value));
 
 $('#format').addEventListener('change', e => { S.format = e.target.value; render(); });
 $('#sample').addEventListener('change', e => { S.sample = e.target.checked; render(); });
