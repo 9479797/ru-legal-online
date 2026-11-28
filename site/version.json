@@ -145,7 +145,7 @@
   "palette_source_commit": "ce3ae10d2822a8a275c9c89891bba2f0fb435093",
   "risk_top_headers": true,
   "intrinsic_select_widths": true,
-  "browser_qa": "11 JavaScript тестов прошли на локальной распакованной копии; GitHub Actions проверяет v20.6.",
+  "browser_qa": "11/11 регрессионных тестов Node.js пройдены; GitHub Actions: технический и браузерный smoke run 46162567928 выполнены успешно. Полный юридический аудит — отдельная задача.",
   "desktop_settings_single_row": true,
   "desktop_settings_direction": "row",
   "stage_navigation": "rollback-without-scroll",
@@ -182,10 +182,11 @@
   "site_backup_drive_folder": "https://drive.google.com/drive/folders/10BkTBIjl9sIcI2GvyHU4arxgByXkQ8gp",
   "working_preview_file": "reklama-site-v20.6-2026-11-28-preview.html",
   "working_archive": "reklama-site-v20.6-2026-11-28-full.zip",
-  "sync_state": "Рабочая ветка; main не изменён, резервная копия v20.6 на Drive ещё не подтверждена.",
+  "sync_state": "Рабочая ветка v20.6 и проверенный ZIP на Google Диске; не опубликовано, main не изменён.",
   "youtube_methods": 14,
   "tiktok_methods": 15,
   "checksum_scheme": "SHA-256 UTF-8 source files in working branch (excluding version.json and sync-manifest.json to avoid self-reference)",
   "working_file_count": 46,
-  "telegram_methods": 16
+  "telegram_methods": 16,
+  "working_archive_drive_url": "https://drive.google.com/file/d/17A8Q78osn34RJsBQIoNvstFRIxKsbGWL/view?usp=drivesdk"
 }
