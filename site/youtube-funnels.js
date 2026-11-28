@@ -2,6 +2,13 @@
    Содержательная проверка: ст. 3, 5(10.7), 18.1 Закона № 38-ФЗ;
    ФАС 25.03.2026; письмо ФАС 09.04.2025 № АК/32908/25;
    YouTube Help: links in Shorts, related video, branded content.
+   Источники:
+   https://www.consultant.ru/document/cons_doc_LAW_529901/
+   https://www.consultant.ru/document/cons_doc_LAW_503349/
+   https://support.google.com/youtube/answer/13748639
+   https://support.google.com/youtube/answer/14075157
+   https://support.google.com/youtube/answer/17596007
+   https://support.google.com/youtube/answer/3364658
    Карточки не являются разрешением конкретного рекламного размещения.
    Загружать ПОСЛЕ data.js и ДО route-matrix.js/goal1-copy.js. */
 (function () {
