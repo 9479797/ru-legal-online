@@ -43,14 +43,27 @@ with sync_playwright() as p:
     pg.goto((SITE / "markirovka.html").as_uri()); pg.wait_for_timeout(200)
     for form in pg.eval_on_selector_all("#form option", "e=>e.map(x=>x.value)"):
         pg.select_option("#form", form)
-    # One pilot flow: risk tab → Instagram → codeword → free PDF → Telegram/site.
+    # One unified page; the old risk URL redirects to it.
     pg.goto((SITE / "risk.html").as_uri())
-    pg.evaluate("localStorage.removeItem('skhema-state-risk')")
+    pg.wait_for_url("**/index.html")
+    pg.evaluate("localStorage.clear()")
     pg.reload()
+    assert pg.locator("#route-mode").count() == 0, "There must be only one view"
+    def sorted_risk(level):
+        values = pg.locator(f'#step-{level} .opt').evaluate_all(
+            "els=>els.map(e=>e.classList.contains('r')?0:e.classList.contains('y')?1:2)"
+        )
+        assert values == sorted(values), f"Incorrect risk order at stage {level}: {values}"
+    sorted_risk(1)
     pg.select_option("#goal", "book")
     pg.select_option("#format", "file")
     pg.check("#sample")
+    pg.select_option("#scope", "promotion")
     pg.locator('[data-pick="0"][data-id="instagram"]').click()
+    sorted_risk(2)
+    # Destination cards in third column must also be sorted, even for an informational route.
+    pg.locator('[data-pick="1"][data-id="ig-info"]').click()
+    sorted_risk(3)
     pg.locator('[data-pick="1"][data-id="word"]').click()
     assert pg.locator(".ig-codeword-flow").is_visible(), "Risk chain must be visible in column 3"
     assert pg.locator(".ig-flow-node").count() == 4, "Four distinct stages required"
