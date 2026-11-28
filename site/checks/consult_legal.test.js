@@ -32,11 +32,10 @@ assert.equal(node('youtube','consult-yt-tg').risk,'g');
 assert.equal(node('tiktok','consult-tt-tg').risk,'g');
 assert.equal(node('rutube','consult-rt-desc').risk,'y');
 assert(D.consultLegal&&D.consultLegal.status==='working');
-for(const page of ['index.html','risk.html']){
- const h=fs.readFileSync(base+page,'utf8');
- assert(h.indexOf('src="instagram-legal.js"')<h.indexOf('src="consult-legal.js"'),'Порядок загрузки '+page);
- assert(h.indexOf('src="consult-legal.js"')<h.indexOf('src="route-matrix.js"'),'Порядок загрузки '+page);
-}
+const page='index.html',h=fs.readFileSync(base+page,'utf8');
+assert(h.indexOf('src="instagram-legal.js"')<h.indexOf('src="consult-legal.js"'),'Порядок Instagram/консультации');
+assert(h.indexOf('src="consult-legal.js"')<h.indexOf('src="route-matrix.js"'),'Порядок консультации/маршруты');
+assert(fs.readFileSync(base+'risk.html','utf8').includes("window.location.replace('index.html')"));
 vm.runInNewContext(fs.readFileSync(base+'route-matrix.js','utf8'),ctx);
 vm.runInNewContext(fs.readFileSync(base+'desktop-board.js','utf8'),ctx);
 const B=ctx.window.DesktopBoard;

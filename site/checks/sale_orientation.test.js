@@ -4,7 +4,7 @@ for(const f of ['data.js','route-matrix.js','book-ui.js'])vm.runInNewContext(fs.
 const D=c.window.SCHEMA,S={goal:'book',scope:'promotion',format:'file',sample:false,salePlace:'donut',saleChosen:true,path:['telegram','tg-reply']};
 c.S=S;c.render=()=>{};
 const html=fs.readFileSync(root+'index.html','utf8');
-vm.runInNewContext(html.slice(html.indexOf('function changeScope('),html.indexOf('function scrollToStep(')),c);
+vm.runInNewContext(html.slice(html.indexOf('function changeScope('),html.indexOf('function returnToChoice(')),c);
 c.changeScope('sale');assert.equal(S.saleChosen,false,'An old Donat selection must not replace an unspecified destination');
 const ui=c.window.BookUI.create({D,S,esc:String,curForm:()=>D.forms[0],saveBar:()=>''});
 assert(!ui.renderStage().includes('aria-pressed="true"'));

@@ -1,12 +1,17 @@
 const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
 const root=__dirname+'/../',c={window:{}};
-for(const f of ['data.js','instagram-legal.js','route-matrix.js','desktop-board.js'])vm.runInNewContext(fs.readFileSync(root+f,'utf8'),c);
+for(const f of ['data.js','instagram-legal.js','youtube-funnels.js','telegram-funnels.js','p0-legal-review.js','route-matrix.js','desktop-board.js'])vm.runInNewContext(fs.readFileSync(root+f,'utf8'),c);
 const D=c.window.SCHEMA,B=c.window.DesktopBoard;
 const pairs=ps=>ps.flatMap(p=>p.children?p.children.map(n=>p.id+'/'+n.id):[p.id]);
 let total=0;
 for(const [goal,ps] of Object.entries(D.start)){
  const resolved=ps.map(n=>n.place?Object.assign({id:n.id},D.places[n.place]):n);
  const before=JSON.stringify(resolved),normal=B.platforms(resolved,'ordinary'),risk=B.platforms(resolved,'risk');
+ const allModes=B.platforms(resolved,'all',goal);
+ assert.deepEqual(pairs(allModes).slice().sort(),pairs(resolved).slice().sort(),goal+' объединённая схема потеряла карточки');
+ const ordered=xs=>xs.every((n,i)=>i===0||({r:0,y:1,g:2}[xs[i-1].risk]??3)<=({r:0,y:1,g:2}[n.risk]??3));
+ assert(ordered(allModes),goal+' рискованные площадки не сверху');
+ for(const p of allModes)if(p.children)assert(ordered(p.children),goal+'/'+p.id+' рискованные способы не сверху');
  const ns=pairs(normal),rs=pairs(risk),all=pairs(resolved);
  assert(!ns.some(x=>rs.includes(x)),goal+' duplicated method');
  assert.deepEqual([...ns,...rs].sort(),[...all].sort(),goal+' lost a method');
@@ -21,10 +26,17 @@ assert(risk.find(p=>p.id==='instagram').children.some(n=>n.id==='target'));
 assert(!normal.find(p=>p.id==='direct').children.some(n=>n.id==='dir-med'));
 assert(risk.find(p=>p.id==='direct').children.some(n=>n.id==='dir-med'));
 assert.equal(normal.find(p=>p.id==='vk').children.length,11);
-const index=fs.readFileSync(root+'index.html','utf8'),risky=fs.readFileSync(root+'risk.html','utf8');
-assert.equal(risky,index.replace('data-route-mode="ordinary"','data-route-mode="risk"').replace('<title>Схема продвижения — доработка интерфейса</title>','<title>Рискованные и запрещённые варианты — схема продвижения</title>'));
-for(const html of [index,risky]){
- for(const [,code] of html.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/g))new vm.Script(code);
- assert(html.includes('data-open-result'));assert(html.includes('stateKey'));
-}
-console.log('Desktop pages: '+total+' route/root choices partitioned without loss; book platforms ordinary='+normal.length+', risk='+risk.length+'; scripts and page parity checked.');
+const index=fs.readFileSync(root+'index.html','utf8'),alias=fs.readFileSync(root+'risk.html','utf8');
+assert(index.includes('data-route-mode="all"'));
+assert(!index.includes('id="route-mode"'));
+assert(alias.includes("window.location.replace('index.html')"));
+const script=index.split('<script>')[1]?.split('</script>')[0]; if(script)new vm.Script(script);
+assert(index.includes('data-open-result'));assert(index.includes('stateKey'));
+// Порядок распространяется и на третью колонку (место назначения).
+const third=[{id:'ordinary',risk:'g'},{id:'warning',risk:'y'},{id:'blocked',risk:'r'},{id:'blocked-2',risk:'r'}];
+assert.deepEqual(B.riskFirst(third).map(x=>x.id),['blocked','blocked-2','warning','ordinary']);
+assert(third[0].id==='ordinary','Сортировка не должна менять исходные объекты');
+assert(index.includes('window.DesktopBoard.riskFirst(n.dest.map'),'Окончания третьей колонки должны сортироваться по риску');
+const red=B.platforms(D.start.book,'all','book').find(p=>p.id==='instagram').children.filter(n=>n.risk==='r');
+assert(red.length>0,'Красные Instagram-карточки не должны исчезнуть');
+console.log('Unified board: '+total+' route/root choices retained; red/yellow/green ordered in every column.');

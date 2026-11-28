@@ -40,9 +40,9 @@ for(const id of ['author','bio','source','dm','tglink']) {
 }
 const guide=book.children.find(x=>x.id==='ig-info').guide;
 assert(guide&&guide.examples.length===2,'Не хватает примеров');
-load('route-matrix.js');load('book-ui.js');load('card-help.js');load('goal1-copy.js');load('desktop-board.js');
-assert.equal(D.routeMatrix.rows.length,65);
-assert.equal(Object.keys(c.window.Goal1Copy.methods).length,65);
+load('youtube-funnels.js');load('telegram-funnels.js');load('route-matrix.js');load('book-ui.js');load('card-help.js');load('goal1-copy.js');load('desktop-board.js');
+assert.equal(D.routeMatrix.rows.length,86);
+assert.equal(Object.keys(c.window.Goal1Copy.methods).length,86);
 for(const [goal,starts] of Object.entries(D.start)) {
  const p=starts.find(x=>x.id==='instagram');if(!p)continue;
  const normal=c.window.DesktopBoard.platforms(starts,'ordinary').find(x=>x.id==='instagram');
@@ -60,12 +60,11 @@ assert(ui.publicationInfo(bloggers,bloggers.children.find(n=>n.id==='bl-barter')
 assert(ui.publicationInfo(bloggers,bloggers.children.find(n=>n.id==='bl-partner')).blocked,'Партнёрская реклама блогера разрешена');
 const mutual=ui.publicationInfo(bloggers,bloggers.children.find(n=>n.id==='bl-mutual'));
 assert(mutual.needsCheck&&!mutual.blocked,'Взаимное упоминание должно пройти проверку');
-const index=fs.readFileSync(root+'index.html','utf8'),risk=fs.readFileSync(root+'risk.html','utf8');
-for(const html of [index,risk]){
- const first=html.indexOf('src="data.js"'),legal=html.indexOf('src="instagram-legal.js"'),matrix=html.indexOf('src="route-matrix.js"');
- assert(first>=0&&first<legal&&legal<matrix,'Неверный порядок скриптов');
- for(const [,code] of html.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/g))new vm.Script(code);
-}
+const index=fs.readFileSync(root+'index.html','utf8'),legacy=fs.readFileSync(root+'risk.html','utf8');
+const first=index.indexOf('src="data.js"'),legal=index.indexOf('src="instagram-legal.js"'),matrix=index.indexOf('src="route-matrix.js"');
+assert(first>=0&&first<legal&&legal<matrix,'Неверный порядок скриптов');
+const script=index.split('<script>')[1]?.split('</script>')[0]; if(script)new vm.Script(script);
+assert(legacy.includes("window.location.replace('index.html')"),'Наследуемый URL рисков должен вести к единой схеме');
 const marking=fs.readFileSync(root+'markirovka.js','utf8');
 assert(marking.includes('Обычная информация о товарах'),'Нет пояснения об информационных публикациях на странице маркировки');
-console.log('Instagram: '+ordinary+' целей со справочными сообщениями, '+banned+' запрещённых сценариев; обе вкладки и 65 маршрутов первой цели сохранены.');
+console.log('Instagram: '+ordinary+' целей со справочными сообщениями, '+banned+' запрещённых сценариев; обе вкладки и 86 маршрутов первой цели сохранены.');

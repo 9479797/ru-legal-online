@@ -8,6 +8,12 @@ const vm = require('vm');
 const file = path.join(__dirname, '..', 'site', 'data.js');
 const ctx = { window: {} };
 vm.runInNewContext(fs.readFileSync(file, 'utf8'), ctx, { filename: file });
+const ytfile = path.join(__dirname, '..', 'site', 'youtube-funnels.js');
+vm.runInNewContext(fs.readFileSync(ytfile, 'utf8'), ctx, { filename: ytfile });
+const tgfile = path.join(__dirname, '..', 'site', 'telegram-funnels.js');
+vm.runInNewContext(fs.readFileSync(tgfile, 'utf8'), ctx, { filename: tgfile });
+const p0file = path.join(__dirname, '..', 'site', 'p0-legal-review.js');
+vm.runInNewContext(fs.readFileSync(p0file, 'utf8'), ctx, { filename: p0file });
 const D = ctx.window.SCHEMA;
 const err = [];
 const forms = D.forms.map((f) => f.id);
@@ -89,6 +95,97 @@ const M = mctx.window.MARK;
 for (const p of M.platforms) if (!(D.platforms || {})[p.id]) err.push(`маркировка: площадки «${p.id}» нет в platforms`);
 for (const fo of D.forms) if (!M.ordData[fo.id] && !M.ordData[fo.col]) err.push(`маркировка: нет данных для ОРД формы ${fo.id}`);
 walk(M, 'MARK');
+
+// Регрессия: TikTok-варианты, окончания и одноэкранное переключение режимов.
+for (const name of ['instagram-legal.js','consult-legal.js','route-matrix.js','card-help.js','goal1-copy.js','desktop-board.js']) {
+  const filename = path.join(__dirname, '..', 'site', name);
+  vm.runInNewContext(fs.readFileSync(filename, 'utf8'), ctx, { filename });
+}
+const telegram = D.start.book.find(x=>x.id==='telegram');
+const telegramIDs=['tg-own-info','tg-sample','tg-independent','tg-gift','tg-barter','tg-affiliate','tg-mutual'];
+for(const id of telegramIDs){
+  const n=telegram?.children?.find(x=>x.id===id);
+  if(!n){err.push('Telegram: отсутствует '+id);continue;}
+  const method=ctx.window.Goal1Copy.methods[id];
+  if(method?.examples?.length!==2)err.push('Telegram: нет двух примеров '+id);
+  if(!D.routeMatrix.rows.some(x=>x.method===id))err.push('Telegram: отсутствует маршрут '+id);
+  for(const dest of n.dest||[])if(!D.bookPlaces[dest])err.push('Telegram: нет назначения '+id+'/'+dest);
+}
+if(telegram?.children?.find(x=>x.id==='tg-ads')?.dest?.includes('site'))err.push('Официальный Telegram Ads не должен вести напрямую на сайт');
+if(!telegram?.children?.find(x=>x.id==='tg-sample')?.sample)err.push('Telegram: бесплатный фрагмент без флага');
+if(!telegram?.children?.find(x=>x.id==='tg-gift')?.uncommitted)err.push('Telegram: подарок должен завершаться без обязательной публикации');
+if(telegram?.children?.find(x=>x.id==='tg-vpn')?.saferGoto)err.push('Telegram: реклама VPN ошибочно предлагает сменить площадку');
+for (const pl of ['youtube','tiktok'])for(const n of D.start.book.find(x=>x.id===pl)?.children||[])
+  if(/^[YТ][1-5] · /.test(n.name))err.push('Не удалён служебный префикс '+n.id+': '+n.name);
+const tik = D.start.book.find(x => x.id === 'tiktok');
+const needed = ['tt-direct', 'tt-chat', 'tt-sample', 'tt-independent', 'tt-gift-independent', 'tt-barter'];
+for (const id of needed) {
+  const n = tik.children.find(x => x.id === id);
+  if (!n) { err.push('TikTok: нет карточки ' + id); continue; }
+  if (!D.routeMatrix.rows.some(x => x.method === id)) err.push('TikTok: нет маршрута ' + id);
+  if (!ctx.window.Goal1Copy.methods[id]) err.push('TikTok: нет парных примеров ' + id);
+  for (const dest of n.dest || []) if (!D.bookPlaces[dest]) err.push('TikTok ' + id + ': нет назначения ' + dest);
+}
+for (const [mode, id] of [['ordinary','tt-direct'], ['ordinary','tt-gift-independent'],['risk','tt-barter'],['risk','tt-blogger']]) {
+  const p = ctx.window.DesktopBoard.platforms(D.start.book, mode, 'book').find(x => x.id === 'tiktok');
+  if (!p?.children?.some(x => x.id === id)) err.push('TikTok ' + mode + ': не показан ' + id);
+}
+if (!tik.children.find(x=>x.id==='tt-sample')?.sample) err.push('TikTok: бесплатный фрагмент не включается на своём пути');
+
+const youtube = D.start.book.find(x => x.id === 'youtube');
+const youtubeIDs = [
+  'yt-expert','yt-own-info','yt-desc','yt-sample','yt-independent','yt-gift',
+  'yt-barter','yt-blogger','yt-affiliate','yt-sponsor','yt-shorts',
+  'yt-move','book-yt-tg','yt-vpn'
+];
+for (const id of youtubeIDs) {
+  const n = youtube?.children?.find(x => x.id === id);
+  if (!n) { err.push('YouTube: нет карточки ' + id); continue; }
+  if (!D.routeMatrix.rows.some(x => x.method === id)) err.push('YouTube: нет окончания ' + id);
+  const c = ctx.window.Goal1Copy.methods[id];
+  if (!c?.examples || c.examples.length !== 2) err.push('YouTube: нет двух примеров ' + id);
+  for (const dest of n.dest || []) if (!D.bookPlaces[dest]) err.push('YouTube ' + id + ': нет назначения ' + dest);
+}
+for (const [mode,id] of [
+  ['ordinary','yt-expert'],['ordinary','yt-own-info'],['ordinary','yt-sample'],
+  ['ordinary','yt-independent'],['ordinary','yt-gift'],['ordinary','yt-shorts'],
+  ['risk','yt-desc'],['risk','yt-barter'],['risk','yt-blogger'],
+  ['risk','yt-affiliate'],['risk','yt-sponsor'],['risk','yt-vpn']
+]) {
+  const p = ctx.window.DesktopBoard.platforms(D.start.book, mode, 'book').find(x => x.id === 'youtube');
+  if (!p?.children?.some(x => x.id === id)) err.push('YouTube: неверный режим '+mode+' для '+id);
+}
+if (!youtube?.children?.find(x=>x.id==='yt-sample')?.sample) err.push('YouTube: не включается фрагмент');
+if (!youtube?.children?.find(x=>x.id==='yt-gift')?.uncommitted) err.push('YouTube: подарок ошибочно обещает обзор');
+if (youtube?.children?.find(x=>x.id==='yt-vpn')?.saferGoto) err.push('YouTube: реклама VPN не должна вести к простому копированию ролика');
+if (!youtube?.children?.find(x=>x.id==='yt-shorts')?.details.includes('некликабельны')) err.push('YouTube: нет проверки некликабельности Shorts URL');
+if (youtube?.children?.find(x=>x.id==='book-yt-tg')?.risk !== 'g') err.push('YouTube: нейтральная ссылка ошибочно отмечена как реклама');
+
+if (!tik.children.find(x=>x.id==='tt-gift-independent')?.uncommitted) err.push('TikTok: подарок без условий должен завершаться без обещания обзора');
+// Единая схема: все цвета сохраняются, режимы не скрывают карточки.
+const html = fs.readFileSync(path.join(__dirname, '..', 'site', 'index.html'), 'utf8');
+const inline = /<script>\s*([\s\S]*?)<\/script>/.exec(html);
+if (!inline) err.push('index.html: нет кода интерфейса');
+else { try { new vm.Script(inline[1]); } catch (e) { err.push('index.html: ошибка синтаксиса '+e.message); } }
+if (!html.includes('data-route-mode="all"')) err.push('Схема не переведена в единый режим');
+if (!html.includes("map(resolve), 'all', S.goal")) err.push('Неверный набор карточек');
+if (html.includes('id="route-mode"')) err.push('Остался переключатель «Варианты связки»');
+if (html.includes('scrollToStep(')) err.push('Осталась автопрокрутка выбора');
+if (!html.includes('S.path = S.path.slice(0, num - 1)')) err.push('Кнопка этапа не возвращает к выбору');
+for(const module of ['youtube-funnels.js','telegram-funnels.js','desktop-board.js']) {
+  if(!html.includes('<script src="'+module+'"></script>')) err.push('Не подключён модуль '+module);
+}
+const riskAlias = fs.readFileSync(path.join(__dirname,'..','site','risk.html'),'utf8');
+if(!riskAlias.includes("window.location.replace('index.html')"))err.push('Старый risk.html не перенаправляет в общую схему');
+for(const [goal,raw] of Object.entries(D.start)){
+  const nodes=raw.map(n=>n.place?Object.assign({id:n.id},D.places[n.place]):n);
+  const all=ctx.window.DesktopBoard.platforms(nodes,'all',goal);
+  const ids=xs=>xs.flatMap(p=>p.children?p.children.map(n=>p.id+'/'+n.id):[p.id]);
+  if(JSON.stringify(ids(all).sort())!==JSON.stringify(ids(nodes).sort()))err.push('Единая схема потеряла карточки '+goal);
+  const order=xs=>xs.every((n,i)=>i===0||({r:0,y:1,g:2}[xs[i-1].risk]??3)<=({r:0,y:1,g:2}[n.risk]??3));
+  if(!order(all))err.push('Площадки идут не в порядке риска '+goal);
+  for(const p of all)if(p.children&&!order(p.children))err.push('Способы идут не в порядке риска '+goal+'/'+p.id);
+}
 
 const verify = Object.entries(D.fines).filter(([, f]) => f.verify).map(([k]) => k);
 console.log(`Схема: ${uzly} узлов, ${Object.keys(D.places).length} площадок, ${Object.keys(D.fines).length} штрафов, на сверке: ${verify.join(', ') || 'нет'}`);

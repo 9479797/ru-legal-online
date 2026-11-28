@@ -22,7 +22,21 @@
    // не становятся запрещёнными из-за обычных условий размещения.
    return false;
  }
+ // Один список во всех трёх колонках: красный → жёлтый → обычный.
+ // Сортировка стабильная и не меняет исходные объекты/маршруты.
+ const riskOrder={r:0,y:1,g:2};
+ function riskFirst(nodes){
+   return nodes.map((n,i)=>({n,i})).sort((a,b)=>
+     (riskOrder[a.n.risk]??3)-(riskOrder[b.n.risk]??3) || a.i-b.i
+   ).map(x=>x.n);
+ }
+ function allPlatforms(nodes){
+   return riskFirst(nodes.map(p=>p.children
+     ? {...p,children:riskFirst(p.children)}
+     : p));
+ }
  function platforms(nodes,mode,goal){
+   if(mode==='all') return allPlatforms(nodes);
    return nodes.map(p=>{
      if(!p.children) return p;
      const children=p.children.filter(n=>isRisk(p,n,goal)===(mode==='risk'));
@@ -66,5 +80,5 @@
    const outcome=host.querySelector('#step-4');
    if(outcome){outcome.hidden=true;stages[2]?.insertAdjacentHTML('beforeend','<div class="board-result-action"><span>Связка собрана</span><button type="button" class="cta" data-open-result>Посмотреть итог</button></div>');}
  }
- root.DesktopBoard={platforms,isRisk,decorate};
+ root.DesktopBoard={platforms,isRisk,riskFirst,decorate};
 })(window);

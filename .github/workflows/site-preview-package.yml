@@ -1,0 +1,56 @@
+name: Site preview package
+on:
+  push:
+    branches:
+      - 'site/tiktok-funnels-2026-11-28'
+  pull_request:
+    branches:
+      - main
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify website data
+        run: node scripts/proverka_skhemy.js
+      - name: Verify nine historical P0 scenarios
+        run: node site/checks/p0_legal_review.test.js
+      - name: Validate legal audit registry coverage (NOT legal approval)
+        run: node scripts/check_site_audit.js
+      - name: Verify source checksum manifest
+        run: |
+          python3 - <<'PY'
+          import hashlib, json
+          from pathlib import Path
+          root = Path('site')
+          m = json.loads((root / 'sync-manifest.json').read_text())
+          for name, expected in m['files'].items():
+              actual = hashlib.sha256((root / name).read_bytes()).hexdigest()
+              if actual != expected:
+                  raise SystemExit(f'Checksum mismatch: {name}')
+          print(f"Verified {len(m['files'])} source checksums.")
+          PY
+      - name: Package offline website
+        run: |
+          test -f site/index.html
+          test -f site/risk.html
+          test -f site/youtube-funnels.js
+          test -f site/data.js
+          cd site
+          zip -q -r ../reklama-site-v20.7-2026-11-28.zip . -x '*.DS_Store'
+      - name: Upload legal audit work package
+        uses: actions/upload-artifact@v4
+        with:
+          name: route-legal-audit-v1
+          path: reviews/ru-reklama-online/site-route-audit/2026-11-28/
+          if-no-files-found: error
+          retention-days: 30
+      - name: Upload site package
+        uses: actions/upload-artifact@v4
+        with:
+          name: reklama-site-v20.7
+          path: site/
+          if-no-files-found: error
+          retention-days: 30
