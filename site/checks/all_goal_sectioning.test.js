@@ -2,7 +2,7 @@
    Юридические статусы: справочная информация / рекламные ограничения / запрет. */
 const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
 const dir=__dirname+'/../',ctx={window:{}};
-for(const p of ['data.js','instagram-legal.js','route-matrix.js','desktop-board.js'])
+for(const p of ['data.js','instagram-legal.js','consult-legal.js','route-matrix.js','desktop-board.js'])
   vm.runInNewContext(fs.readFileSync(dir+p,'utf8'),ctx,{filename:p});
 const D=ctx.window.SCHEMA,B=ctx.window.DesktopBoard;
 const goals=Object.entries(D.start);
