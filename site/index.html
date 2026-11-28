@@ -153,7 +153,7 @@ dialog::backdrop{background:rgba(20,21,34,.45)}
 </style>
 <link rel="stylesheet" href="frontend.css">
 </head>
-<body data-route-mode="ordinary">
+<body data-route-mode="all">
 <svg class="geo" aria-hidden="true" viewBox="0 0 1440 1400" preserveAspectRatio="xMidYMin slice"><g fill="none" stroke-width="1.2"><polyline points="0,300 420,40 760,520 1200,180 1440,420"/><polyline points="0,840 360,560 820,900 1180,620 1440,880"/><polyline points="0,1300 480,1040 900,1360 1300,1080 1440,1220"/><line x1="420" y1="40" x2="360" y2="560"/><line x1="760" y1="520" x2="820" y2="900"/><line x1="1200" y1="180" x2="1180" y2="620"/><line x1="360" y1="560" x2="480" y2="1040"/><line x1="1180" y1="620" x2="1300" y2="1080"/></g></svg>
 
 <header class="top">
@@ -185,7 +185,6 @@ dialog::backdrop{background:rgba(20,21,34,.45)}
 
 </div>
 <div class="fields">
-<div><label for="route-mode">Варианты связки</label><div class="sw"><select id="route-mode" aria-describedby="route-page-note"><option value="ordinary">Обычные варианты</option><option value="risk">Рискованные и запрещённые</option></select><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4F5BD5" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></div><span id="route-page-note" hidden></span></div>
 <div><div class="label-help"><label for="scope">Что проверяем</label><button type="button" class="help-button" data-help="scope" aria-label="Чем отличаются продвижение и продажа" aria-haspopup="dialog">?</button></div><div class="sw"><select id="scope"><option value="promotion">Продвижение</option><option value="sale">Продажу</option></select></div></div>
 <div><label for="form">Как вы оформлены</label><div class="sw"><select id="form"></select><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4F5BD5" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></div></div>
 <div><label for="goal">Цель</label><div class="sw"><select id="goal"></select><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4F5BD5" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></div></div>
@@ -200,10 +199,10 @@ dialog::backdrop{background:rgba(20,21,34,.45)}
 <template id="scope-help"><p><b>Продвижение</b> — как человек узнаёт о предложении и приходит к нему: публикации, реклама, рекомендации и переходы между площадками.</p><p><b>Продажа</b> — что человек видит в месте продажи: страница товара, карточка или предложение в боте. Здесь проверяем рекламный характер, содержание и необходимые сведения.</p><p>Выдача материалов, доставка и оказание услуг относятся к сопровождению онлайн-бизнеса.</p></template>
 
 <template id="sample-help"><p>Это часть материала, с которой человек может ознакомиться до покупки: например, две страницы памятки или одна таблица из гайда.</p><p>Включите флажок, если предлагаете такой фрагмент в выбранной связке. Если сразу предлагаете полную версию, оставьте его выключенным. В маршрутах, где фрагмент уже выбран как способ знакомства, флажок включается автоматически.</p><p>Получение фрагмента и согласие на рекламную рассылку — отдельные действия.</p></template>
-<template id="navigation-help"><p>Схема помогает проверить, как вы рассказываете о своём продукте, куда ведёте читателя и какие рекламные требования нужно учесть. Она подходит для материалов, курсов, консультаций и других онлайн-проектов.</p><p>Выберите статус, цель и нужный раздел: «Продвижение» или «Продажу». Для текстовых материалов укажите формат и, при необходимости, бесплатный фрагмент.</p><ol><li><b>Площадка.</b> Выберите, где человек впервые видит материал.</li><li><b>Как вы рассказываете о материале.</b> Выберите конкретный способ: например, ответ на входящий вопрос или публикацию со ссылкой.</li><li><b>Чем заканчивается связка.</b> Выберите место, куда приходит читатель. Кнопка «Посмотреть итог» открывает разбор собранного маршрута.</li></ol><p>На ПК три этапа расположены рядом. Чтобы собрать другой маршрут, выберите площадку в первой колонке: следующие шаги обновятся, а настройки сохранятся.</p><p>Выберите «Обычные варианты» или «Рискованные и запрещённые» в меню «Варианты связки». Разделы переключаются в этой же вкладке. Выбор в каждом разделе сохраняется отдельно: при возвращении вы продолжите с прежнего этапа.</p><p>Цветная полоса показывает оценку риска, а фиолетовая рамка с галочкой — выбранную карточку. Кнопка «?» у карточки открывает пояснение с примерами, «Ответственность» — отдельный разбор ответственности.</p><p>Условия конкретной публикации нужно проверить даже для обычных вариантов. Примеры о здоровье требуют отдельной проверки объекта рекламы: книга, услуга, лекарство или БАД. Оформление и выполнение заказа относятся к сопровождению онлайн-бизнеса.</p></template>
+<template id="navigation-help"><p>Схема помогает проверить, как вы рассказываете о своём продукте, куда ведёте читателя и какие рекламные требования нужно учесть. Она подходит для материалов, курсов, консультаций и других онлайн-проектов.</p><p>Выберите статус, цель и нужный раздел: «Продвижение» или «Продажу». Для текстовых материалов укажите формат и, при необходимости, бесплатный фрагмент.</p><ol><li><b>Площадка.</b> Выберите, где человек впервые видит материал.</li><li><b>Как вы рассказываете о материале.</b> Выберите конкретный способ: например, ответ на входящий вопрос или публикацию со ссылкой.</li><li><b>Чем заканчивается связка.</b> Выберите место, куда приходит читатель. Кнопка «Посмотреть итог» открывает разбор собранного маршрута.</li></ol><p>На ПК три этапа расположены рядом. Чтобы собрать другой маршрут, выберите площадку в первой колонке: следующие шаги обновятся, а настройки сохранятся.</p><p></p><p>Цветная полоса показывает оценку риска, а фиолетовая рамка с галочкой — выбранную карточку. Кнопка «?» у карточки открывает пояснение с примерами, «Ответственность» — отдельный разбор ответственности.</p><p>Условия конкретной публикации нужно проверить даже для обычных вариантов. Примеры о здоровье требуют отдельной проверки объекта рекламы: книга, услуга, лекарство или БАД. Оформление и выполнение заказа относятся к сопровождению онлайн-бизнеса.</p></template>
 
 <footer>
-<details class="version-note"><summary>Рабочая версия · 28.11.2026 · v20.5 · Telegram, YouTube и TikTok</summary><p>Сохранён интерфейс сайта v20, включая переключение разделов в той же вкладке и выбранные этапы. Проверено распределение вариантов по десяти целям; собственные сведения в Instagram отделены от запрещённой рекламы. Дополнительно пересмотрена цель консультаций; для текстовых материалов проверены маршруты TikTok без служебной нумерации. Для YouTube отдельно разобраны собственные публикации, бесплатные фрагменты, независимые обзоры, подарки, платные интеграции, партнёрские ссылки, спонсорство и Shorts. Для Telegram уточнены собственные посты, отзывы блогеров, бартер, партнёрские ссылки и технические ограничения Telegram Ads. Переключение обычных и рискованных вариантов работает без перезагрузки; выбор каждого раздела сохраняется, автоматическая прокрутка после выбора выключена. Полный правовой аудит остальных целей продолжается. Цвет карточки не является юридическим заключением.</p><p><a href="TASKS.md">Задачи и нерешённые вопросы</a> · <a href="LEGAL_REVIEW_2026-11-24.md">Результаты дополнительной сверки</a></p></details>
+<details class="version-note"><summary>Рабочая версия · 28.11.2026 · v20.6 · Единая схема</summary><p>Сохранён интерфейс сайта v20; обычные и рискованные действия доступны в единой схеме с выбранными этапами. Проверено распределение вариантов по десяти целям; собственные сведения в Instagram отделены от запрещённой рекламы. Дополнительно пересмотрена цель консультаций; для текстовых материалов проверены маршруты TikTok без служебной нумерации. Для YouTube отдельно разобраны собственные публикации, бесплатные фрагменты, независимые обзоры, подарки, платные интеграции, партнёрские ссылки, спонсорство и Shorts. Для Telegram уточнены собственные посты, отзывы блогеров, бартер, партнёрские ссылки и технические ограничения Telegram Ads. Выбранный маршрут сохраняется, автоматическая прокрутка после выбора выключена. Полный правовой аудит остальных целей продолжается. Цвет карточки не является юридическим заключением.</p><p><a href="TASKS.md">Задачи и нерешённые вопросы</a> · <a href="LEGAL_REVIEW_2026-11-24.md">Результаты дополнительной сверки</a></p></details>
 <div class="foot">
 <div style="flex:1 1 340px;display:flex;flex-direction:column;gap:10px">
 <span class="tag" style="align-self:flex-start">Как пользоваться</span>
@@ -257,13 +256,16 @@ const store = {
 const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const motion = window.FrontendMotion.create({host:$('#steps'), bar:$('.pathbar'), reduce});
 
-let routeMode = document.body.dataset.routeMode;
-let stateKey = 'skhema-state-' + routeMode;
-$('#route-mode').value = routeMode;
-$('#route-page-note').textContent = routeMode === 'risk' ? 'Ограничения площадок и действия с высоким риском' : 'Условия конкретной публикации всё равно нужно проверить';
-let S = Object.assign({ form: 'ip', goal: 'book', path: [], scope: 'promotion', format: 'file', sample: false, salePlace: 'site', publisher:'' }, store.get(stateKey, store.get('skhema-state', {})));
-if (!store.get(stateKey, null)) Object.assign(S, store.get('skhema-settings', {}));
-if (!store.get(stateKey, null)) S.scope = 'promotion';
+// Единая схема. Состояния старых режимов не удаляем из хранилища.
+const stateKey = 'skhema-state-all';
+const oldOrdinary = store.get('skhema-state-ordinary', null);
+const oldRisk = store.get('skhema-state-risk', null);
+const oldState = [oldOrdinary, oldRisk].filter(v => v && typeof v === 'object' && !Array.isArray(v))
+  .sort((a,b) => (b.path?.length || 0) - (a.path?.length || 0))[0] || store.get('skhema-state', {});
+const currentState = store.get(stateKey, null);
+let S = Object.assign({ form: 'ip', goal: 'book', path: [], scope: 'promotion', format: 'file', sample: false, salePlace: 'site', publisher:'' },
+  currentState || oldState || {});
+if (!currentState && !oldState?.goal) Object.assign(S, store.get('skhema-settings', {}));
 if(typeof S.saleChosen !== 'boolean') S.saleChosen=false;
 if (!D.forms.some((f) => f.id === S.form)) S.form = 'ip';
 if (!D.goals.some((g) => g.id === S.goal)) S.goal = 'book';
@@ -292,10 +294,10 @@ const routePlace = (n, k) => {
   return p;
 };
 const resolve = (n) => (n.place ? place(n.place, n.id) : n);
-const level1 = () => window.DesktopBoard?.platforms((D.start[S.goal] || []).map(resolve), document.body.dataset.routeMode, S.goal) || (D.start[S.goal] || []).map(resolve);
+const level1 = () => window.DesktopBoard?.platforms((D.start[S.goal] || []).map(resolve), 'all', S.goal) || (D.start[S.goal] || []).map(resolve);
 const childrenOf = (n) => {
   if (S.goal === 'book' && n.dest && (n.uncommitted || bookUI.publicationIssue(level1().find(a => a.id === S.path[0]), n))) return null;
-  return n.children ? n.children : n.dest ? n.dest.map((k) => routePlace(n, k)) : null;
+  return n.children ? n.children : n.dest ? window.DesktopBoard.riskFirst(n.dest.map((k) => routePlace(n, k))) : null;
 };
 
 function chain() {
@@ -408,41 +410,16 @@ function finalPanel(link, p, from) {
 
 function redPanel(link, siblings) {
   const target = (siblings || []).find(x => x.id === (link.saferGoto || 'author'));
-  const change = target ? '<p class="sub">Кнопка заменит ваш выбор на шаге 2. Затем вы сможете посмотреть условия этого способа.</p><button type="button" class="wbtn" data-goto="' + esc(target.id) + '">Выбрать «' + esc(target.name) + '»</button>' : '<button type="button" class="wbtn" data-set-route-mode="ordinary">Открыть обычные варианты</button>';
+  const change = target ? '<p class="sub">Кнопка заменит выбор способа на шаге 2.</p><button type="button" class="wbtn" data-goto="' + esc(target.id) + '">Выбрать «' + esc(target.name) + '»</button>' : '<button type="button" class="wbtn" data-risk-options>Вернуться к вариантам связки</button>';
   return '<div class="row" style="align-items:stretch">' +
-    '<div class="big" style="background:var(--r)"><h3>' + (link.review ? 'Что нужно проверить' : 'Почему нельзя') + '</h3>' + list(link.why) + '<div class="risk-entry"><button type="button" class="wbtn" data-risk-options>' + (routeMode==='risk'?'Другие рискованные варианты':'Хочу рискнуть') + '</button><p class="sub">Показать рискованные варианты и их последствия.</p></div></div>' +
+    '<div class="big" style="background:var(--r)"><h3>' + (link.review ? 'Что нужно проверить' : 'Почему нельзя') + '</h3>' + list(link.why) + '<div class="risk-entry"><button type="button" class="wbtn" data-risk-options>Другие варианты связки</button></div></div>' +
     '<div class="big" style="background:var(--g)"><h3>Как сделать безопаснее</h3><p>' + esc(link.safer) + '</p>' + change + '</div>' +
     '<div class="big" style="background:var(--brand)"><h3>Ответственность ' + esc(D.formWho[S.form]) + '</h3><p class="sub">Штрафы по КоАП для статуса «' + esc(curForm().name) + '». Сменить статус можно в поле «Как вы оформлены».</p>' + formNote() + fineRows(link.fines) + '</div></div>';
 }
 
-function changeRouteMode(next) {
-  if (!['ordinary','risk'].includes(next) || next === routeMode) return;
-  // Оба режима работают в текущем документе. Состояние каждого сохраняется
-  // отдельно; BookUI держит ссылку на S, поэтому объект не заменяем.
-  motion.cancelScroll();
-  store.set(stateKey, S);
-  const nextKey = 'skhema-state-' + next;
-  const previous = store.get(nextKey, null);
-  const restored = previous && typeof previous === 'object' && !Array.isArray(previous)
-    ? previous
-    : Object.assign({}, S, {path: Array.isArray(S.path) ? S.path.slice(0, 1) : []});
-  for (const key of Object.keys(S)) delete S[key];
-  Object.assign(S, restored);
-  if (!Array.isArray(S.path)) S.path = [];
-  routeMode = next;
-  stateKey = nextKey;
-  document.body.dataset.routeMode = next;
-  $('#route-mode').value = next;
-  if (dlg.open) dlg.close();
-  render();
-  $('#route-status').textContent = next === 'risk'
-    ? 'Открыты рискованные и запрещённые варианты. Прежний выбор обычных вариантов сохранён.'
-    : 'Открыты обычные варианты. Прежний выбор рискованных вариантов сохранён.';
-}
 function openRiskOptions() {
   if (dlg.open) dlg.close();
-  if (routeMode === 'risk') returnToChoice(2);
-  else changeRouteMode('risk');
+  returnToChoice(2);
 }
 
 function syncRouteLayout() {
@@ -453,7 +430,6 @@ function render() {
   const goal = D.goals.find((g) => g.id === S.goal);
   if (S.goal !== 'book') S.scope = 'promotion';
   $('#scope').value = S.scope;
-  $('#route-mode').value = routeMode;
   $('#form').value = S.form;
   $('#goal').value = S.goal;
   [...$('#scope').options].forEach(o => o.disabled = S.goal !== 'book' && o.value !== 'promotion');
@@ -495,7 +471,7 @@ function render() {
         html += step(3, publicationIssue.title, '', bookUI.publicationNotice(a, b) + saveBar());
       } else if (b && b.dest) {
         const destinationHint = S.goal === 'book' ? (b.republish ? 'где публикуете копию' : b.transfer ? 'куда переводите аудиторию' : b.id === 'tg-bot' ? 'где размещено предложение' : 'какой результат нужен: информация, переход или предложение') : goal.destHint || 'где продаёте';
-        html += step(3, 'Куда ведёт «' + b.name + '»', destinationHint, '<div class="row">' + b.dest.map((k) => card(routePlace(b, k), 2, S.path[2])).join('') + '</div>');
+        html += step(3, 'Куда ведёт «' + b.name + '»', destinationHint, '<div class="row">' + childrenOf(b).map((n) => card(n, 2, S.path[2])).join('') + '</div>');
         if (d) html += step(4, 'Итог: ' + (S.goal === 'book' ? bookUI.publicationInfo(a, b)?.name || a.name : a.name) + ' → ' + d.name, '', finalPanel(b, d, a.name) + saveBar());
       } else if (b) {
         html += step(3, b.review ? 'Требуется отдельная проверка' : 'Почему так нельзя', '', (S.goal === 'book' ? bookUI.publicationNotice(a, b) : '') + redPanel(b, a.children) + saveBar());
@@ -507,7 +483,6 @@ function render() {
   $('#steps').innerHTML = html;
   document.body.dataset.routeScope = S.scope;
   window.SettingsLayout.fit();
-  $('#route-page-note').textContent=S.scope==='sale'?'Сейчас: проверка предложения в месте продажи':routeMode==='risk'?'Ограничения площадок и действия с высоким риском':'Условия конкретной публикации всё равно нужно проверить';
   if(S.scope === 'promotion') window.DesktopBoard.decorate($('#steps'),{goal:S.goal,platform:S.path[0]});
   requestAnimationFrame(syncRouteLayout);
   $('#legal').textContent = 'Это разбор, а не юридическое заключение. Маршруты Telegram, YouTube и TikTok уточнены 28.11.2026; другие ветки ранее сверялись 24–25.11.2026. Другие цели и исходные суммы: ' + D.checked + ', их проверка продолжается. Неопределённые условия не являются подтверждённым разрешением или запретом.';
@@ -663,8 +638,6 @@ document.addEventListener('click', (e) => {
   }
   const nav = e.target.closest('[data-step-nav]');
   if (nav) { returnToChoice(+nav.dataset.stepNav); return; }
-  const switchMode = e.target.closest('[data-set-route-mode]');
-  if (switchMode) { changeRouteMode(switchMode.dataset.setRouteMode); return; }
   if (e.target.closest('[data-risk-options]')) { openRiskOptions(); return; }
   const riskPick = e.target.closest('[data-risk-pick]');
   if (riskPick) {
@@ -741,7 +714,6 @@ $('#form').value = S.form; $('#goal').value = S.goal;
 $('#form').addEventListener('change', (e) => { S.form = e.target.value; render(); });
 $('#goal').addEventListener('change', (e) => { S.goal = e.target.value; S.path = []; render(); });
 $('#scope').addEventListener('change', e => changeScope(e.target.value));
-$('#route-mode').addEventListener('change', e => changeRouteMode(e.target.value));
 
 $('#format').addEventListener('change', e => { S.format = e.target.value; render(); });
 $('#sample').addEventListener('change', e => { S.sample = e.target.checked; render(); });
